@@ -63,6 +63,7 @@ Item {
     Rectangle {
         id: gauge
         anchors.fill: parent
+        color:"transparent"
         property double value: value
         Behavior on value {
             NumberAnimation {
@@ -245,7 +246,8 @@ Item {
                 id:foregroundpaint
                 anchors.fill: parent
                 opacity: 1
-                property double value: gauge.value
+                z:3
+                property double value: value
                 onValueChanged: requestPaint()
                 onPaint: {
                     var ctx = getContext("2d");
