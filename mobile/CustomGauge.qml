@@ -20,9 +20,9 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
-import QtQuick.Extras 1.4
-import QtQuick.Controls.Styles 1.4
-import QtGraphicalEffects 1.0
+import QtQuick
+import QtQuick.Controls.Universal 2.12
+//import QtGraphicalEffects 1.0
 import QtQuick.Controls.Material 2.2
 import Vedder.vesc.utility 1.0
 

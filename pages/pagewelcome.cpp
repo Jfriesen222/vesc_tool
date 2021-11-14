@@ -49,18 +49,18 @@ PageWelcome::PageWelcome(QWidget *parent) :
     ui->bgWidget->setPixmap(QPixmap("://res/bg.png"));
 
     connect(ui->wizardFocSimpleButton, &QPushButton::clicked, [this]() {
-        QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "setupMotors");
+        //QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "setupMotors");
     });
 
     connect(ui->wizardAppButton, SIGNAL(clicked(bool)),
             this, SLOT(startSetupWizardApp()));
 
     connect(ui->multiSettingButton, &QPushButton::clicked, [this]() {
-        QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "openMultiSettings");
+        //QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "openMultiSettings");
     });
 
     connect(ui->invertDirButton, &QPushButton::clicked, [this]() {
-        QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "dirSetup");
+        //QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "dirSetup");
     });
 }
 
@@ -79,7 +79,7 @@ void PageWelcome::startSetupWizardFocSimple()
 void PageWelcome::startSetupWizardFocQml()
 {
     if (mVesc) {
-        mQmlUi.startCustomGui(mVesc, "qrc:/res/qml/SetupMotorWindow.qml");
+        //mQmlUi.startCustomGui(mVesc, "qrc:/res/qml/SetupMotorWindow.qml");
     }
 }
 
@@ -108,11 +108,11 @@ void PageWelcome::setVesc(VescInterface *vesc)
 {
     mVesc = vesc;
 
-    ui->qmlWidget->engine()->rootContext()->setContextProperty("VescIf", mVesc);
-    ui->qmlWidget->engine()->rootContext()->setContextProperty("QmlUi", this);
-    ui->qmlWidget->engine()->rootContext()->setContextProperty("Utility", &mUtil);
+    //ui->qmlWidget->engine()->rootContext()->setContextProperty("VescIf", mVesc);
+    //ui->qmlWidget->engine()->rootContext()->setContextProperty("QmlUi", this);
+    //ui->qmlWidget->engine()->rootContext()->setContextProperty("Utility", &mUtil);
 
-    ui->qmlWidget->setSource(QUrl(QLatin1String("qrc:/res/qml/WelcomeQmlPanel.qml")));
+    //ui->qmlWidget->setSource(QUrl(QLatin1String("qrc:/res/qml/WelcomeQmlPanel.qml")));
 }
 
 void PageWelcome::on_autoConnectButton_clicked()
@@ -122,5 +122,5 @@ void PageWelcome::on_autoConnectButton_clicked()
 
 void PageWelcome::on_nrfPairButton_clicked()
 {
-    QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "nrfQuickPair");
+  //  QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "nrfQuickPair");
 }

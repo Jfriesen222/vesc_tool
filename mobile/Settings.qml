@@ -135,7 +135,7 @@ Item {
         }
 
         x: 10
-        y: Math.max((parent.height - height) / 2, 10)
+        y: Math.max((appWindow.height - height) / 2, 10)
         parent: ApplicationWindow.overlay
 
         Text {

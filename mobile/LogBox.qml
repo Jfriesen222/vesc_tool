@@ -158,16 +158,16 @@ Item {
         }
     }
 
-    DirectoryPicker {
-        id: logFilePicker
-        anchors.fill: parent
-        showDotAndDotDot: true
-        visible: false
-        enabled: false
-        parent: dialogParent
+//    DirectoryPicker {
+//        id: logFilePicker
+//        anchors.fill: parent
+//        showDotAndDotDot: true
+//        visible: false
+//        enabled: false
+//        parent: dialogParent
 
-        onDirSelected: {
-            rtLogFileText.text = fileName
-        }
-    }
+//        onDirSelected: {
+//            rtLogFileText.text = fileName
+//        }
+//    }
 }

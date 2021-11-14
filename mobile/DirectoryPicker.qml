@@ -24,7 +24,7 @@ SOFTWARE.
 */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.4 as OldControls
+//import QtQuick.Controls 1.4 as OldControls
 import QtQuick.Controls 2.1
 import Qt.labs.folderlistmodel 2.1
 import QtQuick.Layouts 1.3

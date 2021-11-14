@@ -705,7 +705,7 @@ ApplicationWindow {
             Text {
                 id: vescDialogLabel
                 color: {color = Utility.getAppHexColor("lightText")}
-                linkColor: {linkColor = Utility.getAppHexColor("accent")}
+                linkColor: {linkColor = Utility.getAppHexColor("lightAccent")}
                 verticalAlignment: Text.AlignVCenter
                 anchors.fill: parent
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -717,7 +717,7 @@ ApplicationWindow {
         }
     }
 
-    property var hwUiObj: 0
+    property int hwUiObj: 0
 
     function updateHwUi () {
         if (hwUiObj != 0) {
@@ -749,7 +749,7 @@ ApplicationWindow {
         }
     }
 
-    property var appUiObj: 0
+    property int appUiObj: 0
 
     function updateAppUi () {
         if (appUiObj != 0) {

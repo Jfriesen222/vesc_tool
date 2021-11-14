@@ -46,7 +46,7 @@ Item {
     }
 
     Component.onCompleted: {
-        mBle.startScan()
+        //mBle.startScan()
         scanDotTimer.running = true
     }
 
@@ -432,7 +432,7 @@ Item {
     }
 
     Dialog {
-        property var addr: ""
+        property string addr: ""
 
         id: bleNameDialog
         standardButtons: Dialog.Ok | Dialog.Cancel
@@ -477,7 +477,7 @@ Item {
 
     Dialog {
         id: preferredDialog
-        property var bleAddr: ""
+        property string bleAddr: ""
         standardButtons: Dialog.Yes | Dialog.No
         modal: true
         focus: true

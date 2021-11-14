@@ -451,8 +451,8 @@ void QCodeEditor::proceedCompleterEnd(QKeyEvent *e)
     }
 
     auto isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_Space);
-    auto isDot = charUnderCursor(-1) == ".";
-    auto isSpace = charUnderCursor(-1) == " " || charUnderCursor(-1) == "\t";
+    auto isDot = charUnderCursor(-1) == QString(".");
+    auto isSpace = charUnderCursor(-1) ==  QString(" ") || charUnderCursor(-1) ==  QString("\t");
 
     if (isSpace || (word.isEmpty() && !isDot)) {
         m_completer->popup()->hide();
@@ -739,7 +739,7 @@ void QCodeEditor::keyPressEvent(QKeyEvent* e) {
 
         // Shortcut for moving line to left
         if (m_replaceTab && e->key() == Qt::Key_Backtab) {
-            indentationLevel = std::min(indentationLevel, m_tabReplace.size());
+            indentationLevel = qMin(indentationLevel, m_tabReplace.size());
 
             auto cursor = textCursor();
 

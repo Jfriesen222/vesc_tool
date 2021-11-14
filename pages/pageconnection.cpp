@@ -464,13 +464,13 @@ void PageConnection::on_bleSetNameButton_clicked()
 #endif
 }
 
-void PageConnection::on_canFwdBox_currentIndexChanged(const QString &arg1)
-{
-    (void)arg1;
-    if (mVesc && ui->canFwdBox->count() > 0) {
-        mVesc->commands()->setCanSendId(quint32(ui->canFwdBox->currentData().toInt()));
-    }
-}
+//void PageConnection::on_canFwdBox_currentIndexChanged(const QString &arg1)
+//{
+//    (void)arg1;
+//    if (mVesc && ui->canFwdBox->count() > 0) {
+//        mVesc->commands()->setCanSendId(quint32(ui->canFwdBox->currentData().toInt()));
+//    }
+//}
 
 void PageConnection::on_canRefreshButton_clicked()
 {

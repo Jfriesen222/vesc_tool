@@ -459,6 +459,7 @@ Item {
                         value: 20
                         unitText: VescIf.useImperialUnits() ? "Wh/mi" : "Wh/km"
                         typeText: "Consump."
+                        precision: 1
                         property color blueColor: {blueColor = Utility.getAppHexColor("tertiary2")}
                         property color orangeColor: {orangeColor = Utility.getAppHexColor("orange")}
                         property color redColor: {redColor = Utility.getAppHexColor("red")}
@@ -639,7 +640,7 @@ Item {
 
             var dist = values.tachometer_abs / 1000.0
             var wh_consume = values.watt_hours - values.watt_hours_charged
-            var wh_km_total = wh_consume / dist
+            var wh_km_total = wh_consume / Math.max(dist, 1e-10)
 
             if (Math.abs(speedGauge.maximumValue - speedMaxRound) > 6.0) {
                 speedGauge.maximumValue = speedMaxRound

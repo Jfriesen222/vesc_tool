@@ -111,7 +111,9 @@ Item {
                     }
                     width: canList.width
                     height: 40
-                    color: canList.currentIndex == index ? Utility.getAppHexColor("darkAccent") : Utility.getAppHexColor("normalBackground")
+                    property color selectedColor: {selectedColor =  Utility.getAppHexColor("darkAccent")}
+                    property color unselectedColor: {unselectedColor =  Utility.getAppHexColor("normalBackground")}
+                    color: canList.currentIndex === index ? selectedColor : unselectedColor
                     radius: 10
                     MouseArea{
                         anchors.fill: parent

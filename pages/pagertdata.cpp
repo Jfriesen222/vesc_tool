@@ -635,7 +635,7 @@ void PageRtData::on_experimentLoadXmlButton_clicked()
         // Look for plot tag
         bool plots_found = false;
         while (stream.readNextStartElement()) {
-            if (stream.name() == "plot") {
+            if (stream.name() == QString("plot")) {
                 plots_found = true;
                 break;
             }
@@ -728,7 +728,6 @@ void PageRtData::on_experimentSaveXmlButton_clicked()
     }
 
     QXmlStreamWriter stream(&file);
-    stream.setCodec("UTF-8");
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
 

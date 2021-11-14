@@ -37,7 +37,8 @@ ios: {
 }}
 
 # Build mobile GUI
-CONFIG += build_mobile
+#CONFIG += build_mobile
+QT += openglwidgets
 
 ios: {
     CONFIG    += build_mobile
@@ -71,7 +72,7 @@ DEFINES += HAS_POS
 !android: {
     # Serial port available
     DEFINES += HAS_SERIALPORT
-    DEFINES += HAS_GAMEPAD
+   # DEFINES += HAS_GAMEPAD
 }
 }
 

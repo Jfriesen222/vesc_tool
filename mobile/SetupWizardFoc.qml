@@ -20,7 +20,6 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.10
 import QtQuick.Layouts 1.3
-import QtGraphicalEffects 1.0
 import QtQuick.Controls.Material 2.2
 
 import Vedder.vesc.vescinterface 1.0
@@ -161,11 +160,11 @@ Item {
                                             visible: false
                                         }
 
-                                        OpacityMask {
-                                            anchors.fill: image2
-                                            source: image2
-                                            maskSource: mask2
-                                        }
+                                        //OpacityMask {
+                                        //    anchors.fill: image2
+                                         //   source: image2
+                                         //   maskSource: mask2
+                                        //}
                                     }
 
                                     Text {
@@ -307,11 +306,11 @@ Item {
                                             visible: false
                                         }
 
-                                        OpacityMask {
-                                            anchors.fill: image
-                                            source: image
-                                            maskSource: mask
-                                        }
+                                        //OpacityMask {
+                                        //    anchors.fill: image
+                                        //    source: image
+                                        //    maskSource: mask
+                                        //}
                                     }
 
                                     Text {
@@ -692,7 +691,7 @@ Item {
             color: "#AA000000"
         }
 
-        y: dialog.y + dialog.height / 2 - height / 2
+        //y: dialog.y + dialog.height / 2 - height / 2
 
         Text {
             color: { color = Utility.getAppHexColor("lightText") }
@@ -767,7 +766,7 @@ Item {
         leftMargin: 10
         closePolicy: Popup.CloseOnEscape
         title: "Battery Settings"
-        y: 10 + parent.height / 2 - height / 2
+        y: 10 + appWindow.height / 2 - height / 2
         parent: dialogParent
         width:appWindow.width - (rightMargin + leftMargin)
         Overlay.modal: Rectangle {

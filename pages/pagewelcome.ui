@@ -175,21 +175,11 @@
        </item>
       </layout>
      </widget>
-     <widget class="QQuickWidget" name="qmlWidget">
-      <property name="resizeMode">
-       <enum>QQuickWidget::SizeRootObjectToView</enum>
-      </property>
-     </widget>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QQuickWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QtQuickWidgets/QQuickWidget</header>
-  </customwidget>
   <customwidget>
    <class>ImageWidget</class>
    <extends>QWidget</extends>

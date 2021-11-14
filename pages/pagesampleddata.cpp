@@ -701,7 +701,7 @@ void PageSampledData::on_saveDataButton_clicked()
         }
 
         QTextStream stream(&file);
-        stream.setCodec("UTF-8");
+        //stream.setCodec("UTF-8");
 
         // Generate Time axis
         QVector<double> timeVec;

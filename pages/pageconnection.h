@@ -64,7 +64,7 @@ private slots:
     void on_bleDisconnectButton_clicked();
     void on_bleConnectButton_clicked();
     void on_bleSetNameButton_clicked();
-    void on_canFwdBox_currentIndexChanged(const QString &arg1);
+    //void on_canFwdBox_currentIndexChanged(const QString &arg1);
     void on_canRefreshButton_clicked();
     void on_canDefaultButton_clicked();
     void on_pairConnectedButton_clicked();

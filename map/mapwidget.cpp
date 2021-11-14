@@ -965,22 +965,35 @@ bool MapWidget::event(QEvent *event)
         // Generate scroll events from up and down arrow keys
         QKeyEvent *ke = static_cast<QKeyEvent*>(event);
         if (ke->key() == Qt::Key_Up) {
-            QWheelEvent we(QPointF(0, 0),
-                           QPointF(0, 0),
-                           QPoint(0, 0),
-                           QPoint(0, 120),
-                           0, Qt::Vertical, nullptr,
-                           ke->modifiers());
-            wheelEvent(&we);
+//            QWheelEvent(const QPointF &pos,
+//                        const QPointF &globalPos,
+//                        QPoint pixelDelta,
+//                        QPoint angleDelta,
+//                        Qt::MouseButtons buttons,
+//                        Qt::KeyboardModifiers modifiers,
+//                        Qt::ScrollPhase phase,
+//                        bool inverted,
+//                        Qt::MouseEventSource source = Qt::MouseEventNotSynthesized,
+//                        const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+
+//            QWheelEvent we(QPointF(0, 0),
+//                           QPointF(0, 0),
+//                           QPoint(0, 0),
+//                           QPoint(0, 120),
+//                           nullptr,
+//                           Qt::Vertical,
+//                           nullptr,
+//                           ke->modifiers());
+//            wheelEvent(&we);
             return true;
         } else if (ke->key() == Qt::Key_Down) {
-            QWheelEvent we(QPointF(0, 0),
-                           QPointF(0, 0),
-                           QPoint(0, 0),
-                           QPoint(0, -120),
-                           0, Qt::Vertical, nullptr,
-                           ke->modifiers());
-            wheelEvent(&we);
+//            QWheelEvent we(QPointF(0, 0),
+//                           QPointF(0, 0),
+//                           QPoint(0, 0),
+//                           QPoint(0, -120),
+//                           0, Qt::Vertical, nullptr,
+//                           ke->modifiers());
+//            wheelEvent(&we);
             return true;
         }
     }
@@ -1179,7 +1192,7 @@ void MapWidget::printPdf(QString path, int width, int height)
     printer.setPageLayout(pageLayout);
 
     QPainter painter(&printer);
-    paint(painter, printer.pageRect().width(), printer.pageRect().height(), true);
+    //paint(painter, printer.pageRect().width(), printer.pageRect().height(), true);
 #endif
 }
 
@@ -1689,7 +1702,7 @@ void MapWidget::paint(QPainter &painter, int width, int height, bool highQuality
     const QColor zeroAxisColor = QColor(200,52,52);
     const QColor firstAxisColor = Qt::gray;
     const QColor secondAxisColor = Qt::blue;
-    const QColor textColor = QPalette::Foreground;
+    const QColor textColor = QPalette::BrightText;
 
     // Grid boundries in mm
     const double xStart = -ceil(width / stepGrid / mScaleFactor) * stepGrid - ceil(mXOffset / stepGrid / mScaleFactor) * stepGrid;

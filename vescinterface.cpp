@@ -124,8 +124,8 @@ VescInterface::VescInterface(QObject *parent) : QObject(parent)
 
     connect(mSerialPort, SIGNAL(readyRead()),
             this, SLOT(serialDataAvailable()));
-    connect(mSerialPort, SIGNAL(error(QSerialPort::SerialPortError)),
-            this, SLOT(serialPortError(QSerialPort::SerialPortError)));
+   // connect(mSerialPort, SIGNAL(error(QSerialPort::SerialPortError)),
+   //         this, SLOT(serialPortError(QSerialPort::SerialPortError)));
 #endif
 
     // CANbus
@@ -150,15 +150,15 @@ VescInterface::VescInterface(QObject *parent) : QObject(parent)
     connect(mTcpSocket, SIGNAL(connected()), this, SLOT(tcpInputConnected()));
     connect(mTcpSocket, SIGNAL(disconnected()),
             this, SLOT(tcpInputDisconnected()));
-    connect(mTcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(tcpInputError(QAbstractSocket::SocketError)));
+    //connect(mTcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
+    //        this, SLOT(tcpInputError(QAbstractSocket::SocketError)));
 
     // UDP
     mUdpSocket = new QUdpSocket(this);
     mUdpConnected = false;
     connect(mUdpSocket, SIGNAL(readyRead()), this, SLOT(udpInputDataAvailable()));
-    connect(mUdpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(udpInputError(QAbstractSocket::SocketError)));
+    //connect(mUdpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
+     //       this, SLOT(udpInputError(QAbstractSocket::SocketError)));
 
     // BLE
 #ifdef HAS_BLUETOOTH
@@ -393,8 +393,8 @@ VescInterface::VescInterface(QObject *parent) : QObject(parent)
             os << mLastImuValues.gyroZ << ";";
 
             os << msPos << ";";
-            os << fixed << qSetRealNumberPrecision(8) << lat << ";";
-            os << fixed << qSetRealNumberPrecision(8) << lon << ";";
+            os << Qt::fixed << qSetRealNumberPrecision(8) << lat << ";";
+            os << Qt::fixed << qSetRealNumberPrecision(8) << lon << ";";
             os << alt << ";";
             os << gVel << ";";
             os << vVel << ";";
@@ -662,7 +662,7 @@ void VescInterface::deleteProfile(int index)
 void VescInterface::moveProfileUp(int index)
 {
     if (index > 0 && index < mProfiles.size()) {
-        mProfiles.swap(index, index - 1);
+        mProfiles.swapItemsAt(index, index - 1);
         emit profilesUpdated();
     }
 }
@@ -670,7 +670,7 @@ void VescInterface::moveProfileUp(int index)
 void VescInterface::moveProfileDown(int index)
 {
     if (index >= 0 && index < (mProfiles.size() - 1)) {
-        mProfiles.swap(index, index + 1);
+        mProfiles.swapItemsAt(index, index + 1);
         emit profilesUpdated();
     }
 }

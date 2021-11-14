@@ -68,17 +68,12 @@ void BleUart::startConnect(QString addr)
     mUartServiceFound = false;
     mConnectDone = false;
 
-#if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
     // Create BT Controller from unique device UUID stored as addr. Creating
     // a controller using a devices address is not supported on macOS or iOS.
     QBluetoothDeviceInfo deviceInfo = QBluetoothDeviceInfo();
     deviceInfo.setDeviceUuid(QBluetoothUuid(addr));
-    mControl = new QLowEnergyController(deviceInfo);
+    mControl = QLowEnergyController::createCentral(deviceInfo);
 
-#else
-    mControl = new QLowEnergyController(QBluetoothAddress(addr));
-
-#endif
 
     mControl->setRemoteAddressType(QLowEnergyController::RandomAddress);
 
@@ -267,7 +262,7 @@ void BleUart::serviceStateChanged(QLowEnergyService::ServiceState s)
 {
     // A descriptor can only be written if the service is in the ServiceDiscovered state
     switch (s) {
-    case QLowEnergyService::ServiceDiscovered: {
+    case QLowEnergyService::RemoteServiceDiscovered: {
         //looking for the TX characteristic
         const QLowEnergyCharacteristic txChar = mService->characteristic(
                     QBluetoothUuid(QUuid(mTxUuid)));
@@ -288,7 +283,7 @@ void BleUart::serviceStateChanged(QLowEnergyService::ServiceState s)
         // Bluetooth LE spec Where a characteristic can be notified, a Client Characteristic Configuration descriptor
         // shall be included in that characteristic as required by the Bluetooth Core Specification
         // Tx notify is enabled
-        mNotificationDescTx = txChar.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
+        mNotificationDescTx = txChar.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
 
         if (mNotificationDescTx.isValid()) {
             // enable notification
