@@ -1546,7 +1546,7 @@ void MainWindow::reloadPages()
 
     for(int i = 0; i < ui->pageList->count(); i++) {
         QListWidgetItem *item = ui->pageList->item(i);
-        item->setSizeHint(QSize(item->sizeHint().width(), 2*height));
+        item->setSizeHint(QSize(item->sizeHint().width(), height));
     }
 
     ui->pageList->setMinimumWidth(width);
@@ -1558,7 +1558,7 @@ void MainWindow::reloadPages()
     ui->scanCanButton->setMaximumWidth(width);
 
     ui->pageList->setCurrentRow(0);
-    ui->pageList->setGridSize(QSize(0.85*width , 2*height));
+    ui->pageList->setGridSize(QSize(0.85*width , height));
     ui->pageWidget->setCurrentIndex(0);
 
 }

@@ -72,6 +72,7 @@ CANListItem::CANListItem(FW_RX_PARAMS p,
     layout->addStretch();
     layout->addWidget(mIdLabel);
     layout->addSpacing(4);
+    layout->setContentsMargins(0,0,0,0);
 
     this->setLayout(layout);
 }

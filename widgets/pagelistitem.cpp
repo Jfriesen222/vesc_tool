@@ -46,6 +46,7 @@ PageListItem::PageListItem(QString name,
     layout->addStretch();
     layout->addWidget(mGroupLabel);
     layout->addSpacing(2);
+    layout->setContentsMargins(0,0,0,0);
 
     this->setLayout(layout);
 }
