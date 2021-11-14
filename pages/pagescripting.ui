@@ -144,6 +144,14 @@
         </item>
        </layout>
       </widget>
+      <widget class="QQuickWidget" name="qmlWidget">
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
+       <property name="resizeMode">
+        <enum>QQuickWidget::SizeRootObjectToView</enum>
+       </property>
+     </widget>
      </widget>
      <widget class="QTabWidget" name="tabWidget">
       <property name="tabPosition">
@@ -522,6 +530,11 @@
   </layout>
  </widget>
  <customwidgets>
+ <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
   <customwidget>
    <class>VTextBrowser</class>
    <extends>QTextEdit</extends>

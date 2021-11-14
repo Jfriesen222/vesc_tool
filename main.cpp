@@ -209,6 +209,7 @@ int main(int argc, char *argv[])
     bool useTcp = false;
     bool retryTcp = false;
     int tcpPort = 65102;
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
     for (int i = 0;i < args.size();i++) {
         // Skip the program argument
