@@ -38,8 +38,8 @@ PageScripting::PageScripting(QWidget *parent) :
 {
     ui->setupUi(this);
     mVesc = nullptr;
-    //ui->qmlWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    //ui->qmlWidget->setClearColor(Utility::getAppQColor("normalBackground"));
+    ui->qmlWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    ui->qmlWidget->setClearColor(Utility::getAppQColor("normalBackground"));
 
     makeEditorConnections(ui->mainEdit);
 
@@ -183,9 +183,9 @@ void PageScripting::setVesc(VescInterface *vesc)
 {
     mVesc = vesc;
 
-    //ui->qmlWidget->engine()->rootContext()->setContextProperty("VescIf", mVesc);
-   // ui->qmlWidget->engine()->rootContext()->setContextProperty("QmlUi", this);
-   // ui->qmlWidget->engine()->rootContext()->setContextProperty("Utility", &mUtil);
+    ui->qmlWidget->engine()->rootContext()->setContextProperty("VescIf", mVesc);
+    ui->qmlWidget->engine()->rootContext()->setContextProperty("QmlUi", this);
+    ui->qmlWidget->engine()->rootContext()->setContextProperty("Utility", &mUtil);
 }
 
 void PageScripting::reloadParams()
@@ -212,15 +212,15 @@ void PageScripting::debugMsgRx(QtMsgType type, const QString msg)
 
 void PageScripting::on_runButton_clicked()
 {
-    //ui->qmlWidget->setSource(QUrl(QLatin1String("qrc:/res/qml/DynamicLoader.qml")));
-    //ui->qmlWidget->engine()->clearComponentCache();
+    ui->qmlWidget->setSource(QUrl(QLatin1String("qrc:/res/qml/DynamicLoader.qml")));
+    ui->qmlWidget->engine()->clearComponentCache();
     emit reloadQml(qmlToRun());
 }
 
 void PageScripting::on_stopButton_clicked()
 {
-    //ui->qmlWidget->setSource(QUrl(QLatin1String("")));
-    //mQmlUi.stopCustomGui();
+    ui->qmlWidget->setSource(QUrl(QLatin1String("")));
+    mQmlUi.stopCustomGui();
 }
 
 void PageScripting::on_runWindowButton_clicked()
@@ -228,9 +228,9 @@ void PageScripting::on_runWindowButton_clicked()
     ui->runWindowButton->setEnabled(false);
 
     if (!mQmlUi.isCustomGuiRunning()) {
-        //mQmlUi.startCustomGui(mVesc);
+        mQmlUi.startCustomGui(mVesc);
     } else {
-        //mQmlUi.clearQmlCache();
+        mQmlUi.clearQmlCache();
     }
 
     QTimer::singleShot(10, [this]() {
