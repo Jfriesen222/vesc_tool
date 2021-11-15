@@ -28,6 +28,7 @@ import Vedder.vesc.utility 1.0
 Item {
     property double value: 0
     property double outerRadius: width/2
+    height: width
     property double labelStepSize: labelStep
     property double tickmarkStepSize: labelStep
     property double labelInset: outerRadius * 0.28 + outerRadius*0.06
@@ -79,32 +80,27 @@ Item {
 
     Rectangle {
         id: gauge
-        anchors.fill: parent
-        color:"transparent"
-        property double value: value
+        anchors.centerIn: parent
+        width:outerRadius*2
+        height:width
+        z:0
+        radius:outerRadius
+        color: {color = Utility.isDarkMode() ? Utility.getAppHexColor("darkBackground") : Utility.getAppHexColor("normalBackground")}
+        property double value: parent.value
         Behavior on value {
             NumberAnimation {
                 easing.type: Easing.OutCirc
                 duration: 100
             }
         }
-        Rectangle {
-            id:backgroundpaint
-            property double value: value
-            anchors.fill: parent
-            z:0
-            radius:outerRadius
-            color: {color = Utility.isDarkMode() ? Utility.getAppHexColor("darkBackground") : Utility.getAppHexColor("normalBackground")}
-        }
         Text {
             id: speedLabel
-
             anchors.centerIn: parent
             visible: centerTextVisible
             text: gauge.value.toFixed(precision)
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: outerRadius * 0.3
-            color: { color = Utility.getAppHexColor("lightText") }
+            color: {color = Utility.getAppHexColor("lightText") }
             antialiasing: true
             font.family: "Roboto Mono"
         }
@@ -152,11 +148,13 @@ Item {
             }
             Canvas {
                 id: pointerNib
-                property alias gAngle: needleTransform.angle
-                onGAngleChanged: requestPaint()
+                property double value: gauge.value
+                property double gAngle: needleTransform.angle
+                onValueChanged: requestPaint()
                 anchors.fill:parent
                 onPaint:{
                     var ctx = getContext("2d");
+
                     // the triangle
                     ctx.beginPath();
                     ctx.moveTo(parent.width/2, 0);
@@ -200,35 +198,26 @@ Item {
             anchors.fill: parent
             opacity: 1
             z:3
-            property double value: value
+            property double value: gauge.value
             onValueChanged: requestPaint()
             onPaint: {
                 var ctx = getContext("2d");
+                ctx.reset();
                 //create radial glow around outside of gauge
                 var gradient1 = ctx.createRadialGradient(outerRadius, outerRadius, outerRadius - outerRadius * 0.13, outerRadius, outerRadius, outerRadius- outerRadius * 0.05);
                 gradient1.addColorStop(0, '#00000000');
                 gradient1.addColorStop(1, traceColor);
-                if (gauge.value*isInverted < 0) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = gradient1
-                    ctx.lineWidth = outerRadius * 0.2
-                    ctx.arc(outerRadius,
-                            outerRadius,
-                            outerRadius - outerRadius * 0.1,
-                            (valueToAngle(gauge.value) - 90),
-                            d2r(valueToAngle(0) - 90));
-                    ctx.stroke();
-                } else {
-                    ctx.beginPath();
-                    ctx.strokeStyle = gradient1
-                    ctx.lineWidth = outerRadius * 0.2
-                    ctx.arc(outerRadius,
-                            outerRadius,
-                            outerRadius - outerRadius * 0.1,
-                            d2r(valueToAngle(0) - 90),
-                            d2r(valueToAngle(gauge.value) - 90));
-                    ctx.stroke();
-                }
+                ctx.beginPath();
+                ctx.strokeStyle = gradient1
+                ctx.lineWidth = outerRadius * 0.2
+                ctx.arc(outerRadius,
+                        outerRadius,
+                        outerRadius - outerRadius * 0.1,
+                        d2r(valueToAngle(0.0) - 90),
+                        d2r(valueToAngle(gauge.value) - 90),
+                        gauge.value*isInverted < 0);
+                ctx.stroke();
+
 
                 //create outer gauge metal bezel effect
                 ctx.beginPath();

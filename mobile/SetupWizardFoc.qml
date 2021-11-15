@@ -21,6 +21,7 @@ import QtQuick 2.7
 import QtQuick.Controls 2.10
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.2
+import QtQuick.Window 2.10
 
 import Vedder.vesc.vescinterface 1.0
 import Vedder.vesc.commands 1.0
@@ -686,12 +687,12 @@ Item {
         closePolicy: Popup.CloseOnEscape
         title: "Load Default Parameters"
         parent: dialogParent
-        width: appWindow.width - (rightMargin + leftMargin)
+        width: parent.width - (rightMargin + leftMargin)
         Overlay.modal: Rectangle {
             color: "#AA000000"
         }
 
-        //y: dialog.y + dialog.height / 2 - height / 2
+        y: dialog.y + dialog.height / 2 - height / 2
 
         Text {
             color: { color = Utility.getAppHexColor("lightText") }
@@ -719,9 +720,9 @@ Item {
         leftMargin: 10
         closePolicy: Popup.CloseOnEscape
         title: "Motor Selection"
-        y: 10 + appWindow.height / 2 - height / 2
+        y: 10 + parent.height / 2 - height / 2
         parent: dialogParent
-        width: appWindow.width - (rightMargin + leftMargin)
+        width:  parent.width - (rightMargin + leftMargin)
         Overlay.modal: Rectangle {
             color: "#AA000000"
         }
@@ -766,9 +767,9 @@ Item {
         leftMargin: 10
         closePolicy: Popup.CloseOnEscape
         title: "Battery Settings"
-        y: 10 + appWindow.height / 2 - height / 2
+        y: 10 +  parent.height / 2 - height / 2
         parent: dialogParent
-        width:appWindow.width - (rightMargin + leftMargin)
+        width: parent.width - (rightMargin + leftMargin)
         Overlay.modal: Rectangle {
             color: "#AA000000"
         }
