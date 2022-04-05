@@ -5,46 +5,34 @@
 #-------------------------------------------------
 
 # Version
-VT_VERSION = 4.00
+VT_VERSION = 3.00
 VT_INTRO_VERSION = 1
-VT_CONFIG_VERSION = 2
+VT_IS_TEST_VERSION = 0
 
-# Set to 0 for stable versions and to test version number for development versions.
-VT_IS_TEST_VERSION = 5
-
-VT_ANDROID_VERSION_ARMV7 = 108
-VT_ANDROID_VERSION_ARM64 = 109
-VT_ANDROID_VERSION_X86 = 110
+VT_ANDROID_VERSION_ARMV7 = 95
+VT_ANDROID_VERSION_ARM64 = 96
+VT_ANDROID_VERSION_X86 = 97
 
 VT_ANDROID_VERSION = $$VT_ANDROID_VERSION_X86
 
 # Ubuntu 18.04 (should work on raspbian buster too)
-# sudo apt install qml-module-qt-labs-folderlistmodel qml-module-qtquick-extras qml-module-qtquick-controls2 qt5-default libqt5quickcontrols2-5 qtquickcontrols2-5-dev qtcreator qtcreator-doc libqt5serialport5-dev build-essential qml-module-qt3d qt3d5-dev qtdeclarative5-dev qtconnectivity5-dev qtmultimedia5-dev qtpositioning5-dev qtpositioning5-dev libqt5gamepad5-dev qml-module-qt-labs-settings qml-module-qt-labs-platform libqt5svg5-dev
+# sudo apt install qml-module-qt-labs-folderlistmodel qml-module-qtquick-extras qml-module-qtquick-controls2 qt5-default libqt5quickcontrols2-5 qtquickcontrols2-5-dev qtcreator qtcreator-doc libqt5serialport5-dev build-essential qml-module-qt3d qt3d5-dev qtdeclarative5-dev qtconnectivity5-dev qtmultimedia5-dev qtpositioning5-dev qtpositioning5-dev libqt5gamepad5-dev qml-module-qt-labs-settings
 
 DEFINES += VT_VERSION=$$VT_VERSION
 DEFINES += VT_INTRO_VERSION=$$VT_INTRO_VERSION
-DEFINES += VT_CONFIG_VERSION=$$VT_CONFIG_VERSION
-DEFINES += VT_IS_TEST_VERSION=$$VT_IS_TEST_VERSION
-QT_LOGGING_RULES="qt.qml.connections=false"
-#CONFIG += qtquickcompiler
-
-CONFIG += c++11
-CONFIG += resources_big
-ios: {
-    QMAKE_CXXFLAGS_DEBUG += -Wall
+!vt_test_version: {
+    DEFINES += VT_IS_TEST_VERSION=$$VT_IS_TEST_VERSION
+}
+vt_test_version: {
+    DEFINES += VT_IS_TEST_VERSION=1
 }
 
-!win32-msvc*: { !android: {
-    QMAKE_CXXFLAGS += -Wno-deprecated-copy
-}}
+CONFIG += c++11
+#QMAKE_CXXFLAGS += -Wno-deprecated-copy
+
 
 # Build mobile GUI
 #CONFIG += build_mobile
-
-ios: {
-    CONFIG    += build_mobile
-    DEFINES   += QT_NO_PRINTER
-}
 
 # Debug build (e.g. F5 to reload QML files)
 #DEFINES += DEBUG_BUILD
@@ -57,9 +45,7 @@ ios: {
 # sudo service bluetooth restart
 
 # Bluetooth available
-!win32: {
-    DEFINES += HAS_BLUETOOTH
-}
+DEFINES += HAS_BLUETOOTH
 
 # CAN bus available
 # Adding serialbus to Qt seems to break the serial port on static builds. TODO: Figure out why.
@@ -68,15 +54,11 @@ ios: {
 # Positioning
 DEFINES += HAS_POS
 
-!ios: {
-    QT       += printsupport
 !android: {
     # Serial port available
     DEFINES += HAS_SERIALPORT
     DEFINES += HAS_GAMEPAD
 }
-}
-
 win32: {
     DEFINES += _USE_MATH_DEFINES
 }
@@ -91,12 +73,10 @@ win32: {
 
 QT       += core gui
 QT       += widgets
+QT       += printsupport
 QT       += network
 QT       += quick
 QT       += quickcontrols2
-QT       += quickwidgets
-QT       += svg
-QT       += gui-private
 
 contains(DEFINES, HAS_SERIALPORT) {
     QT       += serialport
@@ -120,16 +100,8 @@ contains(DEFINES, HAS_GAMEPAD) {
 
 android: QT += androidextras
 
-ios | macx: {
-    TARGET = "VESC Tool"
-}else: {
-    android:{
-        TARGET = "vesc_tool"
-    }else:{
-
-        TARGET = vesc_tool_$$VT_VERSION
-    }
-}
+android: TARGET = vesc_tool
+!android: TARGET = vesc_tool_$$VT_VERSION
 
 ANDROID_VERSION = 1
 
@@ -194,9 +166,8 @@ build_mobile {
 }
 
 SOURCES += main.cpp\
-    mainwindow.cpp \
+        mainwindow.cpp \
     packet.cpp \
-    preferences.cpp \
     udpserversimple.cpp \
     vbytearray.cpp \
     commands.cpp \
@@ -209,12 +180,10 @@ SOURCES += main.cpp\
     setupwizardmotor.cpp \
     startupwizard.cpp \
     utility.cpp \
-    tcpserversimple.cpp \
-    hexfile.cpp
+    tcpserversimple.cpp
 
 HEADERS  += mainwindow.h \
     packet.h \
-    preferences.h \
     udpserversimple.h \
     vbytearray.h \
     commands.h \
@@ -228,12 +197,10 @@ HEADERS  += mainwindow.h \
     setupwizardmotor.h \
     startupwizard.h \
     utility.h \
-    tcpserversimple.h \
-    hexfile.h
+    tcpserversimple.h
 
 FORMS    += mainwindow.ui \
-    parametereditor.ui \
-    preferences.ui
+    parametereditor.ui
 
 contains(DEFINES, HAS_BLUETOOTH) {
     SOURCES += bleuart.cpp
@@ -245,36 +212,39 @@ include(widgets/widgets.pri)
 include(mobile/mobile.pri)
 include(map/map.pri)
 include(lzokay/lzokay.pri)
-include(heatshrink/heatshrink.pri)
-include(QCodeEditor/qcodeeditor.pri)
 
 RESOURCES += res.qrc \
     res_fw_bms.qrc \
-    res/firmwares/res_fw.qrc \
-    res_lisp.qrc \
     res_qml.qrc
 RESOURCES += res_config.qrc
 
 build_original {
-    RESOURCES += res_original.qrc
+    RESOURCES += res_original.qrc \
+    res_fw_original.qrc
     DEFINES += VER_ORIGINAL
 } else:build_platinum {
-    RESOURCES += res_platinum.qrc
+    RESOURCES += res_platinum.qrc \
+    res_fw.qrc
     DEFINES += VER_PLATINUM
 } else:build_gold {
-    RESOURCES += res_gold.qrc
+    RESOURCES += res_gold.qrc \
+    res_fw.qrc
     DEFINES += VER_GOLD
 } else:build_silver {
-    RESOURCES += res_silver.qrc
+    RESOURCES += res_silver.qrc \
+    res_fw.qrc
     DEFINES += VER_SILVER
 } else:build_bronze {
-    RESOURCES += res_bronze.qrc
+    RESOURCES += res_bronze.qrc \
+    res_fw.qrc
     DEFINES += VER_BRONZE
 } else:build_free {
-    RESOURCES += res_free.qrc
+    RESOURCES += res_free.qrc \
+    res_fw.qrc
     DEFINES += VER_FREE
 } else {
-    RESOURCES += res_neutral.qrc
+    RESOURCES += res_neutral.qrc \
+    res_fw.qrc
     DEFINES += VER_NEUTRAL
 }
 
@@ -282,7 +252,6 @@ DISTFILES += \
     android/AndroidManifest.xml \
     android/gradle/wrapper/gradle-wrapper.jar \
     android/gradlew \
-    android/gradlew.bat \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
@@ -290,46 +259,3 @@ DISTFILES += \
     android/src/com/vedder/vesc/Utils.java
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-
-macx-clang:contains(QMAKE_HOST.arch, arm.*): {
-   QMAKE_APPLE_DEVICE_ARCHS=arm64
-}
-
-macx {
-    ICON        =  macos/appIcon.icns
-    QMAKE_INFO_PLIST = macos/Info.plist
-    DISTFILES += macos/Info.plist    
-    QMAKE_CFLAGS_RELEASE = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
-    QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO
-    QMAKE_OBJECTIVE_CFLAGS_RELEASE = $$QMAKE_OBJECTIVE_CFLAGS_RELEASE_WITH_DEBUGINFO
-    QMAKE_LFLAGS_RELEASE = $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
-}
-
-ios {
-    QMAKE_INFO_PLIST = ios/Info.plist
-    HEADERS += ios/src/setIosParameters.h
-    SOURCES += ios/src/setIosParameters.mm
-    DISTFILES += ios/Info.plist \
-                 ios/*.storyboard
-    QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
-    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
-
-    ios_artwork.files = $$files($$PWD/ios/iTunesArtwork*.png)
-    QMAKE_BUNDLE_DATA += ios_artwork
-    app_launch_images.files = $$files($$PWD/ios/LaunchImage*.png)
-    QMAKE_BUNDLE_DATA += app_launch_images
-    app_launch_screen.files = $$files($$PWD/ios/MyLaunchScreen.storyboard)
-    QMAKE_BUNDLE_DATA += app_launch_screen
-
-    #QMAKE_IOS_DEPLOYMENT_TARGET = 11.0
-
-    disable_warning.name = GCC_WARN_64_TO_32_BIT_CONVERSION
-    disable_warning.value = NO
-
-    QMAKE_MAC_XCODE_SETTINGS += disable_warning
-
-    # Note for devices: 1=iPhone, 2=iPad, 1,2=Universal.
-    CONFIG -= warn_on
-    QMAKE_APPLE_TARGETED_DEVICE_FAMILY = 1,2
-}
-CONFIG -= warn_on
