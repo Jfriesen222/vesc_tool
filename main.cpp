@@ -24,6 +24,9 @@
 #include "mobile/vesc3ditem.h"
 #include "mobile/logwriter.h"
 #include "mobile/logreader.h"
+#include "mobile/ridelog.h"
+#include "mobile/logplot.h"
+#include "mobile/logmap.h"
 #include "tcpserversimple.h"
 #include "pages/pagemotorcomparison.h"
 #include "codeloader.h"
@@ -258,6 +261,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<Vesc3dItem>("Vedder.vesc.vesc3ditem", 1, 0, "Vesc3dItem");
     qmlRegisterType<LogWriter>("Vedder.vesc.logwriter", 1, 0, "LogWriter");
     qmlRegisterType<LogReader>("Vedder.vesc.logreader", 1, 0, "LogReader");
+    qmlRegisterType<RideLog>("Vedder.vesc.ridelog", 1, 0, "RideLog");
+    qmlRegisterType<LogPlot>("Vedder.vesc.ridelog", 1, 0, "LogPlot");
+    qmlRegisterType<LogMap>("Vedder.vesc.ridelog", 1, 0, "LogMap");
     qmlRegisterType<TcpHub>("Vedder.vesc.tcphub", 1, 0, "TcpHub");
     qmlRegisterType<CodeLoader>("Vedder.vesc.codeloader", 1, 0, "CodeLoader");
     qmlRegisterType<QMiniMp3>("Vedder.vesc.qminimp3", 1, 0, "QMiniMp3");

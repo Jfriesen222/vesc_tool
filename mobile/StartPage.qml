@@ -33,6 +33,7 @@ Item {
     signal requestOpenControls()
     signal requestConnect()
     signal requestOpenMultiSettings()
+    signal requestOpenLogs()
 
     ScrollView {
         anchors.fill: parent
@@ -209,6 +210,16 @@ Item {
                     columns: 2
                     columnSpacing: 5
                     rowSpacing: 5
+
+                    ImageButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 500
+                        Layout.preferredHeight: 80
+                        buttonText: "Ride Logs"
+                        imageSrc: "qrc" + Utility.getThemePath() + "icons/Line Chart-96.png"
+                        onClicked: requestOpenLogs()
+                    }
 
                     ImageButton {
                         Layout.fillWidth: true

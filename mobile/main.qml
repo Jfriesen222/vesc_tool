@@ -314,6 +314,10 @@ ApplicationWindow {
                     onRequestOpenMultiSettings: {
                         multiSettings.openDialog()
                     }
+
+                    onRequestOpenLogs: {
+                        mainSwipeView.setCurrentIndex(logsPage.SwipeView.index)
+                    }
                 }
             }
         }
@@ -493,6 +497,20 @@ ApplicationWindow {
                 }
             }
         }
+
+        Page {
+            id: logsPage
+            property bool opened: false
+            SwipeView.onIsCurrentItemChanged: {
+                if (SwipeView.isCurrentItem) opened = true
+            }
+            Loader {
+                anchors.fill: parent
+                asynchronous: true
+                active: logsPage.opened
+                source: "qrc:/mobile/LogViewer.qml"
+            }
+        }
     }
 
     header: Rectangle {
@@ -529,7 +547,7 @@ ApplicationWindow {
 
                 Repeater {
                     id: rep
-                    model: ["Start", "RT Data", "BMS", "Profiles", "Terminal", "LispBM"]
+                    model: ["Start", "RT Data", "BMS", "Profiles", "Terminal", "LispBM", "Logs"]
 
                     TabButton {
                         text: modelData

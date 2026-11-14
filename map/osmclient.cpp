@@ -274,6 +274,7 @@ void OsmClient::clearCacheMemory()
 
 void OsmClient::fileDownloaded(QNetworkReply *pReply)
 {
+    pReply->deleteLater();
     QString path = pReply->url().toString();
     path = path.left(path.length() - 4);
     int ind = path.lastIndexOf("/");

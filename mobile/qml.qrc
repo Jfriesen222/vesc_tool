@@ -47,6 +47,7 @@
         <file>ConnectScreen.qml</file>
         <file>ImageButton.qml</file>
         <file>LogBox.qml</file>
+        <file>LogViewer.qml</file>
         <file>TcpBox.qml</file>
         <file>MultiSettings.qml</file>
         <file>CanScreen.qml</file>
