@@ -32,6 +32,8 @@ Item {
     property Commands mCommands: VescIf.commands()
     property bool isHorizontal: width > height
     property var dialogParent: Overlay.overlay
+    property alias detectMenu: detectMenu
+    property alias fileMenu: fileMenu
 
     ParamEditors {
         id: editors
@@ -216,8 +218,9 @@ Item {
             }
         }
 
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
+            columns: isHorizontal ? 4 : 2
             Button {
                 Layout.preferredWidth: 100
                 Layout.fillWidth: true
@@ -239,27 +242,15 @@ Item {
             }
 
             Button {
-                id: menuButton
-                Layout.preferredWidth: 50
+                Layout.preferredWidth: 100
                 Layout.fillWidth: true
-                text: "..."
-                onClicked: menu.open()
+                text: "Detect && calibrate ▾"
+                onClicked: detectMenu.open()
 
                 Menu {
-                    id: menu
-                    bottomPadding: notchBot
-                    leftPadding: notchLeft
-                    rightPadding: notchRight
-                    parent: confPageMotorItem
-                    y: parent.height - implicitHeight
-                    width: parent.width
+                    id: detectMenu
+                    y: -height
 
-                    MenuItem {
-                        text: "Read Default Settings"
-                        onTriggered: {
-                            mCommands.getMcconfDefault()
-                        }
-                    }
                     MenuItem {
                         text: "Detect BLDC Parameters..."
                         onTriggered: {
@@ -299,6 +290,25 @@ Item {
                         onTriggered: {
                             directionSetupDialog.open()
                             directionSetup.scanCan()
+                        }
+                    }
+                }
+            }
+
+            Button {
+                Layout.preferredWidth: 100
+                Layout.fillWidth: true
+                text: "File ▾"
+                onClicked: fileMenu.open()
+
+                Menu {
+                    id: fileMenu
+                    y: -height
+
+                    MenuItem {
+                        text: "Read Default Settings"
+                        onTriggered: {
+                            mCommands.getMcconfDefault()
                         }
                     }
                     MenuItem {

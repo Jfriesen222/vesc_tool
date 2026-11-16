@@ -294,6 +294,7 @@ signals:
     void fwUploadStatus(const QString &status, double progress, bool isOngoing);
     void serialPortNotWritable(const QString &port);
     void fwRxChanged(bool rx, bool limited);
+    void fwUpdateAvailable(int major, int minor);
     void portConnectedChanged();
     void autoConnectProgressUpdated(double progress, bool isOngoing);
     void autoConnectFinished();

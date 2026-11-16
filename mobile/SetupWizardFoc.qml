@@ -38,6 +38,7 @@ Item {
     property var canDevs: []
 
     signal dialogClosed()
+    signal wizardFinished()
 
     function openDialog() {
         dialog.open()
@@ -715,6 +716,7 @@ Item {
                         stackLayout.currentIndex = 0
                         dialog.close()
                         dialogClosed()
+                        wizardFinished()
                     }
 
                     updateButtonText()

@@ -33,6 +33,7 @@ Item {
     property Commands mCommands: VescIf.commands()
     property bool isHorizontal: width > height
     property var dialogParent: Overlay.overlay
+    property alias inputMenu: inputMenu
 
     ParamEditors {
         id: editors
@@ -193,8 +194,9 @@ Item {
             }
         }
 
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
+            columns: isHorizontal ? 4 : 2
             Button {
                 Layout.preferredWidth: 100
                 Layout.fillWidth: true
@@ -216,26 +218,15 @@ Item {
             }
 
             Button {
-                Layout.preferredWidth: 50
+                Layout.preferredWidth: 100
                 Layout.fillWidth: true
-                text: "..."
-                onClicked: menu.open()
+                text: "Input tools ▾"
+                onClicked: inputMenu.open()
 
                 Menu {
-                    id: menu
-                    bottomPadding: notchBot
-                    leftPadding: notchLeft
-                    rightPadding: notchRight
-                    parent: appPageItem
-                    y: parent.height - implicitHeight
-                    width: parent.width
+                    id: inputMenu
+                    y: -height
 
-                    MenuItem {
-                        text: "Read Default Settings"
-                        onTriggered: {
-                            mCommands.getAppConfDefault()
-                        }
-                    }
                     MenuItem {
                         text: "PPM Mapping..."
                         onTriggered: {
@@ -252,6 +243,25 @@ Item {
                         text: "Pair NRF..."
                         onTriggered: {
                             nrfPair.open()
+                        }
+                    }
+                }
+            }
+
+            Button {
+                Layout.preferredWidth: 100
+                Layout.fillWidth: true
+                text: "File ▾"
+                onClicked: fileMenu.open()
+
+                Menu {
+                    id: fileMenu
+                    y: -height
+
+                    MenuItem {
+                        text: "Read Default Settings"
+                        onTriggered: {
+                            mCommands.getAppConfDefault()
                         }
                     }
                     MenuItem {

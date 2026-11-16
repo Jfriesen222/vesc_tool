@@ -38,46 +38,64 @@ Item {
         anchors.fill: parent
         columns: isHorizontal ? 2 : 1
 
-        GroupBox {
-            id: statBox
-            title: "Since Start"
+        RowLayout {
+            id: heroRow
+            property string efficiencyUnit
+            property var values: []
             Layout.fillWidth: true
-            Layout.preferredHeight: isHorizontal ? tripBox.height : implicitHeight
+            Layout.columnSpan: isHorizontal ? 2 : 1
 
-            Text {
-                id: statText
-                anchors.fill: parent
-                color: Utility.getAppHexColor("lightText")
-                text: ""
-                font.family: "DejaVu Sans Mono"
-            }
-        }
+            Repeater {
+                model: ["Distance", "Time", heroRow.efficiencyUnit]
 
-        GroupBox {
-            id: tripBox
-            title: "Trip"
-            Layout.fillWidth: true
-
-            ColumnLayout {
-                anchors.fill: parent
-
-                Text {
-                    id: tripText
-                    color: Utility.getAppHexColor("lightText")
-                    text: ""
+                Rectangle {
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    font.family: "DejaVu Sans Mono"
-                }
+                    Layout.preferredWidth: 1
+                    implicitHeight: heroColumn.implicitHeight + 16
+                    radius: 10
+                    color: Utility.getAppHexColor("normalBackground")
+                    border.color: Utility.getAppHexColor("lightBackground")
 
-                Button {
-                    text: "Reset"
-                    Layout.fillWidth: true
-                    onClicked: {
-                        mCommands.resetStats(false)
+                    ColumnLayout {
+                        id: heroColumn
+                        anchors.centerIn: parent
+                        spacing: 0
+
+                        Label {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: heroRow.values[index] || ""
+                            color: Utility.getAppHexColor("white")
+                            font.pointSize: 16
+                            font.bold: true
+                        }
+
+                        Label {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: modelData
+                            color: Utility.getAppHexColor("normalText")
+                            font.pointSize: 10
+                        }
                     }
                 }
             }
+        }
+
+        ReadoutGrid {
+            id: tripGrid
+            title: "This trip"
+            Layout.fillWidth: true
+            Layout.preferredWidth: 1
+            labels: ["Avg speed", "Max speed", "Avg power", "Max power", "Energy", "Charge",
+                    "Motor temp", "FET temp", "Avg current", "Max current"]
+        }
+
+        ReadoutGrid {
+            id: statGrid
+            title: "Since power-up"
+            Layout.fillWidth: true
+            Layout.preferredWidth: 1
+            Layout.alignment: Qt.AlignTop
+            labels: ["Distance", "Abs. distance", "Wh drawn", "Wh charged", "Ah drawn", "Ah charged"]
         }
 
         Item {
@@ -90,37 +108,37 @@ Item {
         target: mCommands
 
         function onValuesSetupReceived(values, mask) {
-            statText.text =
-                    "Ah Drawn   : " + parseFloat(values.amp_hours * 1000).toFixed(1) + " mAh\n" +
-                    "Ah Charged : " + parseFloat(values.amp_hours_charged * 1000).toFixed(1) + " mAh\n" +
-                    "Wh Drawn   : " + parseFloat(values.watt_hours).toFixed(3) + " Wh\n" +
-                    "Wh Charged : " + parseFloat(values.watt_hours_charged).toFixed(3) + " Wh\n" +
-                    "Dist       : " + parseFloat(values.tachometer).toFixed(2) + " m\n" +
-                    "Dist Abs   : " + parseFloat(values.tachometer_abs).toFixed(2) + " m\n"
+            statGrid.values = [
+                    parseFloat(values.tachometer).toFixed(2) + " m",
+                    parseFloat(values.tachometer_abs).toFixed(2) + " m",
+                    parseFloat(values.watt_hours).toFixed(3) + " Wh",
+                    parseFloat(values.watt_hours_charged).toFixed(3) + " Wh",
+                    parseFloat(values.amp_hours * 1000).toFixed(1) + " mAh",
+                    parseFloat(values.amp_hours_charged * 1000).toFixed(1) + " mAh"]
         }
 
         function onStatsRx(val, mask) {
             var useImperial = VescIf.useImperialUnits()
             var impFact = useImperial ? 0.621371192 : 1.0
             var speedUnit = useImperial ? "mph" : "km/h"
-            var efficiencyUnit = useImperial ? "Wh/mi" : "Wh/km"
 
-            tripText.text =
-                    "Time       : " + new Date(val.count_time * 1000).toISOString().substr(11, 8) + "\n" +
-                    "Distance   : " + parseFloat(val.distance()).toFixed(2) + " m\n" +
-                    "Efficiency : " + parseFloat(val.efficiency() / impFact).toFixed(3) + " " + efficiencyUnit + "\n" +
-                    "Energy     : " + parseFloat(val.energy()).toFixed(3) + " Wh\n" +
-                    "Ah         : " + parseFloat(val.ah()).toFixed(3) + " Ah\n" +
-                    "Speed Avg  : " + parseFloat(val.speed_avg * 3.6 * impFact).toFixed(1) + " " + speedUnit + "\n" +
-                    "Speed Max  : " + parseFloat(val.speed_max * 3.6 * impFact).toFixed(1) + " " + speedUnit + "\n" +
-                    "Power Avg  : " + parseFloat(val.power_avg).toFixed(1) + " W\n" +
-                    "Power Max  : " + parseFloat(val.power_max).toFixed(1) + " W\n" +
-                    "T Mot Avg  : " + parseFloat(val.temp_motor_avg).toFixed(1) + " \u00B0C\n" +
-                    "T Mot Max  : " + parseFloat(val.temp_motor_max).toFixed(1) + " \u00B0C\n" +
-                    "T FET Avg  : " + parseFloat(val.temp_mos_avg).toFixed(1) + " \u00B0C\n" +
-                    "T FET Max  : " + parseFloat(val.temp_mos_max).toFixed(1) + " \u00B0C\n" +
-                    "I Avg      : " + parseFloat(val.current_avg).toFixed(1) + " A\n" +
-                    "I Max      : " + parseFloat(val.current_max).toFixed(1) + " A\n"
+            heroRow.efficiencyUnit = useImperial ? "Wh/mi" : "Wh/km"
+            heroRow.values = [
+                    parseFloat(val.distance() / 1000 * impFact).toFixed(1) + (useImperial ? " mi" : " km"),
+                    new Date(val.count_time * 1000).toISOString().substr(11, 8),
+                    parseFloat(val.efficiency() / impFact || 0).toFixed(1)]
+
+            tripGrid.values = [
+                    parseFloat(val.speed_avg * 3.6 * impFact).toFixed(1) + " " + speedUnit,
+                    parseFloat(val.speed_max * 3.6 * impFact).toFixed(1) + " " + speedUnit,
+                    parseFloat(val.power_avg).toFixed(1) + " W",
+                    parseFloat(val.power_max).toFixed(1) + " W",
+                    parseFloat(val.energy()).toFixed(3) + " Wh",
+                    parseFloat(val.ah()).toFixed(3) + " Ah",
+                    parseFloat(val.temp_motor_avg).toFixed(1) + " / " + parseFloat(val.temp_motor_max).toFixed(1) + " \u00B0C",
+                    parseFloat(val.temp_mos_avg).toFixed(1) + " / " + parseFloat(val.temp_mos_max).toFixed(1) + " \u00B0C",
+                    parseFloat(val.current_avg).toFixed(1) + " A",
+                    parseFloat(val.current_max).toFixed(1) + " A"]
         }
     }
 }

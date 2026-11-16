@@ -3889,6 +3889,9 @@ void VescInterface::fwVersionReceived(FW_RX_PARAMS params)
             if (!wasReceived) {
                 if (mFwSupportsConfiguration) {
                     if (params.hwType == HW_TYPE_VESC && mSettings.value("showFwUpdateAvailable", true).toBool()) {
+#ifdef USE_MOBILE
+                        emit fwUpdateAvailable(highest_supported.first, highest_supported.second);
+#else
                         emit messageDialog(tr("Firmware Update Available"),
                                            tr("The connected VESC-based ESC has old, but mostly compatible firmware. This is "
                                               "fine if your setup works properly.<br><br>"
@@ -3899,6 +3902,7 @@ void VescInterface::fwVersionReceived(FW_RX_PARAMS params)
                                               "everything works as expected.<br><br>"
                                               "This message can be disabled from the settings."),
                                            false, false);
+#endif
                     }
                 } else {
                     if (params.hwType == HW_TYPE_VESC) {
@@ -3922,8 +3926,12 @@ void VescInterface::fwVersionReceived(FW_RX_PARAMS params)
         updateFwRx(true);
         if (fw_connected < highest_supported) {
             if (!wasReceived) {
+#ifdef USE_MOBILE
+                emit fwUpdateAvailable(highest_supported.first, highest_supported.second);
+#else
                 emit messageDialog(tr("Warning"), tr("The connected device has compatible, but old "
                                                     "firmware. It is recommended that you update it."), false, false);
+#endif
             }
         }
 

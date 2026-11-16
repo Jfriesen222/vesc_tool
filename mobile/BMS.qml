@@ -26,48 +26,49 @@ import Vedder.vesc.commands 1.0
 import Vedder.vesc.utility 1.0
 
 Item {
-    id: bmsPageItem
     property Commands mCommands: VescIf.commands()
     property var mVal
     property bool mValSet: false
     property bool isHorizontal: width > height
 
+    function openActions(item) {
+        menu.popup(item, 0, item.height)
+    }
+
     GridLayout {
         anchors.fill: parent
         columns: isHorizontal ? 2 : 1
         rows: isHorizontal ? 1 : 2
-        RowLayout {
+        ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.column: isHorizontal ? 1 : 0
             Layout.row: 0
             Layout.preferredWidth: isHorizontal ? parent.width/2 : parent.width
-            Layout.preferredHeight: parent.height*2/3
             spacing: 0
 
-            Rectangle {
-                color: Utility.getAppHexColor("lightestBackground")
-                width: 16
-                Layout.fillHeight: true
-                Layout.alignment: Qt.AlignHCenter |  Qt.AlignVCenter
+            TabBar {
+                id: tabBar
+                Layout.fillWidth: true
 
-                PageIndicator {
-                    id: indicator
-                    count: swipeView.count
-                    currentIndex: swipeView.currentIndex
-                    anchors.centerIn: parent
-                    rotation: 90
+                background: Rectangle {
+                    color: Utility.getAppHexColor("lightBackground")
+                }
+
+                TabButton {
+                    text: "Cells"
+                }
+                TabButton {
+                    text: "Temps"
                 }
             }
 
-            SwipeView {
-                id: swipeView
-                enabled: true
-                clip: true
+            StackLayout {
+                currentIndex: tabBar.currentIndex
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                orientation: Qt.Vertical
+                Layout.margins: 10
 
                 Page {
                     Canvas {
@@ -83,7 +84,7 @@ Item {
                             var heightBars = (height - valMetrics.height * 1.2)
                             var cellWidth = width - xOfsLeft - xOfsRight
 
-                            ctx.font = '%1pt \"%2\"'.arg(valText.font.pointSize).arg(valText.font.family)
+                            ctx.font = '%1pt \"%2\"'.arg(valMetrics.font.pointSize).arg(valMetrics.font.family)
 
                             var lineDivs = 6
                             var lineStep = cellWidth / lineDivs
@@ -189,7 +190,7 @@ Item {
                                 ctx.fillStyle = Utility.getAppHexColor("lightAccent")
                                 ctx.textAlign = "start";
                                 ctx.textBaseline = "middle";
-                                ctx.font = '%1pt \"%2\"'.arg(valText.font.pointSize).arg(valText.font.family)
+                                ctx.font = '%1pt \"%2\"'.arg(valMetrics.font.pointSize).arg(valMetrics.font.family)
 
                                 var cellW = ((temps[i] + 10) / 70) * cellWidth
                                 if (cellW > cellWidth) {
@@ -222,129 +223,85 @@ Item {
                         }
                     }
                 }
-
-                Page {
-
-                }
             }
         }
 
         ColumnLayout {
-            property int textRows: 13
-
             Layout.fillWidth: true
-            Layout.fillHeight: true
             Layout.preferredWidth: isHorizontal ? parent.width/2 : parent.width
             Layout.column:0
             Layout.row: isHorizontal ? 0 : 1
-            Layout.preferredHeight: valMetrics.height * textRows + 20 + menuButton.implicitHeight
-            spacing: 0
+            Layout.alignment: Qt.AlignTop
+            Layout.margins: 10
 
-            Rectangle {
-                id: textRect
-                color: Utility.getAppHexColor("darkBackground")
-
-                Rectangle {
-                    anchors.top: textRect.top
-                    width: parent.width
-                    height: 2
-                    color: Utility.getAppHexColor("lightAccent")
-                }
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: valMetrics.height * parent.textRows + 20
-                Layout.alignment: Qt.AlignBottom
-
-                Text {
-                    id: valText
-                    color: Utility.getAppHexColor("lightText")
-                    text: "No Data"
-                    font.family: "DejaVu Sans Mono"
-                    verticalAlignment: Text.AlignVCenter
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-                    anchors.topMargin: 5
-                }
-
-                TextMetrics {
-                    id: valMetrics
-                    font: valText.font
-                    text: "A"
-                }
+            Label {
+                text: "No Data"
+                color: Utility.getAppHexColor("lightText")
+                visible: !mValSet
             }
 
-            RowLayout {
-                Layout.leftMargin: 10 + notchLeft
-                Layout.rightMargin: 10 + notchRight
+            ReadoutGrid {
+                id: packGrid
+                title: "Pack"
                 Layout.fillWidth: true
-
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 150
-                }
-
-                Button {
-                    id: menuButton
-                    Layout.preferredWidth: 50
-                    Layout.fillWidth: true
-                    text: "..."
-                    onClicked: menu.open()
-
-                    Menu {
-                        id: menu
-                        bottomPadding: notchBot
-                        leftPadding: notchLeft
-                        rightPadding: notchRight
-                        parent: bmsPageItem
-                        y: parent.height - implicitHeight
-                        width: parent.width
-
-                        MenuItem {
-                            text: "Balance On"
-                            onTriggered: {
-                                mCommands.bmsForceBalance(true)
-                            }
-                        }
-                        MenuItem {
-                            text: "Balance Off"
-                            onTriggered: {
-                                mCommands.bmsForceBalance(false)
-                            }
-                        }
-                        MenuItem {
-                            text: "Reset Ah Counter"
-                            onTriggered: {
-                                mCommands.bmsResetCounters(true, false)
-                            }
-                        }
-                        MenuItem {
-                            text: "Reset Wh Counter"
-                            onTriggered: {
-                                mCommands.bmsResetCounters(false, true)
-                            }
-                        }
-                        MenuItem {
-                            text: "Allow Charging"
-                            onTriggered: {
-                                mCommands.bmsSetChargeAllowed(true)
-                            }
-                        }
-                        MenuItem {
-                            text: "Disable Charging"
-                            onTriggered: {
-                                mCommands.bmsSetChargeAllowed(false)
-                            }
-                        }
-                        MenuItem {
-                            text: "Zero Current Offset"
-                            onTriggered: {
-                                mCommands.bmsZeroCurrentOffset()
-                            }
-                        }
-                    }
-                }
+                visible: mValSet
+                labels: ["Voltage", "Current", "Power", "SoC", "Cell min / max", "Diff", "Ah count", "Wh count",
+                        "Ah chg total", "Ah dis total", "Charge voltage", "Pressure", "Humidity", "Status"]
             }
         }
+    }
+
+    Menu {
+        id: menu
+
+        MenuItem {
+            text: "Balance On"
+            onTriggered: {
+                mCommands.bmsForceBalance(true)
+            }
+        }
+        MenuItem {
+            text: "Balance Off"
+            onTriggered: {
+                mCommands.bmsForceBalance(false)
+            }
+        }
+        MenuItem {
+            text: "Reset Ah Counter"
+            onTriggered: {
+                mCommands.bmsResetCounters(true, false)
+            }
+        }
+        MenuItem {
+            text: "Reset Wh Counter"
+            onTriggered: {
+                mCommands.bmsResetCounters(false, true)
+            }
+        }
+        MenuItem {
+            text: "Allow Charging"
+            onTriggered: {
+                mCommands.bmsSetChargeAllowed(true)
+            }
+        }
+        MenuItem {
+            text: "Disable Charging"
+            onTriggered: {
+                mCommands.bmsSetChargeAllowed(false)
+            }
+        }
+        MenuItem {
+            text: "Zero Current Offset"
+            onTriggered: {
+                mCommands.bmsZeroCurrentOffset()
+            }
+        }
+    }
+
+    TextMetrics {
+        id: valMetrics
+        font.family: "DejaVu Sans Mono"
+        text: "A"
     }
 
     Connections {
@@ -357,23 +314,21 @@ Item {
             var cvMin = Math.min(...mVal.v_cells)
             var cvMax = Math.max(...mVal.v_cells)
 
-            valText.text =
-                    "Min-Max-Diff : " + parseFloat(cvMin).toFixed(3) + " - " +
-                                        parseFloat(cvMax).toFixed(3) + " - " +
-                                        parseFloat(cvMax - cvMin).toFixed(3) + " V\n" +
-                    "V Tot        : " + parseFloat(val.v_tot).toFixed(2) + " V\n" +
-                    "V Charge     : " + parseFloat(val.v_charge).toFixed(2) + " V\n" +
-                    "I In         : " + parseFloat(val.i_in_ic).toFixed(2) + " A\n" +
-                    "Ah Cnt       : " + parseFloat(val.ah_cnt).toFixed(3) + " Ah\n" +
-                    "Wh Cnt       : " + parseFloat(val.wh_cnt).toFixed(2) + " Wh\n" +
-                    "Power        : " + parseFloat(val.v_tot * val.i_in_ic).toFixed(2) + " W\n" +
-                    "Hum (temp)   : " + parseFloat(val.humidity).toFixed(1) + " %" +
-                                        " (" + parseFloat(val.temp_hum_sensor).toFixed(1) + " \u00B0C)\n" +
-                    "Pressure     : " + parseFloat(val.pressure).toFixed(0) + " Pa\n" +
-                    "SoC          : " + parseFloat(val.soc * 100).toFixed(1) + " %\n" +
-                    "Ah Chg Tot   : " + parseFloat(val.ah_cnt_chg_total).toFixed(3) + " Ah\n" +
-                    "Ah Dis Tot   : " + parseFloat(val.ah_cnt_dis_total).toFixed(3) + " Ah\n" +
-                    "Status       : " + val.status
+            packGrid.values = [
+                    parseFloat(val.v_tot).toFixed(2) + " V",
+                    parseFloat(val.i_in_ic).toFixed(2) + " A",
+                    parseFloat(val.v_tot * val.i_in_ic).toFixed(2) + " W",
+                    parseFloat(val.soc * 100).toFixed(1) + " %",
+                    parseFloat(cvMin).toFixed(3) + " / " + parseFloat(cvMax).toFixed(3),
+                    parseFloat(cvMax - cvMin).toFixed(3) + " V",
+                    parseFloat(val.ah_cnt).toFixed(3) + " Ah",
+                    parseFloat(val.wh_cnt).toFixed(2) + " Wh",
+                    parseFloat(val.ah_cnt_chg_total).toFixed(3) + " Ah",
+                    parseFloat(val.ah_cnt_dis_total).toFixed(3) + " Ah",
+                    parseFloat(val.v_charge).toFixed(2) + " V",
+                    parseFloat(val.pressure).toFixed(0) + " Pa",
+                    parseFloat(val.humidity).toFixed(1) + " % (" + parseFloat(val.temp_hum_sensor).toFixed(1) + " \u00B0C)",
+                    val.status]
 
             cellCanvas.requestPaint()
             tempCanvas.requestPaint()

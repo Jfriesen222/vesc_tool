@@ -35,6 +35,8 @@ Item {
     property int mCanIdAtStart: 0
     property bool isHorizontal: width > height
 
+    signal wizardFinished()
+
     function openDialog() {
         workaroundTimerOpen.start()
     }
@@ -690,6 +692,7 @@ Item {
     function closeWizard(finished) {
         if (finished) {
             workaroundTimerClose.start()
+            wizardFinished()
         }
         mCommands.setSendCan(mSendCanAtStart, mCanIdAtStart)
         dialog.close()
