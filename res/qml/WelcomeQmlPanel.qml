@@ -511,7 +511,8 @@ Item {
         }
 
         function onQmlLoadDone() {
-            if (VescIf.askQmlLoad()) {
+            // The Virtual ESC page is part of VESC Tool
+            if (VescIf.askQmlLoad() && !VescIf.isVirtualConnected()) {
                 qmlLoadDialog.open()
             } else {
                 updateHwAppUi()

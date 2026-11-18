@@ -163,6 +163,7 @@ public:
     Q_INVOKABLE bool speedGaugeUseNegativeValues();
     Q_INVOKABLE void setSpeedGaugeUseNegativeValues(bool useNegativeValues);
     Q_INVOKABLE bool askQmlLoad() const;
+    Q_INVOKABLE bool isVirtualConnected() const;
     Q_INVOKABLE void setAskQmlLoad(bool newAskQmlLoad);
 
     Q_INVOKABLE void storeBlePreferred(QString address, bool preferred);

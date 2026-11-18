@@ -2215,6 +2215,11 @@ bool VescInterface::askQmlLoad() const
     return mAskQmlLoad;
 }
 
+bool VescInterface::isVirtualConnected() const
+{
+    return mVirtualConnected;
+}
+
 void VescInterface::setAskQmlLoad(bool newAskQmlLoad)
 {
     mAskQmlLoad = newAskQmlLoad;

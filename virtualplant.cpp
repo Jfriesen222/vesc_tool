@@ -22,17 +22,30 @@
 
 #include <cmath>
 
-// Forward rotation goes through the hall states 1, 3, 2, 6, 4, 5. Angles are
-// in the firmware format, where 200 is one electrical revolution.
-const int VirtualPlant::hallTable[8] = {255, 11, 78, 44, 144, 178, 111, 255};
+const QVector<VirtualPlant::Param> VirtualPlant::params = {
+    {"motor_r", "mOhm", 1e-3, 21.3, 1.0, 1000.0, 1, &VirtualPlant::motorR},
+    {"motor_l", "uH", 1e-6, 17.6, 1.0, 5000.0, 1, &VirtualPlant::motorL},
+    {"motor_ld_lq", "uH", 1e-6, 3.1, 0.0, 1000.0, 1, &VirtualPlant::motorLdLqDiff},
+    {"motor_flux", "mWb", 1e-3, 4.11, 0.1, 200.0, 2, &VirtualPlant::motorLambda},
+    {"enc_offset", "deg", 1.0, 123.4, 0.0, 360.0, 1, &VirtualPlant::encOffset},
+    {"hall_offset", "deg", 1.0, 0.0, -180.0, 180.0, 0, &VirtualPlant::hallOffset},
+    {"cells", "S", 1.0, 12.0, 1.0, maxCells, 0, &VirtualPlant::packCells},
+    {"cell_res", "mOhm", 1e-3, 6.0, 0.0, 100.0, 1, &VirtualPlant::cellRes},
+    {"soc", "%", 1e-2, 85.0, 0.0, 100.0, 0, &VirtualPlant::soc},
+    {"soh", "%", 1e-2, 97.0, 0.0, 100.0, 0, &VirtualPlant::soh},
+    {"pack_temp", "degC", 1.0, 24.0, -20.0, 80.0, 0, &VirtualPlant::packTemp},
+    {"mass", "kg", 1.0, 90.0, 10.0, 500.0, 0, &VirtualPlant::mass},
+};
 
 namespace {
-const double MASS = 90.0;
+// Forward rotation goes through the hall states 1, 3, 2, 6, 4, 5. Angles are
+// in the firmware format, where 200 is one electrical revolution.
+const int HALL_TABLE[8] = {255, 11, 78, 44, 144, 178, 111, 255};
+
 const double GRAVITY = 9.81;
 const double ROLL_RES = 0.015;
 const double DRAG_AREA = 0.5; // Cd * A
 const double AIR_DENSITY = 1.2;
-const double CELL_RES = 0.006;
 const double AMBIENT = 22.0;
 const double GNSS_LAT = 57.7089;
 const double GNSS_LON = 11.9746;
@@ -91,8 +104,7 @@ VirtualPlant::VirtualPlant(ConfigParams *mcConf, ConfigParams *appConf) :
     appDisabledS = 0.0;
     fault = FAULT_CODE_NONE;
     faultForced = FAULT_CODE_NONE;
-    cellOverride.fill(NAN, packCells);
-    soc = 0.85;
+    resetParams();
 
     timeS = speed = erpm = iq = vd = vq = duty = iIn = 0.0;
     angleE = accel = slope = heading = throttle = 0.0;
@@ -121,6 +133,24 @@ void VirtualPlant::setControl(Control mode, double value)
     mControlAgeS = 0.0;
 }
 
+void VirtualPlant::resetParams()
+{
+    cellOverride.fill(NAN, maxCells);
+    for (const auto &p: params) {
+        this->*p.value = p.def * p.scale;
+    }
+}
+
+int VirtualPlant::hallAngle(int state) const
+{
+    if (HALL_TABLE[state] > 200) {
+        return HALL_TABLE[state];
+    }
+
+    int angle = HALL_TABLE[state] + int(round(hallOffset / 360.0 * 200.0));
+    return (angle % 200 + 200) % 200;
+}
+
 void VirtualPlant::resetStats()
 {
     statTime = statSpeedSum = statSpeedMax = statPowerSum = statPowerMax = 0.0;
@@ -134,7 +164,7 @@ double VirtualPlant::cellVoltage(int cell) const
     }
 
     // Small spread between the cells, as in a real pack
-    return cellOcv(soc) - iIn * motorCount * CELL_RES + 0.004 * sin(cell * 2.1);
+    return cellOcv(soc) - iIn * motorCount * cellRes + 0.004 * sin(cell * 2.1);
 }
 
 double VirtualPlant::erpmPerSpeed() const
@@ -152,7 +182,7 @@ double VirtualPlant::hallTorqueFactor() const
     for (int i = 1;i < 7;i++) {
         int conf = mMc->getParamInt(QString("foc_hall_table__%1").arg(i));
         if (conf <= 200) {
-            sum += cos(double(conf - hallTable[i]) / 200.0 * 2.0 * M_PI);
+            sum += cos(double(conf - hallAngle(i)) / 200.0 * 2.0 * M_PI);
         }
     }
     return sum / 6.0;
@@ -392,9 +422,9 @@ void VirtualPlant::step(double dt)
     double wheelR = qMax(0.01, mMc->getParamDouble("si_wheel_diameter")) / 2.0;
     double torque = 1.5 * mMc->getParamInt("si_motor_poles") / 2.0 * motorLambda * iq * torqueFactor;
     double force = motorCount * torque * mMc->getParamDouble("si_gear_ratio") / wheelR;
-    double drag = ROLL_RES * MASS * GRAVITY * tanh(speed / 0.1) +
-            0.5 * AIR_DENSITY * DRAG_AREA * speed * fabs(speed) + MASS * GRAVITY * sin(slope);
-    accel = (force - drag) / MASS;
+    double drag = ROLL_RES * mass * GRAVITY * tanh(speed / 0.1) +
+            0.5 * AIR_DENSITY * DRAG_AREA * speed * fabs(speed) + mass * GRAVITY * sin(slope);
+    accel = (force - drag) / mass;
     speed += accel * dt;
     erpm = speed * erpmPerSpeed();
 
@@ -409,7 +439,7 @@ void VirtualPlant::step(double dt)
     double cap = qMax(0.1, mMc->getParamDouble("si_battery_ah"));
     soc = qBound(0.0, soc - iIn * motorCount * dt / 3600.0 / cap, 1.0);
     double v = 0.0;
-    for (int i = 0;i < packCells;i++) {
+    for (int i = 0;i < int(packCells);i++) {
         v += cellVoltage(i);
     }
     vBus = qMax(1.0, v);
