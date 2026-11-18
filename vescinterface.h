@@ -163,7 +163,6 @@ public:
     Q_INVOKABLE bool speedGaugeUseNegativeValues();
     Q_INVOKABLE void setSpeedGaugeUseNegativeValues(bool useNegativeValues);
     Q_INVOKABLE bool askQmlLoad() const;
-    Q_INVOKABLE bool isVirtualConnected() const;
     Q_INVOKABLE void setAskQmlLoad(bool newAskQmlLoad);
 
     Q_INVOKABLE void storeBlePreferred(QString address, bool preferred);
@@ -203,6 +202,7 @@ public:
     Q_INVOKABLE void connectUdp(QString server, int port);
     Q_INVOKABLE void connectBle(QString address);
     Q_INVOKABLE void connectVirtual();
+    Q_INVOKABLE bool isVirtualConnected() const;
     Q_INVOKABLE bool isAutoconnectOngoing() const;
     Q_INVOKABLE double getAutoconnectProgress() const;
     Q_INVOKABLE QVector<int> scanCan();

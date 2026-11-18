@@ -1,5 +1,5 @@
 /*
-    Copyright 2026 Dado Mista
+    Copyright 2026 Jeffrey M. Friesen
 
     This file is part of VESC Tool.
 
@@ -47,7 +47,8 @@ public:
     double packCells, cellRes, soc, soh, packTemp, mass;
     int hallAngle(int state) const;
 
-    // Adjustable with sim set, in the units shown to the user
+    // Adjustable with sim set, in the units shown to the user. resetParams
+    // also restores the rider, the forced fault and the cell overrides.
     struct Param {
         const char *name;
         const char *unit;
@@ -94,6 +95,7 @@ public:
     void resetStats();
 
     double cellVoltage(int cell) const;
+    double iMotor() const { return vq < 0.0 ? -iq : iq; } // As reported by the firmware
 
 private:
     ConfigParams *mMc;
@@ -103,6 +105,7 @@ private:
     double mControlAgeS;
     double mRpmInt;
     double mSweepStartS;
+    double mVBusFilt;
 
     double erpmPerSpeed() const;
     double hallTorqueFactor() const;

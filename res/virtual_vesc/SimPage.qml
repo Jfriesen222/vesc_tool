@@ -1,5 +1,5 @@
 /*
-    Copyright 2026 Dado Mista
+    Copyright 2026 Jeffrey M. Friesen
 
     This file is part of VESC Tool.
 
@@ -23,6 +23,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Vedder.vesc.vescinterface 1.0
 import Vedder.vesc.commands 1.0
 import Vedder.vesc.utility 1.0
 import "qrc:/mobile"
@@ -37,19 +38,30 @@ Item {
 
     function sim(cmd) {
         mCommands.sendTerminalCmd("sim " + cmd)
-        mCommands.sendTerminalCmd("sim get")
     }
 
     function value(name, fallback) {
         return values[name] ? values[name][1] : fallback
     }
 
-    Component.onCompleted: mCommands.sendTerminalCmd("sim get")
+    Component.onCompleted: sim("get")
+    onVisibleChanged: if (visible) sim("get")
+
+    // Values change after every sim command, also from the terminal
+    Timer {
+        id: refreshTimer
+        interval: 100
+        onTriggered: sim("get")
+    }
 
     Connections {
         target: mCommands
 
         function onPrintReceived(str) {
+            if (str.startsWith("-> sim ") && !str.startsWith("-> sim get")) {
+                refreshTimer.restart()
+            }
+
             var t = str.trim().split(/\s+/)
             if ((t.length === 6 && !isNaN(t[1])) ||
                     (t.length === 2 && ["scenario", "throttle", "fault", "can"].includes(t[0]))) {
@@ -157,7 +169,8 @@ Item {
                         Layout.preferredWidth: 190
                         property var names: ["cruise", "hill", "stopgo", "idle"]
                         model: ["Cruise", "Hill", "Stop and go", "Idle"]
-                        currentIndex: names.indexOf(root.value("scenario", "cruise"))
+                        property var line: root.values.scenario
+                        onLineChanged: currentIndex = names.indexOf(line[1])
                         onActivated: root.sim("scenario " + names[currentIndex])
                     }
                 }
@@ -174,14 +187,17 @@ Item {
                         enabled: !autoBox.checked
                         from: -1.0
                         to: 1.0
-                        value: Number(root.value("throttle", 0)) || 0 // 0 when auto
+                        property var line: root.values.throttle
+                        onLineChanged: value = Number(line[1]) || 0 // 0 when auto
                         onMoved: mCommands.sendTerminalCmd("sim throttle " + value.toFixed(2))
                     }
 
                     Switch {
                         id: autoBox
                         text: "Rider"
-                        checked: root.value("throttle", "auto") === "auto"
+                        checked: true
+                        property var line: root.values.throttle
+                        onLineChanged: checked = line[1] === "auto"
                         onToggled: root.sim("throttle " + (checked ? "auto" : throttleSlider.value.toFixed(2)))
                     }
                 }
@@ -203,7 +219,8 @@ Item {
                         // In the order of mc_fault_code
                         model: ["None", "Over voltage", "Under voltage", "DRV", "ABS over current",
                             "FET over temp", "Motor over temp"]
-                        currentIndex: Number(root.value("fault", 0)) < count ? Number(root.value("fault", 0)) : -1
+                        property var line: root.values.fault
+                        onLineChanged: currentIndex = Number(line[1]) < count ? Number(line[1]) : -1
                         displayText: currentIndex < 0 ? "Code " + root.value("fault", 0) : currentText
                         onActivated: root.sim("fault " + currentIndex)
                     }
@@ -211,7 +228,10 @@ Item {
 
                 Switch {
                     text: "CAN devices"
-                    checked: root.value("can", "on") === "on"
+                    visible: !mCommands.getSendCan() // Off would disconnect this page
+                    checked: true
+                    property var line: root.values.can
+                    onLineChanged: checked = line[1] === "on"
                     onToggled: root.sim("can " + (checked ? "on" : "off"))
                 }
             }

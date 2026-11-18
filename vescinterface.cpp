@@ -2215,11 +2215,6 @@ bool VescInterface::askQmlLoad() const
     return mAskQmlLoad;
 }
 
-bool VescInterface::isVirtualConnected() const
-{
-    return mVirtualConnected;
-}
-
 void VescInterface::setAskQmlLoad(bool newAskQmlLoad)
 {
     mAskQmlLoad = newAskQmlLoad;
@@ -2840,6 +2835,11 @@ void VescInterface::connectVirtual()
     mVirtualConnected = true;
     setLastConnectionType(CONN_VIRTUAL);
     updateFwRx(false);
+}
+
+bool VescInterface::isVirtualConnected() const
+{
+    return mVirtualConnected;
 }
 
 void VescInterface::connectBle(QString address)

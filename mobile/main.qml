@@ -1567,7 +1567,7 @@ ApplicationWindow {
         }
 
         function onQmlLoadDone() {
-            // The Virtual ESC page is part of VESC Tool
+            // The QML on the Virtual ESC is from VESC Tool or uploaded by the user
             if (VescIf.askQmlLoad() && !VescIf.isVirtualConnected()) {
                 qmlLoadDialog.open()
             } else {

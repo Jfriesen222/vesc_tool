@@ -1,5 +1,5 @@
 /*
-    Copyright 2026 Dado Mista
+    Copyright 2026 Jeffrey M. Friesen
 
     This file is part of VESC Tool.
 
@@ -98,12 +98,9 @@ double cellOcv(double soc)
 VirtualPlant::VirtualPlant(ConfigParams *mcConf, ConfigParams *appConf) :
     mMc(mcConf), mApp(appConf)
 {
-    scenario = CRUISE;
-    throttleOverride = NAN;
     inputPolledS = -100.0;
     appDisabledS = 0.0;
     fault = FAULT_CODE_NONE;
-    faultForced = FAULT_CODE_NONE;
     resetParams();
 
     timeS = speed = erpm = iq = vd = vq = duty = iIn = 0.0;
@@ -115,6 +112,7 @@ VirtualPlant::VirtualPlant(ConfigParams *mcConf, ConfigParams *appConf) :
     lat = GNSS_LAT;
     lon = GNSS_LON;
     vBus = packCells * cellOcv(soc);
+    mVBusFilt = vBus;
     resetStats();
 
     mControl = CTRL_NONE;
@@ -135,6 +133,9 @@ void VirtualPlant::setControl(Control mode, double value)
 
 void VirtualPlant::resetParams()
 {
+    scenario = CRUISE;
+    throttleOverride = NAN;
+    faultForced = FAULT_CODE_NONE;
     cellOverride.fill(NAN, maxCells);
     for (const auto &p: params) {
         this->*p.value = p.def * p.scale;
@@ -338,7 +339,7 @@ double VirtualPlant::requestedIq()
     }
 
     double backEmf = erpm / 60.0 * 2.0 * M_PI * motorLambda;
-    double vMax = vBus / sqrt(3.0);
+    double vMax = mVBusFilt / sqrt(3.0);
 
     switch (mode) {
     case CTRL_CURRENT: return value;
@@ -364,19 +365,22 @@ void VirtualPlant::step(double dt)
 
     double omegaE = erpm / 60.0 * 2.0 * M_PI;
     double backEmf = omegaE * motorLambda;
-    double vMax = vBus * mMc->getParamDouble("l_max_duty") / sqrt(3.0);
+    double vMax = mVBusFilt * mMc->getParamDouble("l_max_duty") / sqrt(3.0);
 
-    // Limits as in mc_interface: temperature, battery cutoff and ERPM
+    // Limits as in mc_interface: temperature, battery cutoff and ERPM. The bus
+    // voltage is filtered, so that the sag does not make the limits oscillate.
     double tempScale = 1.0 - qMax(fade(tempFet, mMc->getParamDouble("l_temp_fet_start"),
                                        mMc->getParamDouble("l_temp_fet_end")),
                                   fade(tempMotor, mMc->getParamDouble("l_temp_motor_start"),
                                        mMc->getParamDouble("l_temp_motor_end")));
-    double battScale = fade(vBus, mMc->getParamDouble("l_battery_cut_end"),
+    double battScale = fade(mVBusFilt, mMc->getParamDouble("l_battery_cut_end"),
                             mMc->getParamDouble("l_battery_cut_start"));
     double iMax = mMc->getParamDouble("l_current_max") * tempScale * battScale;
     double iMin = mMc->getParamDouble("l_current_min") * tempScale;
 
-    double iqNew = qBound(iMin, requestedIq(), iMax);
+    // The limits apply to motoring and braking, also in reverse
+    double iqReq = requestedIq();
+    double iqNew = backEmf >= 0.0 ? qBound(iMin, iqReq, iMax) : qBound(-iMax, iqReq, -iMin);
     if ((erpm > mMc->getParamDouble("l_max_erpm") && iqNew > 0.0) ||
             (erpm < mMc->getParamDouble("l_min_erpm") && iqNew < 0.0)) {
         iqNew = 0.0;
@@ -428,7 +432,7 @@ void VirtualPlant::step(double dt)
     speed += accel * dt;
     erpm = speed * erpmPerSpeed();
 
-    angleE = fmod(angleE + erpm / 60.0 * 2.0 * M_PI * dt, 2.0 * M_PI);
+    angleE = fmod(angleE + erpm / 60.0 * 2.0 * M_PI * dt + 2.0 * M_PI, 2.0 * M_PI);
     tacho += erpm / 60.0 * 6.0 * dt;
     tachoAbs += fabs(erpm) / 60.0 * 6.0 * dt;
     dist += speed * dt;
@@ -443,6 +447,7 @@ void VirtualPlant::step(double dt)
         v += cellVoltage(i);
     }
     vBus = qMax(1.0, v);
+    mVBusFilt += (vBus - mVBusFilt) * qMin(1.0, dt / 0.1);
 
     if (iIn >= 0.0) {
         ah += iIn * dt / 3600.0;
@@ -461,18 +466,18 @@ void VirtualPlant::step(double dt)
     lat = GNSS_LAT + gnssRadius * (1.0 - cos(heading)) / 111320.0;
     lon = GNSS_LON + gnssRadius * sin(heading) / (111320.0 * cos(GNSS_LAT * M_PI / 180.0));
 
-    if (fabs(speed) > 0.3) {
-        double power = fabs(iIn * vBus * motorCount);
-        statTime += dt;
-        statSpeedSum += fabs(speed) * dt;
-        statPowerSum += power * dt;
-        statCurrSum += fabs(iq) * dt;
-        statFetSum += tempFet * dt;
-        statMotorSum += tempMotor * dt;
-        statSpeedMax = qMax(statSpeedMax, fabs(speed));
-        statPowerMax = qMax(statPowerMax, power);
-        statCurrMax = qMax(statCurrMax, fabs(iq));
-        statFetMax = qMax(statFetMax, tempFet);
-        statMotorMax = qMax(statMotorMax, tempMotor);
-    }
+    // Statistics like update_stats in the firmware, for the whole vehicle
+    double power = fabs(iIn * vBus * motorCount);
+    double current = fabs(iq) * motorCount;
+    statTime += dt;
+    statSpeedSum += fabs(speed) * dt;
+    statPowerSum += power * dt;
+    statCurrSum += current * dt;
+    statFetSum += tempFet * dt;
+    statMotorSum += tempMotor * dt;
+    statSpeedMax = qMax(statSpeedMax, fabs(speed));
+    statPowerMax = qMax(statPowerMax, power);
+    statCurrMax = qMax(statCurrMax, current);
+    statFetMax = qMax(statFetMax, tempFet);
+    statMotorMax = qMax(statMotorMax, tempMotor);
 }
