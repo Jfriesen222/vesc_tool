@@ -91,7 +91,7 @@ VirtualPlant::VirtualPlant(ConfigParams *mcConf, ConfigParams *appConf) :
     appDisabledS = 0.0;
     fault = FAULT_CODE_NONE;
     faultForced = FAULT_CODE_NONE;
-    cellOverride.fill(NAN, 32);
+    cellOverride.fill(NAN, packCells);
     soc = 0.85;
 
     timeS = speed = erpm = iq = vd = vq = duty = iIn = 0.0;
@@ -102,7 +102,7 @@ VirtualPlant::VirtualPlant(ConfigParams *mcConf, ConfigParams *appConf) :
     tempMotor = AMBIENT + 1.0;
     lat = GNSS_LAT;
     lon = GNSS_LON;
-    vBus = cells() * cellOcv(soc);
+    vBus = packCells * cellOcv(soc);
     resetStats();
 
     mControl = CTRL_NONE;
@@ -124,11 +124,6 @@ void VirtualPlant::resetStats()
 {
     statTime = statSpeedSum = statSpeedMax = statPowerSum = statPowerMax = 0.0;
     statCurrSum = statCurrMax = statFetSum = statFetMax = statMotorSum = statMotorMax = 0.0;
-}
-
-int VirtualPlant::cells() const
-{
-    return qBound(1, mMc->getParamInt("si_battery_cells"), int(cellOverride.size()));
 }
 
 double VirtualPlant::cellVoltage(int cell) const
@@ -410,7 +405,7 @@ void VirtualPlant::step(double dt)
     double cap = qMax(0.1, mMc->getParamDouble("si_battery_ah"));
     soc = qBound(0.0, soc - iIn * motorCount * dt / 3600.0 / cap, 1.0);
     double v = 0.0;
-    for (int i = 0;i < cells();i++) {
+    for (int i = 0;i < packCells;i++) {
         v += cellVoltage(i);
     }
     vBus = qMax(1.0, v);
