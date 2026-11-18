@@ -89,6 +89,7 @@ private:
     double mControlValue;
     double mControlAgeS;
     double mRpmInt;
+    double mSweepStartS;
 
     double erpmPerSpeed() const;
     double hallTorqueFactor() const;

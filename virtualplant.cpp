@@ -109,6 +109,7 @@ VirtualPlant::VirtualPlant(ConfigParams *mcConf, ConfigParams *appConf) :
     mControlValue = 0.0;
     mControlAgeS = 10.0;
     mRpmInt = 0.0;
+    mSweepStartS = 0.0;
 
     updateInputs();
 }
@@ -175,9 +176,12 @@ void VirtualPlant::updateRider(double dt)
     double cmd = scenario == IDLE ? 0.0 : qBound(-1.0, 0.35 * (target - speed), 1.0);
 
     // Something shows the input mapping: sweep 0, 1, 0, -1, 0 over 8 seconds
+    // and rest in the center for 8 seconds, so the wizards can finish
     if ((timeS - inputPolledS) < 1.5) {
-        double p = fmod(timeS, 8.0) / 2.0;
-        cmd = p < 1.0 ? p : (p < 3.0 ? 2.0 - p : p - 4.0);
+        double p = fmod(timeS - mSweepStartS, 16.0) / 2.0;
+        cmd = p < 1.0 ? p : (p < 3.0 ? 2.0 - p : (p < 4.0 ? p - 4.0 : 0.0));
+    } else {
+        mSweepStartS = timeS;
     }
 
     if (std::isfinite(throttleOverride)) {
