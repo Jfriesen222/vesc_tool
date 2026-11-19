@@ -44,6 +44,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <locale.h>
+#ifdef __APPLE__
+#include <xlocale.h>
+#endif
 
 #define VL_CAT2(a, b) a##_##b
 #define VL_CAT(a, b) VL_CAT2(a, b)
@@ -641,6 +645,19 @@ static bool vl_init(const vl_host_t *f, void *h) {
 }
 
 static void vl_run(void) {
+    // The reader and printer use strtod and printf, which follow the locale of
+    // the app. Numbers in the code would be read as 0 where the decimal
+    // separator is a comma.
+#ifdef _WIN32
+    _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
+    setlocale(LC_NUMERIC, "C");
+#else
+    static locale_t c_locale;
+    if (!c_locale) {
+        c_locale = newlocale(LC_NUMERIC_MASK, "C", (locale_t)0);
+    }
+    uselocale(c_locale);
+#endif
     lbm_run_eval();
 }
 
