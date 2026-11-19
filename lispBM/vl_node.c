@@ -391,6 +391,27 @@ static lbm_value vl_set(const char *what, int id, lbm_value val) {
 SET_LIST
 #undef X
 
+// (sysinfo 'odometer) and (sysinfo 'fw-ver), the others are nil
+static lbm_value vx_sysinfo(lbm_value *args, lbm_uint argn) {
+    if (argn != 1 || !lbm_is_symbol(args[0])) {
+        return ENC_SYM_TERROR;
+    }
+    const char *name = lbm_get_name_by_symbol(lbm_dec_sym(args[0]));
+    if (strcmp(name, "odometer") == 0) {
+        return lbm_enc_u32((uint32_t)fns->get(host, "odometer", 0));
+    } else if (strcmp(name, "fw-ver") == 0) {
+        return lbm_cons(lbm_enc_i((lbm_int)fns->get(host, "fw-major", 0)),
+                        lbm_cons(lbm_enc_i((lbm_int)fns->get(host, "fw-minor", 0)), lbm_cons(lbm_enc_i(0), ENC_SYM_NIL)));
+    }
+    return ENC_SYM_NIL;
+}
+
+// The fault code, the stub returns its name
+static lbm_value vx_get_fault(lbm_value *args, lbm_uint argn) {
+    (void)args; (void)argn;
+    return lbm_enc_i((lbm_int)fns->get(host, "fault", 0));
+}
+
 static lbm_value vx_timeout_reset(lbm_value *args, lbm_uint argn) {
     (void)args; (void)argn;
     fns->set(host, "alive", -1, 0.0);
@@ -590,6 +611,8 @@ static bool vl_init(const vl_host_t *f, void *h) {
     lbm_add_extension("can-list-devs", vx_can_list_devs);
     lbm_add_extension("can-msg-age", vx_can_msg_age);
     lbm_add_extension("get-bms-val", vx_get_bms_val);
+    lbm_add_extension("get-fault", vx_get_fault);
+    lbm_add_extension("sysinfo", vx_sysinfo);
     lbm_add_extension("timeout-reset", vx_timeout_reset);
     lbm_add_extension("reboot", vx_reboot);
     lbm_add_extension("conf-get", vx_conf_get);

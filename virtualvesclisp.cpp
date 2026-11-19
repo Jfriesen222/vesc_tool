@@ -347,6 +347,12 @@ double VirtualVesc::hostGet(void *host, const char *what, int id)
         return v->mHwType == HW_TYPE_CUSTOM_MODULE ? 1000 : 10000;
     } else if (w == "can-local-id") {
         return v->canId();
+    } else if (w == "fault") {
+        return p->fault;
+    } else if (w == "odometer") {
+        return p->odometer;
+    } else if (w == "fw-major" || w == "fw-minor") {
+        return w == "fw-major" ? v->mFwMajor : v->mFwMinor;
     } else if (w == "bms-msg-age") {
         return root->mCanOn ? 0.1 : 1000.0;
     }
@@ -465,6 +471,8 @@ bool VirtualVesc::hostEeprom(void *host, int addr, uint32_t *value, bool store)
         QMetaObject::invokeMethod(v->mSaveTimer, "start", Qt::QueuedConnection);
     } else if (v->mEeprom.contains(addr)) {
         *value = v->mEeprom.value(addr);
+    } else if (v->mHwType == HW_TYPE_CUSTOM_MODULE) {
+        *value = 0xFFFFFFFF; // Erased flash on the Express, -1 or NaN
     } else {
         return false;
     }
