@@ -2485,9 +2485,9 @@ Item {
                 cellHeight: 46
                 // The menu of a tile is placed at it, so it closes when the tiles move
                 onWidthChanged: swapMenu.close()
-                // Columns with data, in the groups of the value picker. The plotted ones show their
-                // value next to their picker below.
-                model: root.columnMeta.filter(c => c.max >= c.min && root.slotColIdx.indexOf(c.index) < 0)
+                // Columns with data, in the groups of the value picker. They keep their places when the
+                // plotted values change, the plotted ones are marked in the colours of their lines.
+                model: root.columnMeta.filter(c => c.max >= c.min)
                        .sort((a, b) => root.columnGroups.indexOf(a.group) - root.columnGroups.indexOf(b.group) || a.index - b.index)
 
                 delegate: Item {
@@ -2497,6 +2497,8 @@ Item {
                     ValueTile {
                         id: tile
                         readonly property var val: root.cursorValue(modelData.index)
+                        // Lines that plot it
+                        readonly property var slots: [0, 1, 2, 3].filter(s => root.slotColIdx[s] === modelData.index)
                         // Marked like a checked chip while its menu is open
                         readonly property bool picked: swapMenu.visible && swapMenu.colIdx === modelData.index
                         anchors.fill: parent
@@ -2511,16 +2513,35 @@ Item {
                         titleFont.pixelSize: 10
                         valueFont.pointSize: 12
 
-                        // A tap plots the value in place of one of the lines
+                        // A bar in the colour of each line that plots it, in the margin at the left edge
+                        Column {
+                            x: 3
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+
+                            Repeater {
+                                model: tile.slots
+
+                                Rectangle {
+                                    width: 3
+                                    height: (tile.height - 16 - (tile.slots.length - 1) * 2) / tile.slots.length
+                                    radius: 1.5
+                                    color: root.slotColors[modelData]
+                                }
+                            }
+                        }
+
+                        // A tap plots the value in place of one of the lines, if it is not plotted yet
                         TapHandler {
+                            enabled: tile.slots.length === 0
                             onTapped: swapMenu.show(modelData.index, tile)
                         }
                     }
                 }
             }
 
-            // The lines to plot a tapped value in place of, at its tile. Here and not in the tiles, as
-            // they are made again when the plotted values change.
+            // The lines to plot a tapped value in place of, at its tile. One for all the tiles, as the grid
+            // makes them again while it scrolls.
             PopupMenu {
                 id: swapMenu
                 property int colIdx: -1
@@ -2550,12 +2571,8 @@ Item {
                 }
 
                 function swap(slot) {
-                    // The new model scrolls the values to the top. They stay where they were, as far as the
-                    // values that are left reach.
-                    var contentY = valuesGrid.contentY
                     root.setSlotColumn(slot, colIdx)
                     if (!root.slotEnabled[slot]) root.toggleSlot(slot, true)
-                    valuesGrid.contentY = Math.max(0, Math.min(contentY, valuesGrid.contentHeight - valuesGrid.height))
                 }
 
                 function label(slot) {
