@@ -2336,6 +2336,13 @@ Item {
                 anchors.margins: 4
                 z: 10
 
+                // Top right on both the map and the values, where the values one shows the map icon
+                RoundButton {
+                    icon.source: "qrc" + Utility.getThemePath() + "icons/Value Tiles-96.png"
+                    Accessible.name: qsTr("Values")
+                    onClicked: root.showValues = true
+                }
+
                 RoundButton {
                     visible: root.hasGps
                     icon.source: "qrc" + Utility.getThemePath() + "icons/Fit to Screen-96.png"
@@ -2371,12 +2378,6 @@ Item {
                     highlighted: checked
                     onToggled: root.showFaults = checked
                     onPressAndHold: faultsDialog.open()
-                }
-
-                RoundButton {
-                    icon.source: "qrc" + Utility.getThemePath() + "icons/Grid-96.png"
-                    Accessible.name: qsTr("Values")
-                    onClicked: root.showValues = true
                 }
             }
 
@@ -2449,10 +2450,12 @@ Item {
                     onClicked: faultsDialog.open()
                 }
 
-                Chip {
-                    topInset: 0
-                    text: qsTr("Map")
-                    iconSource: "qrc" + Utility.getThemePath() + "icons/Waypoint Map-96.png"
+                // Where the Values button is on the map
+                RoundButton {
+                    Layout.topMargin: 4
+                    Layout.rightMargin: 4
+                    icon.source: "qrc" + Utility.getThemePath() + "icons/Waypoint Map-96.png"
+                    Accessible.name: qsTr("Map")
                     onClicked: root.showValues = false
                 }
             }
@@ -2462,11 +2465,12 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
-                // As many tiles as fit at 140 wide or more
-                cellWidth: width / Math.max(1, Math.floor(width / 140))
-                cellHeight: 60
-                // Columns with data, in the groups of the value picker
-                model: root.columnMeta.filter(c => c.max >= c.min)
+                // As many tiles as fit at 120 wide or more
+                cellWidth: width / Math.max(1, Math.floor(width / 120))
+                cellHeight: 46
+                // Columns with data, in the groups of the value picker. The plotted ones show their
+                // value next to their picker below.
+                model: root.columnMeta.filter(c => c.max >= c.min && root.slotColIdx.indexOf(c.index) < 0)
                        .sort((a, b) => root.columnGroups.indexOf(a.group) - root.columnGroups.indexOf(b.group) || a.index - b.index)
 
                 delegate: Item {
@@ -2480,6 +2484,9 @@ Item {
                         title: modelData.label
                         value: val === null ? "–" : val.toFixed(root.colDecimals(modelData))
                         unit: modelData.unit
+                        // Smaller than elsewhere, the title like the min and max under the graphs
+                        titleFont.pixelSize: 10
+                        valueFont.pointSize: 12
                     }
                 }
             }
