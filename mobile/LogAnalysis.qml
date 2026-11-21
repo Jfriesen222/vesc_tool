@@ -38,6 +38,8 @@ Item {
     // graphs get the full height.
     readonly property bool wide: mainIsHorizontal
     readonly property bool headerOverMap: phoneLandscape
+    // Tablets and large windows in landscape show the map, the values and the graphs together
+    readonly property bool showAll: wide && !headerOverMap
     anchors.fill: parent
 
     property var mCommands: VescIf.commands()
@@ -903,7 +905,7 @@ Item {
     // Faults in the log over the map or the values, so that the graphs stay in view. A tap moves the cursor to one
     Dialog {
         id: faultsDialog
-        parent: root.showValues ? valuesView : map
+        parent: map.visible ? map : valuesView
         width: parent.width
         height: parent.height
         padding: 8
@@ -2045,7 +2047,7 @@ Item {
                         checkable: true
                         checked: root.showMapStats
                         // The stats are on the map
-                        enabled: root.rawRows.length > 0 && !root.showValues
+                        enabled: root.rawRows.length > 0 && map.visible
                         opacity: enabled ? 1 : 0.4
                         onToggled: root.showMapStats = checked
                     }
@@ -2093,7 +2095,9 @@ Item {
             Layout.fillHeight: true
             // Half the page on phones, so that the header fits above it
             Layout.preferredWidth: root.headerOverMap ? 3 : 2
-            visible: !root.showValues
+            // Beside the values and the graphs when all show
+            Layout.rowSpan: root.showAll ? 2 : 1
+            visible: root.showAll || !root.showValues
             onVisibleChanged: {
                 if (visible && root.routeFitPending) {
                     root.routeFitPending = false
@@ -2338,6 +2342,7 @@ Item {
 
                 // Top right on both the map and the values, where the values one shows the map icon
                 RoundButton {
+                    visible: !root.showAll
                     icon.source: "qrc" + Utility.getThemePath() + "icons/Value Tiles-96.png"
                     Accessible.name: qsTr("Values")
                     onClicked: root.showValues = true
@@ -2427,12 +2432,18 @@ Item {
         ColumnLayout {
             id: valuesView
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.preferredWidth: map.Layout.preferredWidth
-            visible: root.showValues
+            // Above the graphs when all show, as tall as its tiles up to a bit under half the page, the
+            // graphs get the rest. Else in the place of the map
+            Layout.fillHeight: !root.showAll
+            Layout.preferredHeight: root.showAll ? Math.min(valuesHeader.implicitHeight + spacing + valuesGrid.rowsHeight,
+                                                            root.height * 0.45) : -1
+            Layout.preferredWidth: root.showAll ? 3 : map.Layout.preferredWidth
+            visible: root.showAll || root.showValues
             spacing: 4
 
             RowLayout {
+                id: valuesHeader
+
                 Label {
                     Layout.fillWidth: true
                     Layout.leftMargin: 4
@@ -2452,6 +2463,7 @@ Item {
 
                 // Where the Values button is on the map
                 RoundButton {
+                    visible: !root.showAll
                     Layout.topMargin: 4
                     Layout.rightMargin: 4
                     icon.source: "qrc" + Utility.getThemePath() + "icons/Waypoint Map-96.png"
@@ -2462,6 +2474,8 @@ Item {
 
             GridView {
                 id: valuesGrid
+                // Height of all the rows of tiles
+                readonly property real rowsHeight: Math.ceil(count / Math.max(1, Math.floor(width / 120))) * cellHeight
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
