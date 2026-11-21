@@ -2440,6 +2440,7 @@ Item {
             Layout.preferredWidth: root.showAll ? 3 : map.Layout.preferredWidth
             visible: root.showAll || root.showValues
             spacing: 4
+            onVisibleChanged: swapMenu.close()
 
             RowLayout {
                 id: valuesHeader
@@ -2482,6 +2483,8 @@ Item {
                 // As many tiles as fit at 120 wide or more
                 cellWidth: width / Math.max(1, Math.floor(width / 120))
                 cellHeight: 46
+                // The menu of a tile is placed at it, so it closes when the tiles move
+                onWidthChanged: swapMenu.close()
                 // Columns with data, in the groups of the value picker. The plotted ones show their
                 // value next to their picker below.
                 model: root.columnMeta.filter(c => c.max >= c.min && root.slotColIdx.indexOf(c.index) < 0)
@@ -2492,16 +2495,114 @@ Item {
                     height: valuesGrid.cellHeight
 
                     ValueTile {
+                        id: tile
                         readonly property var val: root.cursorValue(modelData.index)
+                        // Marked like a checked chip while its menu is open
+                        readonly property bool picked: swapMenu.visible && swapMenu.colIdx === modelData.index
                         anchors.fill: parent
                         anchors.margins: 3
+                        color: picked ? Qt.alpha(Material.accent, 0.12) : Utility.getAppHexColor("cardBackground")
+                        border.width: picked ? 1.5 : 1
+                        border.color: picked ? Material.accent : Utility.getAppHexColor("raisedBackground")
                         title: modelData.label
                         value: val === null ? "–" : val.toFixed(root.colDecimals(modelData))
                         unit: modelData.unit
                         // Smaller than elsewhere, the title like the min and max under the graphs
                         titleFont.pixelSize: 10
                         valueFont.pointSize: 12
+
+                        // A tap plots the value in place of one of the lines
+                        TapHandler {
+                            onTapped: swapMenu.show(modelData.index, tile)
+                        }
                     }
+                }
+            }
+
+            // The lines to plot a tapped value in place of, at its tile. Here and not in the tiles, as
+            // they are made again when the plotted values change.
+            PopupMenu {
+                id: swapMenu
+                property int colIdx: -1
+                width: Math.min(280, root.width - 32)
+                // A press outside only closes it, without scrubbing the graphs under it. The page dims a little
+                // and the menu is raised above the tiles, so that it stands out from them.
+                modal: true
+
+                Overlay.modal: Rectangle {
+                    color: Qt.alpha("black", Utility.isDarkMode() ? 0.4 : 0.2)
+                }
+
+                background: Rectangle {
+                    color: Utility.getAppHexColor(Utility.isDarkMode() ? "raisedBackground" : "darkBackground")
+                    border.color: Utility.getAppHexColor("lightestBackground")
+                    radius: 16
+                }
+
+                function show(col, tile) {
+                    colIdx = col
+                    // Under the tile, or over it where the page has no room
+                    var p = tile.mapToItem(valuesView, 0, 0)
+                    x = p.x
+                    y = tile.mapToItem(root, 0, tile.height).y + implicitHeight <= root.height ? p.y + tile.height :
+                                                                                               p.y - implicitHeight
+                    open()
+                }
+
+                function swap(slot) {
+                    // The new model scrolls the values to the top. They stay where they were, as far as the
+                    // values that are left reach.
+                    var contentY = valuesGrid.contentY
+                    root.setSlotColumn(slot, colIdx)
+                    if (!root.slotEnabled[slot]) root.toggleSlot(slot, true)
+                    valuesGrid.contentY = Math.max(0, Math.min(contentY, valuesGrid.contentHeight - valuesGrid.height))
+                }
+
+                function label(slot) {
+                    return root.columnMeta[root.slotColIdx[slot]]?.label ?? ""
+                }
+
+                // A dot and the name in the colour of the line, like its picker under the graphs. The name is
+                // from the log, so it is escaped for the rich text.
+                function entryText(slot) {
+                    return "<font color='" + root.slotColors[slot] + "'>● " +
+                            label(slot).replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</font>"
+                }
+
+                Label {
+                    leftPadding: 10
+                    topPadding: 6
+                    bottomPadding: 4
+                    text: qsTr("Plot %1 in place of").arg(root.columnMeta[swapMenu.colIdx]?.label ?? "")
+                    elide: Text.ElideRight
+                    font.pointSize: 10
+                    color: Utility.getAppHexColor("normalText")
+                }
+
+                // Faded while the line is hidden, the swap shows it again
+                MenuEntry {
+                    text: swapMenu.entryText(0)
+                    Accessible.name: swapMenu.label(0)
+                    opacity: root.slotEnabled[0] ? 1 : 0.5
+                    onTriggered: swapMenu.swap(0)
+                }
+                MenuEntry {
+                    text: swapMenu.entryText(1)
+                    Accessible.name: swapMenu.label(1)
+                    opacity: root.slotEnabled[1] ? 1 : 0.5
+                    onTriggered: swapMenu.swap(1)
+                }
+                MenuEntry {
+                    text: swapMenu.entryText(2)
+                    Accessible.name: swapMenu.label(2)
+                    opacity: root.slotEnabled[2] ? 1 : 0.5
+                    onTriggered: swapMenu.swap(2)
+                }
+                MenuEntry {
+                    text: swapMenu.entryText(3)
+                    Accessible.name: swapMenu.label(3)
+                    opacity: root.slotEnabled[3] ? 1 : 0.5
+                    onTriggered: swapMenu.swap(3)
                 }
             }
         }
