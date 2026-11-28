@@ -939,6 +939,7 @@ ApplicationWindow {
             visible: status == Loader.Ready
             sourceComponent: BMS {
                 anchors.fill: parent
+                shown: mainSwipeView.currentItem == bmsPage
             }
         }
     }

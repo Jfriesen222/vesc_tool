@@ -30,6 +30,9 @@ Item {
     property Commands mCommands: VescIf.commands()
     property var mVal
     property bool mValSet: false
+    // Updating the page takes time, so it is only done while the page is shown. The latest reply waits in mValRx.
+    property bool shown: true
+    property var mValRx: null
     // Cell and temperature bars side by side, as on the desktop BMS page or where there is room
     property bool forceWide: false
     readonly property bool wide: forceWide || width >= 900 || (width > height && width >= 640)
@@ -56,6 +59,17 @@ Item {
     // LTO cells. The bars round it to their grid.
     readonly property real cellRangeLo: cvMin < 3.0 ? cvMin - 0.15 : 3.0
     readonly property real cellRangeHi: cvMax > 4.2 ? cvMax + 0.05 : cvMax < 3.0 ? cvMax + 0.35 : 4.2
+
+    onShownChanged: updateValues()
+
+    function updateValues() {
+        if (mValRx !== null && (shown || !mValSet)) {
+            mVal = mValRx
+            mValSet = true
+            cellCanvas.requestPaint()
+            tempCanvas.requestPaint()
+        }
+    }
 
     function tempValid(t) { return t > -280.0 }
     function tempLabel(i) { return i < tempLabels.length ? tempLabels[i] : "T" + (i + 1 - tempLabels.length) }
@@ -147,18 +161,21 @@ Item {
                     columns: 4
                     columnSpacing: 6
 
+                    // The model is the number of tiles, as a new array would create all of them again on every reply
                     Repeater {
-                        model: [["Pack", mValSet ? fmt(mVal.v_tot, 2) : "-", "V"],
+                        id: tileRepeater
+                        readonly property var values: [["Pack", mValSet ? fmt(mVal.v_tot, 2) : "-", "V"],
                             ["Current", mValSet ? fmt(mVal.i_in_ic, 1) : "-", "A"],
                             ["SoC", mValSet ? fmt(mVal.soc * 100, 0) : "-", "%"],
                             ["Min-Max", hasCells ? fmt((cvMax - cvMin) * 1000, 0) : "-", "mV"]]
+                        model: values.length
 
                         ValueTile {
                             Layout.fillWidth: true
                             Layout.preferredWidth: 1
-                            title: modelData[0]
-                            value: modelData[1]
-                            unit: modelData[2]
+                            title: tileRepeater.values[index][0]
+                            value: tileRepeater.values[index][1]
+                            unit: tileRepeater.values[index][2]
                         }
                     }
                 }
@@ -495,7 +512,8 @@ Item {
                     visible: mValSet
 
                     Repeater {
-                        model: mValSet ? [
+                        id: groupRepeater
+                        readonly property var values: mValSet ? [
                             [qsTr("Pack"), [
                                     [qsTr("Status"), mVal.status !== "" ? mVal.status : "-"],
                                     [qsTr("Input Current"), fmt(mVal.i_in, 2) + " A"],
@@ -511,8 +529,10 @@ Item {
                                     [qsTr("PCB Max"), tempText(tempPcbMax), tempPcbMax],
                                     [qsTr("Humidity"), fmt(mVal.humidity, 1) + " % · " + tempText(mVal.temp_hum_sensor)],
                                     [qsTr("Pressure"), fmt(mVal.pressure, 0) + " Pa"]]]] : []
+                        model: values.length
 
                         Card {
+                            readonly property var group: groupRepeater.values[index]
                             Layout.fillWidth: true
                             Layout.preferredWidth: 1
                             Layout.fillHeight: true
@@ -527,7 +547,7 @@ Item {
                                 Text {
                                     height: 24
                                     verticalAlignment: Text.AlignVCenter
-                                    text: modelData[0]
+                                    text: group[0]
                                     color: Utility.getAppHexColor("normalText")
                                     font.pointSize: 9
                                     font.letterSpacing: 0.5
@@ -535,10 +555,11 @@ Item {
                                 }
 
                                 Repeater {
-                                    model: modelData[1]
+                                    model: group[1].length
 
                                     // The value under the label where both do not fit on one line
                                     Item {
+                                        readonly property var row: group[1][index]
                                         readonly property bool stacked: label.implicitWidth + 8 + value.implicitWidth > width
                                         width: groupColumn.width
                                         height: stacked ? 48 : 30
@@ -548,7 +569,7 @@ Item {
                                             width: parent.width
                                             y: parent.stacked ? 4 : (30 - height) / 2
                                             elide: Text.ElideRight
-                                            text: modelData[0]
+                                            text: row[0]
                                             color: Utility.getAppHexColor("normalText")
                                         }
 
@@ -558,10 +579,10 @@ Item {
                                             width: Math.min(implicitWidth, parent.width)
                                             y: parent.stacked ? parent.height - height - 4 : (30 - height) / 2
                                             elide: Text.ElideLeft
-                                            text: modelData[1]
+                                            text: row[1]
                                             // Temperatures in the colors of the bars once they get warm
-                                            color: modelData.length > 2 && tempValid(modelData[2]) ? tempTextColor(modelData[2]) :
-                                                                                                    Utility.getAppHexColor("lightText")
+                                            color: row.length > 2 && tempValid(row[2]) ? tempTextColor(row[2]) :
+                                                                                         Utility.getAppHexColor("lightText")
                                             font.weight: Font.Medium
                                         }
                                     }
@@ -668,10 +689,8 @@ Item {
         target: mCommands
 
         function onBmsValuesRx(val) {
-            mVal = val
-            mValSet = true
-            cellCanvas.requestPaint()
-            tempCanvas.requestPaint()
+            mValRx = val
+            updateValues()
         }
     }
 }

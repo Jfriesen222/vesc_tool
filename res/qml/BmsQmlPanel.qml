@@ -44,5 +44,6 @@ Item {
     BMS {
         anchors.fill: parent
         forceWide: true
+        shown: Window.visibility !== Window.Hidden
     }
 }
