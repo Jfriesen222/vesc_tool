@@ -73,8 +73,8 @@ PageSwdProg::PageSwdProg(QWidget *parent) :
     connect(mTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
 
     // UICR tab
-    ui->uicrTable->setColumnWidth(0, 200);
-    ui->uicrTable->setColumnWidth(2, 200);
+    ui->uicrTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ui->uicrTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
 
     auto addDataItem = [this](QString name, QString offset, QString defaultValue) {
         ui->uicrTable->setRowCount(ui->uicrTable->rowCount() + 1);

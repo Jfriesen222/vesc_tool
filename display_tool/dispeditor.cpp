@@ -28,6 +28,7 @@
 #include <QImage>
 #include <QColorDialog>
 #include <QMessageBox>
+#include <QTimer>
 
 DispEditor::DispEditor(QWidget *parent) :
     QWidget(parent),
@@ -52,8 +53,48 @@ DispEditor::DispEditor(QWidget *parent) :
         ui->ColorNowLabel->setPixmap(px);
     });
 
+    // A second row for the controls, used on a small window
+    mControls2 = new QHBoxLayout;
+    mControls2->setSpacing(ui->controlsLayout->spacing());
+    mControls2->addStretch();
+    ui->verticalLayout->insertLayout(1, mControls2);
+
+    QTimer::singleShot(0, this, [this]() { on_tabWidget_currentChanged(ui->tabWidget->currentIndex()); });
+
     updatePalette();
     on_imgScaleBox_valueChanged(ui->imgScaleBox->value());
+}
+
+// On a small window the controls take two rows and Load/Save takes two columns
+void DispEditor::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::StyleChange) {
+        bool compact = window()->property("compact").toBool();
+
+        for (int i = 0;i < 2;i++) {
+            QWidget *b = i == 0 ? ui->clearButton : ui->clearLayer2Button;
+            ui->controlsLayout->removeWidget(b);
+            mControls2->removeWidget(b);
+            (compact ? mControls2 : ui->controlsLayout)->insertWidget((compact ? 0 : 2) + i, b);
+        }
+
+        // Row, column and column span: normal, then compact
+        const QList<QWidget*> w = {ui->label, ui->formatBox, ui->saveCButton, ui->loadCButton, ui->savePngButton,
+                                   ui->loadPngButton, ui->loadScaleSpinBox, ui->ditherBox, ui->antialiasBox, ui->showLayer2Box};
+        const int pos[10][6] = {{0, 0, 1, 0, 0, 1}, {0, 1, 1, 0, 1, 1}, {0, 2, 1, 1, 0, 1}, {0, 3, 1, 1, 1, 1},
+                                {1, 0, 1, 2, 0, 1}, {1, 1, 1, 2, 1, 1}, {1, 2, 2, 3, 0, 2}, {2, 0, 1, 4, 0, 1},
+                                {2, 1, 1, 5, 0, 2}, {2, 2, 2, 4, 1, 1}};
+        for (int i = 0;i < w.size();i++) {
+            const int *p = pos[i] + (compact ? 3 : 0);
+            ui->gridLayout->removeWidget(w[i]);
+            ui->gridLayout->addWidget(w[i], p[0], p[1], 1, p[2]);
+        }
+
+        // After the widgets in it are restyled
+        QTimer::singleShot(0, this, [this]() { on_tabWidget_currentChanged(ui->tabWidget->currentIndex()); });
+    }
+
+    QWidget::changeEvent(event);
 }
 
 void DispEditor::addSideWidget(QWidget *widget)
@@ -652,4 +693,14 @@ void DispEditor::on_helpButton_clicked()
                              "<b>Layer 2</b><br>"
                              "The second layer can be used to draw overlays on, without messing with the main image. "
                              "This way the background image can be kept clean for when it is saved.");
+}
+
+// Only the current tab takes height from the editor, as the tab widget would take the height of the highest one
+void DispEditor::on_tabWidget_currentChanged(int index)
+{
+    for (int i = 0;i < ui->tabWidget->count();i++) {
+        ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Preferred, i == index ?
+                                                    QSizePolicy::Preferred : QSizePolicy::Ignored);
+    }
+    ui->tabWidget->setMaximumHeight(ui->tabWidget->minimumSizeHint().height());
 }

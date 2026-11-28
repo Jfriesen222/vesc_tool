@@ -54,6 +54,26 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QPushButton" name="changelogButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Show firmware changelog</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../res.qrc">
+               <normaloff>:/res/icons/About-96.png</normaloff>:/res/icons/About-96.png</iconset>
+             </property>
+             <property name="text">
+              <string>Changelog</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
          <item>
@@ -85,6 +105,12 @@
               <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
                 <widget class="QListWidget" name="hwList">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>36</height>
+                  </size>
+                 </property>
                  <property name="rows" stdset="0">
                   <bool>true</bool>
                  </property>
@@ -123,7 +149,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <layout class="QHBoxLayout" name="optionsLayout">
            <item>
             <widget class="QCheckBox" name="showNonDefaultBox">
              <property name="toolTip">
@@ -156,20 +182,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="changelogButton">
-             <property name="toolTip">
-              <string>Show firmware changelog</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../res.qrc">
-               <normaloff>:/res/icons/About-96.png</normaloff>:/res/icons/About-96.png</iconset>
-             </property>
-             <property name="text">
-              <string>Changelog</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </item>
@@ -468,6 +480,12 @@
               <property name="grid" stdset="0">
                <bool>true</bool>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>36</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -499,7 +517,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <layout class="QHBoxLayout" name="archOptionsLayout">
            <item>
             <widget class="QCheckBox" name="showNonDefaultArchBox">
              <property name="toolTip">
@@ -555,12 +573,25 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_26">
-     <property name="topMargin">
-      <number>60</number>
-     </property>
      <property name="spacing">
       <number>16</number>
      </property>
+     <item>
+      <spacer name="topSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Preferred</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>51</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
      <item>
       <widget class="QGroupBox" name="groupBox_2">
        <property name="title">
@@ -568,7 +599,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>320</width>
+         <width>280</width>
          <height>0</height>
         </size>
        </property>
@@ -633,12 +664,6 @@
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
         <string>Install New Firmware</string>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>320</width>
-         <height>0</height>
-        </size>
        </property>
        <property name="maximumSize">
         <size>

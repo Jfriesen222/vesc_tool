@@ -42,6 +42,9 @@ public:
     void setVesc(VescInterface *vesc);
 
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void timerSlot();
     void valuesReceived(IMU_VALUES values, unsigned int mask);
@@ -53,6 +56,7 @@ private:
     QTimer *mTimer;
 
     bool mUpdatePlots;
+    bool mCompact = false;
 
     QVector<double> mRollVec;
     QVector<double> mPitchVec;

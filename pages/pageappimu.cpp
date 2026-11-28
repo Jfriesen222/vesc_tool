@@ -46,7 +46,10 @@ PageAppImu::PageAppImu(QWidget *parent) :
         Utility::setPlotColors(plots[i]);
         plots[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
         Utility::setPlotLegendRow(plots[i]);
+        // Lower than the legend and the axes need, as the plots in the old tool
+        plots[i]->setMinimumSize(40, 35);
     }
+    ui->splitter->setSizes(QList<int>({1000, 1030}));
 
     int graphIndex = 0;
 
@@ -107,7 +110,7 @@ PageAppImu::PageAppImu(QWidget *parent) :
     ui->gyroPlot->yAxis->setLabel("Angular Velocity (Deg/s)");
 
     m3dView = new Vesc3DView(this);
-    m3dView->setMinimumWidth(200);
+    m3dView->setMinimumWidth(120);
     m3dView->setRollPitchYaw(20, 20, 0);
     m3dView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
     mUseYawBox = new QCheckBox("Use Yaw (will drift)");
@@ -145,6 +148,19 @@ void PageAppImu::reloadParams()
     }
 }
 
+// A compact window gives most of the height to the plots
+void PageAppImu::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+
+    if (event->type() != QEvent::StyleChange || window()->property("compact").toBool() == mCompact) {
+        return;
+    }
+
+    mCompact = !mCompact;
+    ui->splitter->setSizes(mCompact ? QList<int>({1000, 2000}) : QList<int>({1000, 1030}));
+}
+
 void PageAppImu::timerSlot()
 {
     if (mUpdatePlots) {
@@ -180,6 +196,26 @@ void PageAppImu::timerSlot()
         QStringList units = {"°", " G", " °/s"};
         for (int i = 0;i < 9;i++) {
             plots[i / 3]->graph(i % 3)->setName(Utility::plotLegendName(names.at(i), values[i]->last(), 3, units.at(i / 3)));
+        }
+
+        // Two rows when the values do not fit next to each other, and no axis title where it does not fit
+        QStringList yLabels = {"Angle (Deg)", "Acceleration (G)", "Angular Velocity (Deg/s)"};
+        for (int i = 0;i < 3;i++) {
+            QCPLegend *legend = plots[i]->legend;
+            int width = 20 + 2 * legend->columnSpacing();
+            for (int j = 0;j < legend->elementCount();j++) {
+                if (legend->elementAt(j)) {
+                    width += legend->elementAt(j)->minimumOuterSizeHint().width();
+                }
+            }
+            int wrap = width > plots[i]->width() ? 2 : 0;
+            if (legend->wrap() != wrap) {
+                legend->setWrap(wrap);
+                legend->setFillOrder(QCPLayoutGrid::foColumnsFirst, true);
+            }
+            int height = plots[i]->axisRect()->height();
+            plots[i]->yAxis->setLabel(QFontMetrics(plots[i]->yAxis->labelFont()).horizontalAdvance(yLabels.at(i)) < height ?
+                                          yLabels.at(i) : "");
         }
 
         ui->rpyPlot->rescaleAxes();

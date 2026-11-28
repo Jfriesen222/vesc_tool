@@ -108,7 +108,7 @@ bool ParamTable::hasChanges()
     return false;
 }
 
-// The rows are laid out once after they are added, as it depends on how many there are in a block
+// The rows are laid out once after they are added, not for each one
 void ParamTable::scheduleLayout()
 {
     if (!mLayoutPending) {
@@ -121,12 +121,12 @@ void ParamTable::scheduleLayout()
     }
 }
 
-// The parameters between two separators are a block. It is on a card and when there is room it has two
-// columns, filled one after the other so that the parameters stay in the order they were added.
+// The parameters between two separators are a block, which is on a card.
 void ParamTable::layoutRows()
 {
-    const int paramHeight = 38, titleHeight = 38, editorWidth = 236;
-    int columns = wantedColumns();
+    // The rows are lower in a compact window
+    bool compact = window()->property("compact").toBool();
+    const int paramHeight = compact ? 30 : 38, titleHeight = compact ? 30 : 38, editorWidth = 236;
 
     // Parameters of a configuration that no longer exists are left out
     mRows.removeIf([](const QPair<QPointer<ConfigParams>, QString> &r) {
@@ -136,11 +136,9 @@ void ParamTable::layoutRows()
     mLayoutPending = false;
     setUpdatesEnabled(false);
     setRowCount(0);
-    setColumnCount(2 * columns);
-    for (int c = 0;c < columns;c++) {
-        horizontalHeader()->setSectionResizeMode(2 * c, QHeaderView::Stretch);
-        horizontalHeader()->setSectionResizeMode(2 * c + 1, QHeaderView::Fixed);
-    }
+    setColumnCount(2);
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    horizontalHeader()->setSectionResizeMode(1, QHeaderView::Fixed);
 
     mCells.fill(QPoint(-1, -1), mRows.size());
     mBlocks.clear();
@@ -151,7 +149,7 @@ void ParamTable::layoutRows()
         if (!mRows.at(i).first) {
             // A gap above the title, but not above the first one
             setRowCount(row + 1);
-            setRowHeight(row, row == 0 ? titleHeight - 16 : titleHeight);
+            setRowHeight(row, row == 0 ? 22 : titleHeight);
             setSpan(row, 0, 1, columnCount());
             mCells[i++] = QPoint(0, row);
             continue;
@@ -161,14 +159,14 @@ void ParamTable::layoutRows()
         while (end < mRows.size() && mRows.at(end).first) {
             end++;
         }
-        int rows = (end - i + columns - 1) / columns;
+        int rows = end - i;
         setRowCount(row + rows);
         mBlocks.append(qMakePair(row, rows));
         for (int r = row;r < row + rows;r++) {
             setRowHeight(r, paramHeight);
         }
         for (int n = 0;i < end;i++, n++) {
-            QPoint cell(2 * (n / rows), row + n % rows);
+            QPoint cell(0, row + n);
             QTableWidgetItem *item = new QTableWidgetItem(mRows.at(i).first->getLongName(mRows.at(i).second));
             item->setFlags(Qt::ItemIsEnabled);
             setItem(cell.y(), cell.x(), item);
@@ -176,7 +174,7 @@ void ParamTable::layoutRows()
             editor->installEventFilter(this);
             setCellWidget(cell.y(), cell.x() + 1, editor);
             // Editors with more than one line, such as bit fields, make their row higher and get the width they need
-            setRowHeight(cell.y(), qMax(rowHeight(cell.y()), editor->sizeHint().height() + 12));
+            setRowHeight(cell.y(), qMax(rowHeight(cell.y()), editor->sizeHint().height() + (compact ? 8 : 12)));
             if (editor->sizeHint().height() > paramHeight) {
                 widestEditor = qMax(widestEditor, editor->sizeHint().width() + 28);
             }
@@ -185,9 +183,7 @@ void ParamTable::layoutRows()
         }
     }
 
-    for (int c = 0;c < columns;c++) {
-        horizontalHeader()->resizeSection(2 * c + 1, widestEditor);
-    }
+    horizontalHeader()->resizeSection(1, widestEditor);
 
     // Alone in a layout it stays at the top instead of in the middle of the room that is left over
     QBoxLayout *box = parentWidget() ? qobject_cast<QBoxLayout*>(parentWidget()->layout()) : nullptr;
@@ -200,16 +196,10 @@ void ParamTable::layoutRows()
     setUpdatesEnabled(true);
 }
 
-int ParamTable::wantedColumns() const
+void ParamTable::changeEvent(QEvent *event)
 {
-    return (mRows.size() > 1 && width() >= 800) ? 2 : 1;
-}
-
-// Back to one column when two no longer fit, and the other way
-void ParamTable::resizeEvent(QResizeEvent *event)
-{
-    QTableWidget::resizeEvent(event);
-    if (columnCount() != 2 * wantedColumns()) {
+    QTableWidget::changeEvent(event);
+    if (event->type() == QEvent::StyleChange) {
         scheduleLayout();
     }
 }
@@ -232,9 +222,6 @@ void ParamTable::paintEvent(QPaintEvent *event)
         for (int r = 1;r < block.second;r++) {
             double y = rowViewportPosition(block.first + r) + 0.5;
             painter.drawLine(QPointF(card.left(), y), QPointF(card.right(), y));
-        }
-        if (columnCount() > 2) {
-            painter.drawLine(QPointF(columnViewportPosition(2), card.top()), QPointF(columnViewportPosition(2), card.bottom()));
         }
     }
 
@@ -352,7 +339,7 @@ QString ParamTable::referenceString(int row)
 void ParamTable::showContextMenu(const QPoint &pos)
 {
     QModelIndex index = indexAt(pos);
-    int row = mCells.indexOf(QPoint(index.column() & ~1, index.row()));
+    int row = mCells.indexOf(QPoint(0, index.row()));
     int changedRows = 0;
     for (int i = 0;i < mRows.size();i++) {
         changedRows += rowChanged(i);
@@ -390,7 +377,7 @@ void ParamTable::updateHover()
 {
     QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
     QModelIndex index = viewport()->rect().contains(pos) ? indexAt(pos) : QModelIndex();
-    int row = index.isValid() ? mCells.indexOf(QPoint(index.column() & ~1, index.row())) : -1;
+    int row = index.isValid() ? mCells.indexOf(QPoint(0, index.row())) : -1;
     if (row != mHoverRow) {
         setRowActive(mHoverRow, false);
         setRowActive(row, true);

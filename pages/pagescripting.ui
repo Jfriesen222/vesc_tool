@@ -628,7 +628,7 @@
              <item>
               <widget class="QGroupBox" name="groupBox_3">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -636,9 +636,9 @@
                <property name="title">
                 <string>QML Upload</string>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_9" stretch="0,1">
+               <layout class="QHBoxLayout" name="verticalLayout_9" stretch="0,1">
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <layout class="QVBoxLayout" name="horizontalLayout_6">
                   <property name="spacing">
                    <number>2</number>
                   </property>
@@ -665,41 +665,45 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QCheckBox" name="uploadFullscreenBox">
-                    <property name="toolTip">
-                     <string>Run uploaded UI in fullscreen mode.</string>
-                    </property>
-                    <property name="text">
-                     <string>Fullscreen</string>
-                    </property>
-                   </widget>
+                   <layout class="QHBoxLayout" name="horizontalLayout_9">
+                    <item>
+                     <widget class="QCheckBox" name="uploadFullscreenBox">
+                      <property name="toolTip">
+                       <string>Run uploaded UI in fullscreen mode.</string>
+                      </property>
+                      <property name="text">
+                       <string>Fullscreen</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="clearUploadTextButton">
+                      <property name="toolTip">
+                       <string>Clear text below</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="../res.qrc">
+                        <normaloff>:/res/icons/Delete-96.png</normaloff>:/res/icons/Delete-96.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_2">
                     <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
+                     <enum>Qt::Orientation::Vertical</enum>
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
-                      <width>40</width>
-                      <height>20</height>
+                      <width>20</width>
+                      <height>0</height>
                      </size>
                     </property>
                    </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="clearUploadTextButton">
-                    <property name="toolTip">
-                     <string>Clear text below</string>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="../res.qrc">
-                      <normaloff>:/res/icons/Delete-96.png</normaloff>:/res/icons/Delete-96.png</iconset>
-                    </property>
-                   </widget>
                   </item>
                  </layout>
                 </item>

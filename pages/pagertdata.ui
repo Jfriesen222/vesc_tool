@@ -91,279 +91,313 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="tileLayout">
+           <layout class="QVBoxLayout" name="tilesBox">
             <property name="spacing">
-             <number>8</number>
+             <number>6</number>
             </property>
             <item>
-             <widget class="QFrame" name="powerTile">
-              <property name="card" stdset="0">
-               <bool>true</bool>
+             <layout class="QHBoxLayout" name="tileLayout">
+              <property name="spacing">
+               <number>8</number>
               </property>
-              <property name="tile" stdset="0">
-               <bool>true</bool>
-              </property>
-              <layout class="QVBoxLayout" name="powerTileLayout">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>12</number>
-               </property>
-               <property name="topMargin">
-                <number>8</number>
-               </property>
-               <property name="rightMargin">
-                <number>12</number>
-               </property>
-               <property name="bottomMargin">
-                <number>8</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="powerCaption">
-                 <property name="text">
-                  <string>POWER</string>
+              <item>
+               <widget class="QFrame" name="powerTile">
+                <property name="card" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <property name="tile" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="powerTileLayout">
+                 <property name="spacing">
+                  <number>2</number>
                  </property>
-                 <property name="caption" stdset="0">
-                  <bool>true</bool>
+                 <property name="leftMargin">
+                  <number>12</number>
                  </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="powerRow">
+                 <property name="topMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>8</number>
+                 </property>
                  <item>
-                  <widget class="QLabel" name="powerValue">
+                  <widget class="QLabel" name="powerCaption">
                    <property name="text">
-                    <string>-</string>
+                    <string>POWER</string>
                    </property>
-                   <property name="reading" stdset="0">
+                   <property name="caption" stdset="0">
                     <bool>true</bool>
                    </property>
                   </widget>
                  </item>
-                 <item alignment="Qt::AlignmentFlag::AlignBottom">
-                  <widget class="Sparkline" name="powerSpark" native="true"/>
+                 <item>
+                  <layout class="QHBoxLayout" name="powerRow">
+                   <item>
+                    <widget class="QLabel" name="powerValue">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                     <property name="reading" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item alignment="Qt::AlignmentFlag::AlignBottom">
+                    <widget class="Sparkline" name="powerSpark" native="true">
+                     <property name="bonus" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
-               </item>
-              </layout>
-             </widget>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="dutyTile">
+                <property name="card" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <property name="tile" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="dutyTileLayout">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>8</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="dutyCaption">
+                   <property name="text">
+                    <string>DUTY</string>
+                   </property>
+                   <property name="caption" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="dutyRow">
+                   <item>
+                    <widget class="QLabel" name="dutyValue">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                     <property name="reading" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item alignment="Qt::AlignmentFlag::AlignBottom">
+                    <widget class="Sparkline" name="dutySpark" native="true">
+                     <property name="bonus" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="erpmTile">
+                <property name="card" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <property name="tile" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="erpmTileLayout">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>8</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="erpmCaption">
+                   <property name="text">
+                    <string>ERPM</string>
+                   </property>
+                   <property name="caption" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="erpmRow">
+                   <item>
+                    <widget class="QLabel" name="erpmValue">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                     <property name="reading" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item alignment="Qt::AlignmentFlag::AlignBottom">
+                    <widget class="Sparkline" name="erpmSpark" native="true">
+                     <property name="bonus" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="currentInTile">
+                <property name="card" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <property name="tile" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="currentInTileLayout">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>8</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="currentInCaption">
+                   <property name="text">
+                    <string>BATTERY CURRENT</string>
+                   </property>
+                   <property name="caption" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="currentInRow">
+                   <item>
+                    <widget class="QLabel" name="currentInValue">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                     <property name="reading" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item alignment="Qt::AlignmentFlag::AlignBottom">
+                    <widget class="Sparkline" name="currentInSpark" native="true">
+                     <property name="bonus" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="currentMotorTile">
+                <property name="card" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <property name="tile" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="currentMotorTileLayout">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>8</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="currentMotorCaption">
+                   <property name="text">
+                    <string>MOTOR CURRENT</string>
+                   </property>
+                   <property name="caption" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="currentMotorRow">
+                   <item>
+                    <widget class="QLabel" name="currentMotorValue">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                     <property name="reading" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item alignment="Qt::AlignmentFlag::AlignBottom">
+                    <widget class="Sparkline" name="currentMotorSpark" native="true">
+                     <property name="bonus" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QFrame" name="dutyTile">
-              <property name="card" stdset="0">
-               <bool>true</bool>
+             <layout class="QHBoxLayout" name="tileRow2">
+              <property name="spacing">
+               <number>8</number>
               </property>
-              <property name="tile" stdset="0">
-               <bool>true</bool>
-              </property>
-              <layout class="QVBoxLayout" name="dutyTileLayout">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>12</number>
-               </property>
-               <property name="topMargin">
-                <number>8</number>
-               </property>
-               <property name="rightMargin">
-                <number>12</number>
-               </property>
-               <property name="bottomMargin">
-                <number>8</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="dutyCaption">
-                 <property name="text">
-                  <string>DUTY</string>
-                 </property>
-                 <property name="caption" stdset="0">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="dutyRow">
-                 <item>
-                  <widget class="QLabel" name="dutyValue">
-                   <property name="text">
-                    <string>-</string>
-                   </property>
-                   <property name="reading" stdset="0">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignmentFlag::AlignBottom">
-                  <widget class="Sparkline" name="dutySpark" native="true"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="erpmTile">
-              <property name="card" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="tile" stdset="0">
-               <bool>true</bool>
-              </property>
-              <layout class="QVBoxLayout" name="erpmTileLayout">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>12</number>
-               </property>
-               <property name="topMargin">
-                <number>8</number>
-               </property>
-               <property name="rightMargin">
-                <number>12</number>
-               </property>
-               <property name="bottomMargin">
-                <number>8</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="erpmCaption">
-                 <property name="text">
-                  <string>ERPM</string>
-                 </property>
-                 <property name="caption" stdset="0">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="erpmRow">
-                 <item>
-                  <widget class="QLabel" name="erpmValue">
-                   <property name="text">
-                    <string>-</string>
-                   </property>
-                   <property name="reading" stdset="0">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignmentFlag::AlignBottom">
-                  <widget class="Sparkline" name="erpmSpark" native="true"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="currentInTile">
-              <property name="card" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="tile" stdset="0">
-               <bool>true</bool>
-              </property>
-              <layout class="QVBoxLayout" name="currentInTileLayout">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>12</number>
-               </property>
-               <property name="topMargin">
-                <number>8</number>
-               </property>
-               <property name="rightMargin">
-                <number>12</number>
-               </property>
-               <property name="bottomMargin">
-                <number>8</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="currentInCaption">
-                 <property name="text">
-                  <string>BATTERY CURRENT</string>
-                 </property>
-                 <property name="caption" stdset="0">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="currentInRow">
-                 <item>
-                  <widget class="QLabel" name="currentInValue">
-                   <property name="text">
-                    <string>-</string>
-                   </property>
-                   <property name="reading" stdset="0">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignmentFlag::AlignBottom">
-                  <widget class="Sparkline" name="currentInSpark" native="true"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="currentMotorTile">
-              <property name="card" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="tile" stdset="0">
-               <bool>true</bool>
-              </property>
-              <layout class="QVBoxLayout" name="currentMotorTileLayout">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>12</number>
-               </property>
-               <property name="topMargin">
-                <number>8</number>
-               </property>
-               <property name="rightMargin">
-                <number>12</number>
-               </property>
-               <property name="bottomMargin">
-                <number>8</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="currentMotorCaption">
-                 <property name="text">
-                  <string>MOTOR CURRENT</string>
-                 </property>
-                 <property name="caption" stdset="0">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="currentMotorRow">
-                 <item>
-                  <widget class="QLabel" name="currentMotorValue">
-                   <property name="text">
-                    <string>-</string>
-                   </property>
-                   <property name="reading" stdset="0">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignmentFlag::AlignBottom">
-                  <widget class="Sparkline" name="currentMotorSpark" native="true"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
+             </layout>
             </item>
            </layout>
           </item>
@@ -599,6 +633,9 @@
              </item>
              <item row="0" column="3" rowspan="3">
               <widget class="QFrame" name="faultDivider">
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
                <property name="minimumSize">
                 <size>
                  <width>1</width>
@@ -618,6 +655,9 @@
              </item>
              <item row="0" column="9" rowspan="3">
               <widget class="QFrame" name="whDivider">
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
                <property name="minimumSize">
                 <size>
                  <width>1</width>
@@ -673,61 +713,6 @@
            <number>4</number>
           </property>
           <item row="0" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <property name="spacing">
-             <number>8</number>
-            </property>
-            <property name="leftMargin">
-             <number>8</number>
-            </property>
-            <property name="topMargin">
-             <number>4</number>
-            </property>
-            <property name="rightMargin">
-             <number>8</number>
-            </property>
-            <item>
-             <widget class="QCheckBox" name="tempShowMosfetBox">
-              <property name="toolTip">
-               <string>Show MOSFET temperature</string>
-              </property>
-              <property name="text">
-               <string>MOSFET</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="tempShowMotorBox">
-              <property name="toolTip">
-               <string>Show motor temperature</string>
-              </property>
-              <property name="text">
-               <string>Motor</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0">
            <widget class="QCustomPlot" name="tempPlot" native="true"/>
           </item>
          </layout>
@@ -884,7 +869,7 @@
            </layout>
           </item>
           <item row="1" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <layout class="QGridLayout" name="horizontalLayout_7">
             <property name="spacing">
              <number>8</number>
             </property>
@@ -897,7 +882,7 @@
             <property name="rightMargin">
              <number>8</number>
             </property>
-            <item>
+            <item row="0" column="0">
              <widget class="QPushButton" name="posInductanceButton">
               <property name="toolTip">
                <string>Start inductance based signal injection detection (BLDC only)</string>
@@ -907,7 +892,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="1">
              <widget class="QPushButton" name="posEncoderButton">
               <property name="toolTip">
                <string>Plot the encoder position</string>
@@ -917,7 +902,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="2">
              <widget class="QPushButton" name="posObserverButton">
               <property name="toolTip">
                <string>Plot the rotor position seen by the observer (FOC only)</string>
@@ -927,7 +912,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="3">
              <widget class="QPushButton" name="posPidButton">
               <property name="toolTip">
                <string>Plot the PID controller position</string>
@@ -937,7 +922,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="4">
              <widget class="QPushButton" name="posEncoderObserverErrorButton">
               <property name="toolTip">
                <string>Plot the difference between the observer and encoder position (FOC only)</string>
@@ -947,7 +932,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="5">
              <widget class="QPushButton" name="posHallObserverErrorButton">
               <property name="toolTip">
                <string>Plot the difference between the observer and hall sensor position (FOC only)</string>
@@ -957,7 +942,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="6">
              <widget class="QPushButton" name="posPidErrorButton">
               <property name="toolTip">
                <string>Plot the PID controller position error</string>
@@ -967,7 +952,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="7">
              <widget class="QPushButton" name="posStopButton">
               <property name="toolTip">
                <string>Stop sending position samples</string>
@@ -977,7 +962,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="8">
              <spacer name="horizontalSpacer_2">
               <property name="orientation">
                <enum>Qt::Orientation::Horizontal</enum>

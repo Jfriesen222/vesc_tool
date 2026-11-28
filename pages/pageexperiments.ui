@@ -507,6 +507,9 @@
             <property name="hint" stdset="0">
              <bool>true</bool>
             </property>
+            <property name="bonus" stdset="0">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="1" column="0">
@@ -849,7 +852,7 @@
           <item>
            <widget class="QCustomPlot" name="plot" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+             <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -898,12 +901,18 @@
                 <property name="caption" stdset="0">
                  <bool>true</bool>
                 </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="showPowerLabel">
                 <property name="text">
                  <string>Power (W)</string>
+                </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -912,12 +921,18 @@
                 <property name="text">
                  <string>Duty cycle (%)</string>
                 </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="showTempMotorLabel">
                 <property name="text">
                  <string>Temp Motor (°C)</string>
+                </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -926,12 +941,18 @@
                 <property name="text">
                  <string>Temp MOSFET (°C)</string>
                 </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="showTempFetIndLabel">
                 <property name="text">
                  <string>Temp MOSFET 1, 2, 3 (°C)</string>
+                </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -940,12 +961,18 @@
                 <property name="text">
                  <string>Voltage in (V)</string>
                 </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="showCurrentLabel">
                 <property name="text">
                  <string>Current motor (A)</string>
+                </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -954,12 +981,18 @@
                 <property name="text">
                  <string>Current in (A)</string>
                 </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="showErpmLabel">
                 <property name="text">
                  <string>ERPM right axis</string>
+                </property>
+                <property name="bonus" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -1701,7 +1734,7 @@
      <property name="card" stdset="0">
       <bool>true</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0,0,0,0,0,0,0,0">
+     <layout class="QHBoxLayout" name="stripLayout">
       <property name="spacing">
        <number>8</number>
       </property>
@@ -1718,191 +1751,208 @@
        <number>8</number>
       </property>
       <item>
-       <widget class="QProgressBar" name="progressBar">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0,0">
+        <property name="spacing">
+         <number>8</number>
         </property>
-        <property name="value">
-         <number>24</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="stopButton">
-        <property name="text">
-         <string>Stop</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../res.qrc">
-          <normaloff>:/res/icons/Stop Sign-96.png</normaloff>:/res/icons/Stop Sign-96.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="openButton">
-        <property name="text">
-         <string>Open</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../res.qrc">
-          <normaloff>:/res/icons/Open Folder-96.png</normaloff>:/res/icons/Open Folder-96.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="openCompButton">
-        <property name="text">
-         <string>Compare</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../res.qrc">
-          <normaloff>:/res/icons/Open Folder-96.png</normaloff>:/res/icons/Open Folder-96.png</iconset>
-        </property>
-       </widget>
+        <item>
+         <widget class="QProgressBar" name="progressBar">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="value">
+           <number>24</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="stopButton">
+          <property name="text">
+           <string>Stop</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res.qrc">
+            <normaloff>:/res/icons/Stop Sign-96.png</normaloff>:/res/icons/Stop Sign-96.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="openButton">
+          <property name="text">
+           <string>Open</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res.qrc">
+            <normaloff>:/res/icons/Open Folder-96.png</normaloff>:/res/icons/Open Folder-96.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="openCompButton">
+          <property name="text">
+           <string>Compare</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res.qrc">
+            <normaloff>:/res/icons/Open Folder-96.png</normaloff>:/res/icons/Open Folder-96.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line_2">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="saveCsvButton">
-        <property name="text">
-         <string>CSV</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../res.qrc">
-          <normaloff>:/res/icons/Save-96.png</normaloff>:/res/icons/Save-96.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="savePdfButton">
-        <property name="text">
-         <string>PDF</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../res.qrc">
-          <normaloff>:/res/icons/Save-96.png</normaloff>:/res/icons/Save-96.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="savePngButton">
-        <property name="text">
-         <string>PNG</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../res.qrc">
-          <normaloff>:/res/icons/Save-96.png</normaloff>:/res/icons/Save-96.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFrame" name="saveWidthFrame">
-        <property name="field" stdset="0">
+        <property name="bonus" stdset="0">
          <bool>true</bool>
         </property>
-        <layout class="QHBoxLayout" name="saveWidthFrameLayout">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <property name="leftMargin">
-          <number>10</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="saveWidthCaption">
-           <property name="text">
-            <string>W</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="saveWidthBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximum">
-            <number>9999</number>
-           </property>
-           <property name="value">
-            <number>1280</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="saveHeightFrame">
-        <property name="field" stdset="0">
-         <bool>true</bool>
+       <layout class="QHBoxLayout" name="saveLayout">
+        <property name="spacing">
+         <number>8</number>
         </property>
-        <layout class="QHBoxLayout" name="saveHeightFrameLayout">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <property name="leftMargin">
-          <number>10</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="saveHeightCaption">
-           <property name="text">
-            <string>H</string>
+        <item>
+         <widget class="QPushButton" name="saveCsvButton">
+          <property name="text">
+           <string>CSV</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res.qrc">
+            <normaloff>:/res/icons/Save-96.png</normaloff>:/res/icons/Save-96.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="savePdfButton">
+          <property name="text">
+           <string>PDF</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res.qrc">
+            <normaloff>:/res/icons/Save-96.png</normaloff>:/res/icons/Save-96.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="savePngButton">
+          <property name="text">
+           <string>PNG</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res.qrc">
+            <normaloff>:/res/icons/Save-96.png</normaloff>:/res/icons/Save-96.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="saveWidthFrame">
+          <property name="field" stdset="0">
+           <bool>true</bool>
+          </property>
+          <layout class="QHBoxLayout" name="saveWidthFrameLayout">
+           <property name="spacing">
+            <number>2</number>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="saveHeightBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+           <property name="leftMargin">
+            <number>10</number>
            </property>
-           <property name="maximum">
-            <number>9999</number>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-           <property name="value">
-            <number>720</number>
+           <property name="rightMargin">
+            <number>0</number>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="saveWidthCaption">
+             <property name="text">
+              <string>W</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="saveWidthBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+             <property name="value">
+              <number>1280</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="saveHeightFrame">
+          <property name="field" stdset="0">
+           <bool>true</bool>
+          </property>
+          <layout class="QHBoxLayout" name="saveHeightFrameLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="saveHeightCaption">
+             <property name="text">
+              <string>H</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="saveHeightBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+             <property name="value">
+              <number>720</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

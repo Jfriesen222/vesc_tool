@@ -24,6 +24,7 @@
 #include "ui_pagelisp.h"
 #include "utility.h"
 #include "widgets/helpdialog.h"
+#include <QScrollBar>
 
 PageLisp::PageLisp(QWidget *parent) :
     QWidget(parent),
@@ -121,9 +122,14 @@ PageLisp::PageLisp(QWidget *parent) :
         ui->exampleList->addItem(item);
     }
 
-    ui->splitter->setSizes(QList<int>({1000, 400}));
-    ui->splitter_2->setSizes(QList<int>({1000, 300}));
+    // The side panel scrolls only up and down: it keeps the width of its content
+    ui->sideScroll->setMinimumWidth(ui->layoutWidget2->minimumSizeHint().width() +
+                                    ui->sideScroll->verticalScrollBar()->sizeHint().width());
+    ui->splitter->setSizes(QList<int>({1000, 300}));
+    ui->splitter_2->setSizes(QList<int>({1000, 500}));
     ui->bindingTable->horizontalHeaderItem(1)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    ui->bindingTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->bindingTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 
     mPollTimer.start(1000 / ui->pollRateBox->value());
     connect(&mPollTimer, &QTimer::timeout, [this]() {

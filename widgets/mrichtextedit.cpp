@@ -40,6 +40,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QDialog>
+#include <QResizeEvent>
 
 MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
     setupUi(this);
@@ -212,6 +213,24 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
 
     // images
     connect(f_image, SIGNAL(clicked()), this, SLOT(insertImage()));
+}
+
+// The format buttons get a row of their own when one row is too narrow for all buttons
+void MRichTextEdit::resizeEvent(QResizeEvent *event) {
+    bool oneRow = widget->parentWidget() == f_toolbar;
+    int need = f_toolbar->sizeHint().width();
+    if (!oneRow) {
+        need += line_8->sizeHint().width() + widget->sizeHint().width() + 2 * horizontalLayout->spacing();
+    }
+    if ((event->size().width() >= need) != oneRow) {
+        if (oneRow) {
+            verticalLayout->insertWidget(1, widget, 0, Qt::AlignLeft);
+        } else {
+            horizontalLayout->insertWidget(horizontalLayout->indexOf(line_8) + 1, widget);
+        }
+        line_8->setVisible(!oneRow);
+    }
+    QWidget::resizeEvent(event);
 }
 
 

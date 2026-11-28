@@ -75,6 +75,10 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
     ui->playButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
     ui->logListRefreshButton->setIcon(Utility::getIcon("icons/Refresh-96.png"));
     ui->logListOpenButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
+    ui->logListUpButton->setIcon(Utility::getIcon("icons/Upload-96.png"));
+    ui->logLocalRefreshButton->setIcon(Utility::getIcon("icons/Refresh-96.png"));
+    ui->logLocalDeleteButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
+    ui->logLocalOpenButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->openCurrentButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->openCsvButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->savePlotPdfButton->setIcon(Utility::getIcon("icons/Line Chart-96.png"));
@@ -97,13 +101,14 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
     // The map stays closed until a log with positions is opened
     ui->mapSplitter->setSizes({0, 1});
 
+    // The tabs start as narrow as they can be: the map and the plot get the rest
     ui->statSplitter->setStretchFactor(0, 1);
     ui->statSplitter->setStretchFactor(1, 0);
-    ui->statSplitter->setSizes({560, 420});
+    ui->statSplitter->setSizes({10000, 1});
 
     ui->dataSplitter->setStretchFactor(0, 0);
     ui->dataSplitter->setStretchFactor(1, 1);
-    ui->dataSplitter->setSizes({200, 360});
+    ui->dataSplitter->setSizes({120, 440});
 
     Utility::setPlotColors(ui->plot);
     ui->plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
@@ -231,7 +236,7 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
     mPlotHint->position->setType(QCPItemPosition::ptAxisRectRatio);
     mPlotHint->position->setCoords(0.5, 0.5);
     mPlotHint->setColor(Utility::getAppQColor("mutedText"));
-    mPlotHint->setText(tr("Open a log on the Source tab"));
+    mPlotHint->setText(tr("Open a log on\nthe Source tab"));
 
     // The range slider runs under the time axis: the ends of its handles sit under the start and end of the axis
     connect(ui->plot, &QCustomPlot::afterLayout, this, [this]() {
@@ -1035,7 +1040,7 @@ void PageLogAnalysis::updateGraphs()
     }
 
     mPlotHint->setVisible(rows.isEmpty());
-    mPlotHint->setText(tr("Click a series on the Data tab to plot it"));
+    mPlotHint->setText(tr("Click a series on\nthe Data tab to plot it"));
     ui->playButton->setEnabled(!mLogTruncated.isEmpty());
     ui->showLegendBox->setEnabled(!mLogTruncated.isEmpty());
 

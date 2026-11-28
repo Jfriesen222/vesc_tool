@@ -52,6 +52,7 @@ public slots:
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
+    void changeEvent(QEvent *event) override;
 
 private:
     Ui::PageWelcome *ui;

@@ -2477,6 +2477,16 @@ void Utility::setPlotColors(QCustomPlot* plot)
 
     if (!plot->findChild<QObject*>("endDots", Qt::FindDirectChildrenOnly)) {
         new EndDots(plot);
+        // A low plot has fewer numbers on its vertical axes, so that they do not run into each other. Its height is
+        // known once it is laid out, so it is drawn once more when the number changes.
+        QObject::connect(plot, &QCustomPlot::afterReplot, plot, [plot]() {
+            int count = qBound(1, (plot->axisRect()->height() + 15) / 35, 5);
+            if (plot->yAxis->ticker()->tickCount() != count) {
+                plot->yAxis->ticker()->setTickCount(count);
+                plot->yAxis2->ticker()->setTickCount(count);
+                plot->replot(QCustomPlot::rpQueuedReplot);
+            }
+        });
     }
 }
 
@@ -2534,7 +2544,30 @@ void Utility::setupThrottlePlot(QCustomPlot *plot)
         axis->setNumberFormat("f");
         axis->setNumberPrecision(1);
     }
-    setPlotLegendRow(plot);
+}
+
+// The legend of a plot has as many columns as fit beside the width reserved at its right, one row where all fit
+void Utility::fitPlotLegend(QCustomPlot *plot, int reserved)
+{
+    QCPLegend *legend = plot->legend;
+    QVector<int> widths;
+    for (int i = 0;i < legend->elementCount();i++) {
+        if (legend->elementAt(i)) {
+            widths.append(legend->elementAt(i)->minimumOuterSizeHint().width());
+        }
+    }
+    std::sort(widths.begin(), widths.end(), std::greater<int>());
+
+    // The widest entries together are at least as wide as that many columns
+    int columns = 0, width = reserved - legend->columnSpacing();
+    while (columns < widths.size() && (columns == 0 || width + legend->columnSpacing() + widths.at(columns) <= plot->width())) {
+        width += legend->columnSpacing() + widths.at(columns++);
+    }
+    int wrap = columns == widths.size() ? 0 : columns;
+    if (legend->wrap() != wrap) {
+        legend->setWrap(wrap);
+        legend->setFillOrder(QCPLayoutGrid::foColumnsFirst, true);
+    }
 }
 
 // Keeps the plot tools over the top right of the well of the open tab, and the bottom widget under it if given

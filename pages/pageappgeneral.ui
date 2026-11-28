@@ -111,6 +111,9 @@
          <property name="hint" stdset="0">
           <bool>true</bool>
          </property>
+         <property name="bonus" stdset="0">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>Enable Servo Output on the General tab turns on the servo output on the PPM port when the PPM app is disabled.</string>
          </property>

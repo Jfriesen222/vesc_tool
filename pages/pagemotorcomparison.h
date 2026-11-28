@@ -403,6 +403,9 @@ public:
 signals:
     void reloadQml(QString str);
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void on_testRunButton_clicked();
     void on_qmlChooseButton_clicked();
@@ -477,6 +480,7 @@ private:
     bool mQmlProgressOk;
     bool mQmlMotorParamsOk;
     bool mQmlReadNamesDone;
+    bool mCompact = false;
 };
 
 #endif // PAGEMOTORCOMPARISON_H

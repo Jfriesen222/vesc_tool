@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QVector>
+#include <QSet>
 #include <QTimer>
 #include "vescinterface.h"
 
@@ -42,6 +43,9 @@ public:
     VescInterface *vesc() const;
     void setVesc(VescInterface *vesc);
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void timerSlot();
     void valuesReceived(MC_VALUES values, unsigned int mask);
@@ -57,8 +61,6 @@ private slots:
     void on_posPidErrorButton_clicked();
     void on_posEncoderObserverErrorButton_clicked();
     void on_posStopButton_clicked();
-    void on_tempShowMosfetBox_toggled(bool checked);
-    void on_tempShowMotorBox_toggled(bool checked);
     void on_logRtButton_toggled(bool checked);
     void on_posHallObserverErrorButton_clicked();
 
@@ -92,6 +94,8 @@ private:
 
     bool mUpdateValPlot;
     bool mUpdatePosPlot;
+    bool mCompact = false;
+    QSet<QString> mHiddenTraces;
 
     void appendDoubleAndTrunc(QVector<double> *vec, double num, int maxSize);
     void updateZoom();

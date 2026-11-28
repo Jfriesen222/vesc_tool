@@ -48,6 +48,19 @@ ParameterEditor::ParameterEditor(QWidget *parent) :
                                       ui->horizontalLayout_6->contentsMargins().top(), QSizePolicy::Fixed, QSizePolicy::Fixed);
     ui->paramSerialOrderList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    // In a small window icon buttons give up their side padding and number fields get shorter
+    for (QPushButton *b : findChildren<QPushButton*>()) {
+        if (b->text().isEmpty()) {
+            b->setMinimumWidth(32);
+        }
+    }
+    for (QDoubleSpinBox *b : {ui->doubleValBox, ui->doubleMaxBox, ui->doubleMinBox, ui->doubleStep,
+         ui->doubleEditorScaleBox, ui->intEditorScaleBox}) {
+        b->setMinimumWidth(100);
+    }
+    ui->doubleTxScaleBaseBox->setMinimumWidth(56);
+    ui->doubleTxScaleExpBox->setMinimumWidth(44);
+
     setEditorValues("new_parameter", ConfigParam());
     ui->typeCaption->setText(ui->typeBox->currentText().toUpper());
 

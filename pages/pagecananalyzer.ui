@@ -99,16 +99,26 @@
         </item>
         <item alignment="Qt::AlignmentFlag::AlignBottom">
          <widget class="QPushButton" name="updateCanBaudButton">
+          <property name="toolTip">
+           <string>Applies to all connected VESC-based devices. Needs firmware 6.06 or later.</string>
+          </property>
           <property name="text">
            <string>Start Update</string>
           </property>
          </widget>
         </item>
         <item alignment="Qt::AlignmentFlag::AlignTop">
-         <widget class="QLabel" name="canBaudNoteIcon"/>
+         <widget class="QLabel" name="canBaudNoteIcon">
+          <property name="bonus" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="canBaudNoteLabel">
+          <property name="bonus" stdset="0">
+           <bool>true</bool>
+          </property>
           <property name="hint" stdset="0">
            <bool>true</bool>
           </property>
@@ -128,6 +138,12 @@
      </item>
      <item>
       <widget class="QGroupBox" name="groupBox_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="title">
         <string>CAN Configuration</string>
        </property>

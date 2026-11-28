@@ -43,7 +43,8 @@ void DisplayBar::paintEvent(QPaintEvent *event)
     // It is on the black housing of the bottom bar in both themes, so the colors are not from the theme
     const QColor cText(244, 244, 245), cMuted(140, 139, 147), cLit(47, 183, 242), cBrake(63, 212, 135), cHot(242, 181, 74);
     const int w = width(), h = height();
-    const int nameW = 64, readW = 92;
+    // A narrow bar leaves out the name and then the segments, the unit of the value still tells the bars apart
+    const int nameW = w < 230 ? 0 : 64, readW = 92;
 
     QFont font = this->font();
     font.setPointSizeF(font.pointSizeF() * 0.78);
@@ -70,6 +71,9 @@ void DisplayBar::paintEvent(QPaintEvent *event)
     const double pitch = 4.5, segW = 3.0, segH = h - 9.0, top = 2.0;
     const double cx = std::round((nameW + w - readW) / 2.0);
     const int n = ((w - readW - nameW) / 2.0 - 12.0) / pitch;
+    if (n < 1) {
+        return;
+    }
     const double v = qBound(-1.0, mVal / mRange, 1.0);
     const double peak = qBound(-1.0, mPeak / mRange, 1.0);
     painter.setPen(Qt::NoPen);

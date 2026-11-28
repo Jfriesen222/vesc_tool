@@ -51,6 +51,27 @@ DetectFoc::~DetectFoc()
     delete ui;
 }
 
+// A compact window has the results in two rows, with "Calc Apply Old" at the end of the second one, and less room
+// between the rows
+void DetectFoc::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::StyleChange) {
+        bool compact = window()->property("compact").toBool();
+        ui->groupLayout->setSpacing(compact ? 6 : 10);
+        QWidget *tiles[] = {ui->kpTile, ui->kiTile, ui->obsGainTile};
+        for (int i = 0;i < 3;i++) {
+            ui->resultLayout->addWidget(tiles[i], compact, compact ? i : i + 4);
+            ui->resultLayout->setColumnStretch(i + 4, !compact);
+        }
+        if (compact) {
+            ui->resultLayout->addWidget(ui->calcApplyLocalButton, 1, 3);
+        } else {
+            ui->inputLayout->insertWidget(4, ui->calcApplyLocalButton);
+        }
+    }
+}
+
 void DetectFoc::on_rlButton_clicked()
 {
     if (mVesc) {

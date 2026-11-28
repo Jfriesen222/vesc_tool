@@ -237,6 +237,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusBar->addPermanentWidget(mStatusLabel);
     mDebugTimer = new QTimer(this);
     mTimer = new QTimer(this);
+    mPolishTimer = new QTimer(this);
+    mPolishTimer->setSingleShot(true);
+    connect(mPolishTimer, &QTimer::timeout, this, &MainWindow::polishPages);
     mKeyLeft = false;
     mKeyRight = false;
 
@@ -300,8 +303,20 @@ MainWindow::MainWindow(QWidget *parent) :
     };
     connect(ui->pageList->verticalScrollBar(), &QScrollBar::valueChanged, this, placeFade);
     connect(ui->pageList->verticalScrollBar(), &QScrollBar::rangeChanged, this, placeFade);
+    // The current page is kept clear of the fades
+    auto showCurrent = [this]() {
+        QRect rect = ui->pageList->visualItemRect(ui->pageList->currentItem());
+        if (rect.isValid() && (rect.top() < 40 || rect.bottom() > ui->pageList->viewport()->height() - 40)) {
+            ui->pageList->scrollToItem(ui->pageList->currentItem(), QAbstractItemView::PositionAtCenter);
+        }
+    };
+    connect(ui->pageList, &QListWidget::currentRowChanged, this, showCurrent);
+    connect(ui->pageList->verticalScrollBar(), &QScrollBar::rangeChanged, this, showCurrent);
 
     new SearchBox(ui->searchEdit, ui->pageList, ui->pageWidget, ui->canList, mVesc, this);
+    connect(ui->pageWidget, &QStackedWidget::currentChanged, this, [this](int index) {
+        polishPage(ui->pageWidget->widget(index));
+    });
     connect(ui->actionSendAlive, &QAction::toggled, this, [this](bool on) {
         if (!on) {
             setRunning(nullptr);
@@ -814,6 +829,107 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     } else {
         event->accept();
+    }
+}
+
+// Shows or hides the bonus widgets and restyles the widgets for a compact or a normal window. The bonus widgets come
+// first: showing one lays out the window at once, and that takes long after the styles around it have changed.
+static void restyle(const QList<QWidget*> &widgets, bool compact)
+{
+    for (QWidget *w: widgets) {
+        if (w->property("bonus").toBool()) {
+            w->setVisible(!compact);
+        }
+    }
+    for (QWidget *w: widgets) {
+        w->style()->polish(w);
+        QEvent change(QEvent::StyleChange);
+        QCoreApplication::sendEvent(w, &change);
+        w->updateGeometry();
+    }
+}
+
+// A small window is compact: the style sheet has tighter rules for it (MainWindow[compact="true"]) and the widgets
+// with the property "bonus" are hidden.
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+
+    // The other pages are restyled once the window has stopped changing size, so that dragging stays smooth
+    mPolishTimer->start(150);
+
+    // The limit has some play, so that a window near it does not switch back and forth
+    bool compact = property("compact").toBool() ? (width() < 1230 || height() < 660) : (width() < 1200 || height() < 640);
+    if (compact != property("compact").toBool()) {
+        // Restyling every widget at once takes long: the frame and the open page are restyled now, the other pages
+        // later, one in each turn of the event loop. Cached sizes are dropped, as a hidden page does not redo its
+        // layout by itself.
+        setProperty("compact", compact);
+        QList<QWidget*> frame({this});
+        for (QWidget *w: findChildren<QWidget*>()) {
+            if (w->window() == this && !ui->pageWidget->isAncestorOf(w)) {
+                frame.append(w);
+            }
+        }
+        restyle(frame, compact);
+        polishPage(ui->pageWidget->currentWidget());
+
+        // The keys of the toolbar are in one column, where the drawing of the CAN forward key is too wide. The page
+        // list is narrower with lower rows and there is less room around the pages and the bottom bar.
+        for (QBoxLayout *keys: {ui->linkKeysLayout, ui->configKeysLayout, ui->liveKeysColumns}) {
+            keys->setDirection(compact ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
+        }
+        for (QLayout *keys: ui->rail->findChildren<QLayout*>()) {
+            keys->setSpacing(keys == ui->railLayout ? 5 : compact ? 2 : 3);
+        }
+        QIcon can(compact ? QPixmap(Utility::getThemePath() + "icons/can_off.png") : Utility::getIcon("icons/can_off.png"));
+        can.addPixmap(compact ? QPixmap(Utility::getThemePath() + "icons/can_on.png") : Utility::getIcon("icons/can_on.png"), QIcon::Normal, QIcon::On);
+        ui->actionCanFwd->setIcon(can);
+        QFontMetrics fm(font());
+        int listWidth = fm.horizontalAdvance("Welcome & Wizards++++++++++++") * (compact ? 0.9 : 1.0);
+        ui->pageList->setFixedWidth(listWidth);
+        ui->canList->setFixedWidth(listWidth);
+        ui->pageList->setGridSize(QSize(0.85 * listWidth, fm.height() * (compact ? 1.4 : 1.6)));
+        ui->railLayout->setContentsMargins(3, compact ? 4 : 10, 4, compact ? 2 : 6);
+        ui->deckLayout->setContentsMargins(compact ? 8 : 12, compact ? 3 : 6, 0, compact ? 3 : 6);
+        ui->deckLayout->setSpacing(compact ? 6 : 10);
+        for (auto i = mPagePadding.begin();i != mPagePadding.end();i++) {
+            i.key()->setContentsMargins(compact ? i.value() * 0.6 : i.value());
+        }
+        for (QLayout *l: findChildren<QLayout*>()) {
+            if (!ui->pageWidget->isAncestorOf(l->parentWidget())) {
+                l->invalidate();
+            }
+        }
+        // The counts on the write keys move with them
+        QTimer::singleShot(0, this, &MainWindow::updateConfigChanges);
+    }
+}
+
+// Restyles a page for the state of the window, if it is not styled for it yet, and drops its cached sizes
+void MainWindow::polishPage(QWidget *page)
+{
+    bool compact = property("compact").toBool();
+    if (page && page->property("compactStyle").toBool() != compact) {
+        page->setProperty("compactStyle", compact);
+        restyle(QList<QWidget*>({page}) + page->findChildren<QWidget*>(), compact);
+        for (QLayout *l: page->findChildren<QLayout*>()) {
+            l->invalidate();
+        }
+        ui->pageWidget->updateGeometry();
+    }
+}
+
+// Restyles the next page that is not styled for the state of the window, and comes back for the one after it
+void MainWindow::polishPages()
+{
+    for (int i = 0;i < ui->pageWidget->count();i++) {
+        QWidget *page = ui->pageWidget->widget(i);
+        if (page->property("compactStyle").toBool() != property("compact").toBool()) {
+            polishPage(page);
+            mPolishTimer->start(0);
+            return;
+        }
     }
 }
 
@@ -1555,7 +1671,8 @@ void MainWindow::addPageItem(QString name, QString icon, QString groupIcon, bool
     }
     for (QWidget *w: padded) {
         if (w->layout() && !w->findChild<QQuickWidget*>(QString(), Qt::FindDirectChildrenOnly)) {
-            w->layout()->setContentsMargins(16, (w == page && title) ? 1 : 14, 16, 14);
+            w->layout()->setContentsMargins(12, (w == page && title) ? 1 : 10, 12, 10);
+            mPagePadding.insert(w->layout(), w->layout()->contentsMargins());
         }
     }
     // Where the tabs share the page, the room at the sides is around the page: the name lines up with the names of
@@ -1566,7 +1683,8 @@ void MainWindow::addPageItem(QString name, QString icon, QString groupIcon, bool
         }
         for (int i = 0;i < tabs->count();i++) {
             if (tabs->widget(i)->layout()) {
-                tabs->widget(i)->layout()->setContentsMargins(0, 14, 0, 0);
+                tabs->widget(i)->layout()->setContentsMargins(0, 10, 0, 0);
+                mPagePadding.insert(tabs->widget(i)->layout(), tabs->widget(i)->layout()->contentsMargins());
             }
         }
     }
@@ -2008,7 +2126,7 @@ void MainWindow::reloadPages()
     // Adjust sizes
     QFontMetrics fm(this->font());
     int width = fm.horizontalAdvance("Welcome & Wizards++++++++++++");
-    int height = fm.height()*1.8;
+    int height = fm.height()*1.6;
 
     for(int i = 0; i < ui->pageList->count(); i++) {
         QListWidgetItem *item = ui->pageList->item(i);

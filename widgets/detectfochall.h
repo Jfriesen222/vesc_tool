@@ -49,6 +49,8 @@ private:
     Ui::DetectFocHall *ui;
     VescInterface *mVesc;
 
+    void changeEvent(QEvent *event) override;
+
 };
 
 #endif // DETECTFOCHALL_H

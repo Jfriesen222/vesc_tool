@@ -21,6 +21,7 @@
 #define DISPEDITOR_H
 
 #include <QWidget>
+#include <QHBoxLayout>
 #include "displayedit.h"
 
 namespace Ui {
@@ -53,10 +54,15 @@ private slots:
     void on_imgScaleBox_valueChanged(int arg1);
     void on_formatBox_currentIndexChanged(int index);
     void on_helpButton_clicked();
+    void on_tabWidget_currentChanged(int index);
+
+protected:
+    void changeEvent(QEvent *event) override;
 
 private:
     Ui::DispEditor *ui;
     QVector<QColor> mPalette;
+    QHBoxLayout *mControls2;
     void updatePalette();
     int imgBits();
 

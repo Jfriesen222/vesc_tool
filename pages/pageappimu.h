@@ -42,6 +42,9 @@ public:
     void setVesc(VescInterface *vesc);
     void reloadParams();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void timerSlot();
     void valuesReceived(IMU_VALUES values, unsigned int mask);
@@ -73,6 +76,7 @@ private:
 
     Vesc3DView *m3dView;
     QCheckBox *mUseYawBox;
+    bool mCompact = false;
 
     void appendDoubleAndTrunc(QVector<double> *vec, double num, int maxSize);
 };

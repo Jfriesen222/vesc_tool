@@ -67,6 +67,7 @@ private:
 
     void updateColors();
     void setFailed(QList<QWidget*> tiles, bool failed);
+    void changeEvent(QEvent *event) override;
 
 };
 

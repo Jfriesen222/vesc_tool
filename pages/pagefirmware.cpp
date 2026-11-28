@@ -143,6 +143,20 @@ void PageFirmware::reloadParams()
     }
 }
 
+// In a compact window the two check boxes under the lists are stacked and the tabs go without the page name
+void PageFirmware::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::StyleChange) {
+        bool compact = window()->property("compact").toBool();
+        ui->optionsLayout->setDirection(compact ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
+        ui->archOptionsLayout->setDirection(ui->optionsLayout->direction());
+        if (QWidget *title = ui->fwTabWidget->cornerWidget(Qt::TopLeftCorner)) {
+            title->setVisible(!compact);
+        }
+    }
+    QWidget::changeEvent(event);
+}
+
 void PageFirmware::timerSlot()
 {
     if (mVesc) {

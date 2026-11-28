@@ -146,7 +146,7 @@ PageScripting::PageScripting(QWidget *parent) :
         removeEditor(mainQmlEditor);
     });
 
-    ui->splitter_2->setSizes(QList<int>({1000, 600}));
+    ui->splitter_2->setSizes(QList<int>({1000, 300}));
 
     // Clear debug edit from messages that appeared from loading other qml-components
     QTimer::singleShot(2000, [this]() {

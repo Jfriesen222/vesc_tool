@@ -48,6 +48,16 @@ void PageAppSettings::setVesc(VescInterface *vesc)
     mVesc = vesc;
 }
 
+// A compact window has a narrower margin around the text
+void PageAppSettings::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+
+    if (event->type() == QEvent::StyleChange) {
+        ui->textEdit->document()->setDocumentMargin(window()->property("compact").toBool() ? 8 : 24);
+    }
+}
+
 void PageAppSettings::on_appWizardButton_clicked()
 {
     if (mVesc) {

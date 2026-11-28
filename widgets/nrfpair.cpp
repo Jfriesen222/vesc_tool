@@ -72,6 +72,16 @@ void NrfPair::startPairing()
     }
 }
 
+// A compact window has no title over the buttons
+void NrfPair::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+
+    if (event->type() == QEvent::StyleChange) {
+        ui->groupBox->setTitle(window()->property("compact").toBool() ? "" : tr("NRF Pairing"));
+    }
+}
+
 void NrfPair::nrfPairingRes(int res)
 {
     if (!mRunning) {

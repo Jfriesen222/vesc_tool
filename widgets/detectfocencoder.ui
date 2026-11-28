@@ -82,6 +82,9 @@
                <property name="muted" stdset="0">
                 <bool>true</bool>
                </property>
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -151,6 +154,9 @@
                 <string>Result goes to Encoder Offset, Ratio and Inverted</string>
                </property>
                <property name="muted" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="bonus" stdset="0">
                 <bool>true</bool>
                </property>
               </widget>
@@ -439,6 +445,9 @@
            <bool>true</bool>
           </property>
           <property name="hint" stdset="0">
+           <bool>true</bool>
+          </property>
+          <property name="bonus" stdset="0">
            <bool>true</bool>
           </property>
          </widget>

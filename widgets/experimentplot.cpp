@@ -150,6 +150,35 @@ ExperimentPlot::~ExperimentPlot()
     delete ui;
 }
 
+void ExperimentPlot::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    // Where the settings, import and export cards do not fit under the plot, they stand in a column beside it
+    if (!mBeside) {
+        mUnderWidth = ui->scrollAreaWidgetContents->minimumSizeHint().width();
+    }
+    if ((width() < mUnderWidth || height() < 330) == mBeside) {
+        return;
+    }
+
+    mBeside = !mBeside;
+    QBoxLayout::Direction dir = mBeside ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight;
+    ui->bodyLayout->setDirection(mBeside ? QBoxLayout::LeftToRight : QBoxLayout::TopToBottom);
+    ui->horizontalLayout->setDirection(dir);
+    ui->gridLayout_2->setDirection(dir);
+    ui->gridLayout->setDirection(dir);
+    for (QWidget *box: {ui->groupBox_3, ui->groupBox, ui->groupBox_2}) {
+        box->updateGeometry();
+    }
+    ui->scrollArea->setHorizontalScrollBarPolicy(mBeside ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
+    ui->scrollArea->setVerticalScrollBarPolicy(mBeside ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff);
+    ui->scrollArea->setSizePolicy(QSizePolicy::Expanding, mBeside ? QSizePolicy::Expanding : QSizePolicy::Fixed);
+    ui->scrollArea->setMaximumWidth(mBeside ? ui->scrollAreaWidgetContents->minimumSizeHint().width() +
+                                               ui->scrollArea->verticalScrollBar()->sizeHint().width() :
+                                               QWIDGETSIZE_MAX);
+}
+
 VescInterface *ExperimentPlot::vesc() const
 {
     return mVesc;

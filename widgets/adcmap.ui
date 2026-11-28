@@ -45,6 +45,9 @@
           <property name="hint" stdset="0">
            <bool>true</bool>
           </property>
+          <property name="bonus" stdset="0">
+           <bool>true</bool>
+          </property>
           <property name="text">
            <string>Move the throttle between the minimum and maximum values to get them sampled, then apply.</string>
           </property>

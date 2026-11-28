@@ -46,6 +46,9 @@ private slots:
     void on_clearRxButton_clicked();
     void on_updateCanBaudButton_clicked();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private:
     Ui::PageCanAnalyzer *ui;
     VescInterface *mVesc;

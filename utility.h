@@ -144,6 +144,7 @@ public:
 
     static void setPlotColors(QCustomPlot* plot);
     static void setPlotLegendRow(QCustomPlot *plot);
+    static void fitPlotLegend(QCustomPlot *plot, int reserved);
     static QString plotLegendName(QString name, double value, int decimals, QString unit = "");
     static void setupThrottlePlot(QCustomPlot *plot);
     static void placeOnTabs(QTabWidget *tabs, QWidget *tools, QWidget *bottom = nullptr);

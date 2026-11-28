@@ -64,12 +64,6 @@
              <family>Roboto Mono</family>
             </font>
            </property>
-           <property name="minimumSize">
-            <size>
-             <width>220</width>
-             <height>0</height>
-            </size>
-           </property>
           </widget>
          </item>
          <item>
@@ -122,7 +116,7 @@
               <string>Open in editor</string>
              </property>
              <property name="text">
-              <string>Open in editor</string>
+              <string/>
              </property>
              <property name="icon">
               <iconset resource="res.qrc">
@@ -182,7 +176,7 @@
                <item>
                 <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1">
                  <property name="horizontalSpacing">
-                  <number>16</number>
+                  <number>12</number>
                  </property>
                  <item row="2" column="0">
                   <widget class="QLabel" name="label_5">
@@ -297,7 +291,7 @@
                    <item>
                     <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1,0,1,0,0">
                      <property name="horizontalSpacing">
-                      <number>16</number>
+                      <number>12</number>
                      </property>
                      <item row="0" column="2">
                       <widget class="QLabel" name="label_27">
@@ -538,7 +532,10 @@
                  <widget class="QWidget" name="page_3">
                   <layout class="QVBoxLayout" name="verticalLayout_10">
                    <item>
-                    <layout class="QGridLayout" name="gridLayout_3">
+                    <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,0,1">
+                     <property name="horizontalSpacing">
+                      <number>12</number>
+                     </property>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_21">
                        <property name="text">
@@ -546,7 +543,7 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="1" colspan="2">
+                     <item row="0" column="1">
                       <widget class="QSpinBox" name="intValBox">
                        <property name="minimum">
                         <number>-100000000</number>
@@ -563,7 +560,7 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="1" colspan="2">
+                     <item row="1" column="1">
                       <widget class="QSpinBox" name="intMaxBox">
                        <property name="minimum">
                         <number>-100000000</number>
@@ -583,7 +580,7 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="2" column="1" colspan="2">
+                     <item row="2" column="1">
                       <widget class="QSpinBox" name="intMinBox">
                        <property name="minimum">
                         <number>-100000000</number>
@@ -610,28 +607,28 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="4" column="2">
+                     <item row="5" column="2" colspan="2">
                       <widget class="QCheckBox" name="intEditPercentageBox">
                        <property name="text">
                         <string>Edit as Percentage</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="5" column="0">
+                     <item row="1" column="2">
                       <widget class="QLabel" name="label_15">
                        <property name="text">
                         <string>Suffix</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="6" column="0">
+                     <item row="2" column="2">
                       <widget class="QLabel" name="label_17">
                        <property name="text">
                         <string>TX Type</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="6" column="1" colspan="2">
+                     <item row="2" column="3">
                       <widget class="QComboBox" name="intTxTypeBox">
                        <item>
                         <property name="text">
@@ -665,7 +662,7 @@
                        </item>
                       </widget>
                      </item>
-                     <item row="5" column="1" colspan="2">
+                     <item row="1" column="3">
                       <widget class="QLineEdit" name="intSuffixEdit"/>
                      </item>
                      <item row="3" column="1">
@@ -681,7 +678,7 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="3" column="2">
+                     <item row="5" column="0" colspan="2">
                       <widget class="QCheckBox" name="intShowDisplayBox">
                        <property name="text">
                         <string>Show Display</string>
@@ -1140,12 +1137,6 @@
               <font>
                <family>Roboto Mono</family>
               </font>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>220</width>
-               <height>0</height>
-              </size>
              </property>
              <property name="maximumSize">
               <size>

@@ -120,10 +120,9 @@ PageImu::PageImu(QWidget *parent) :
     ui->rpyPlot->xAxis->setLabel("Seconds (s)");
     ui->rpyPlot->yAxis->setLabel("Angle (Deg)");
 
-    ui->accelPlot->xAxis->setLabel("Seconds (s)");
+    // The three plots are stacked and share the time axis: it is named under the last one
     ui->accelPlot->yAxis->setLabel("Acceleration (G)");
 
-    ui->gyroPlot->xAxis->setLabel("Seconds (s)");
     ui->gyroPlot->yAxis->setLabel("Angular Velocity (Deg/s)");
 
     ui->magPlot->xAxis->setLabel("Seconds (s)");
@@ -139,6 +138,27 @@ PageImu::PageImu(QWidget *parent) :
 PageImu::~PageImu()
 {
     delete ui;
+}
+
+// A compact window has the three stacked plots without the names of their axes, so that they fit: the legends
+// have the units
+void PageImu::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+
+    if (event->type() != QEvent::StyleChange || window()->property("compact").toBool() == mCompact) {
+        return;
+    }
+
+    mCompact = !mCompact;
+    for (auto plot: {ui->accelPlot, ui->gyroPlot, ui->magPlot}) {
+        if (mCompact) {
+            plot->yAxis->setProperty("fullLabel", plot->yAxis->label());
+        }
+        plot->yAxis->setLabel(mCompact ? QString() : plot->yAxis->property("fullLabel").toString());
+        plot->replot();
+        plot->updateGeometry();
+    }
 }
 
 VescInterface *PageImu::vesc() const

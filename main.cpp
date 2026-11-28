@@ -1808,6 +1808,7 @@ int main(int argc, char *argv[])
             Utility::setAppQColor("titleText", isDark ? QColor(244,244,245) : QColor(17,17,20));
             Utility::setAppQColor("lightText", isDark ? QColor(200,199,205) : QColor(51,51,58));
             Utility::setAppQColor("disabledText", isDark ? QColor(104,103,111) : QColor(154,154,163));
+            Utility::setAppQColor("plot_graph5", isDark ? QColor(210,210,127) : QColor(170,160,40));
         }
 
         // Style

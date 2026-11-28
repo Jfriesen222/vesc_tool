@@ -24,7 +24,7 @@
        <number>10</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="stepLayout" stretch="4,4,5,0">
+       <layout class="QHBoxLayout" name="stepLayout" stretch="5,5,7,0">
         <property name="spacing">
          <number>8</number>
         </property>
@@ -66,6 +66,9 @@
                <property name="text">
                 <string>Measure R and L</string>
                </property>
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
              <item>
@@ -80,6 +83,9 @@
                 <string>Motor stays still</string>
                </property>
                <property name="muted" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="bonus" stdset="0">
                 <bool>true</bool>
                </property>
               </widget>
@@ -137,6 +143,9 @@
                <property name="text">
                 <string>Measure λ</string>
                </property>
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
              <item>
@@ -153,6 +162,9 @@
                <property name="muted" stdset="0">
                 <bool>true</bool>
                </property>
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -160,7 +172,7 @@
            <item>
             <widget class="QPushButton" name="lambdaButton">
              <property name="toolTip">
-              <string>Measure flux linkage</string>
+              <string>Measure flux linkage. The motor spins: keep it free to turn.</string>
              </property>
              <property name="text">
               <string notr="true">λ</string>
@@ -208,6 +220,9 @@
                <property name="text">
                 <string>Calculate</string>
                </property>
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
              <item>
@@ -222,6 +237,9 @@
                 <string>From R, L and λ</string>
                </property>
                <property name="muted" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="bonus" stdset="0">
                 <bool>true</bool>
                </property>
               </widget>
@@ -407,6 +425,12 @@
            </item>
            <item>
             <widget class="QDoubleSpinBox" name="erpmBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ERPM/sec to ramp up the motor in openloop mode with.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
@@ -495,6 +519,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="helpButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="toolTip">
            <string>Show help</string>
           </property>
@@ -523,16 +553,19 @@
           <property name="hint" stdset="0">
            <bool>true</bool>
           </property>
+          <property name="bonus" stdset="0">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="resultLayout" stretch="1,1,1,1,1,1,1">
+       <layout class="QGridLayout" name="resultLayout" columnstretch="1,1,1,1,1,1,1">
         <property name="spacing">
          <number>8</number>
         </property>
-        <item>
+        <item row="0" column="0">
          <widget class="QFrame" name="resistanceTile">
           <property name="result" stdset="0">
            <bool>true</bool>
@@ -601,7 +634,7 @@
           </layout>
          </widget>
         </item>
-        <item>
+        <item row="0" column="1">
          <widget class="QFrame" name="inductanceTile">
           <property name="result" stdset="0">
            <bool>true</bool>
@@ -667,7 +700,7 @@
           </layout>
          </widget>
         </item>
-        <item>
+        <item row="0" column="2">
          <widget class="QFrame" name="inductanceDiffTile">
           <property name="result" stdset="0">
            <bool>true</bool>
@@ -727,7 +760,7 @@
           </layout>
          </widget>
         </item>
-        <item>
+        <item row="0" column="3">
          <widget class="QFrame" name="lambdaTile">
           <property name="result" stdset="0">
            <bool>true</bool>
@@ -796,7 +829,7 @@
           </layout>
          </widget>
         </item>
-        <item>
+        <item row="0" column="4">
          <widget class="QFrame" name="kpTile">
           <property name="result" stdset="0">
            <bool>true</bool>
@@ -868,7 +901,7 @@
           </layout>
          </widget>
         </item>
-        <item>
+        <item row="0" column="5">
          <widget class="QFrame" name="kiTile">
           <property name="result" stdset="0">
            <bool>true</bool>
@@ -940,7 +973,7 @@
           </layout>
          </widget>
         </item>
-        <item>
+        <item row="0" column="6">
          <widget class="QFrame" name="obsGainTile">
           <property name="result" stdset="0">
            <bool>true</bool>
@@ -1018,6 +1051,9 @@
        <widget class="Line" name="encoderLine">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="bonus" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -42,6 +42,33 @@ PageCanAnalyzer::~PageCanAnalyzer()
     delete ui;
 }
 
+// On a small window the data bytes of the frame to send go on a row of their own
+void PageCanAnalyzer::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::StyleChange) {
+        bool compact = window()->property("compact").toBool();
+        auto put = [this](QWidget *w, int row, int column, int span) {
+            ui->gridLayout->removeWidget(w);
+            ui->gridLayout->addWidget(w, row, column, 1, span);
+        };
+
+        const QList<QWidget*> labels = {ui->label_3, ui->label_4, ui->label_5, ui->label_6,
+                                        ui->label_7, ui->label_8, ui->label_9, ui->label_10};
+        const QList<QWidget*> boxes = {ui->sendD0Box, ui->sendD1Box, ui->sendD2Box, ui->sendD3Box,
+                                       ui->sendD4Box, ui->sendD5Box, ui->sendD6Box, ui->sendD7Box};
+        for (int i = 0;i < 8;i++) {
+            put(labels.at(i), compact ? 2 : 0, compact ? i : i + 2, 1);
+            put(boxes.at(i), compact ? 3 : 1, compact ? i : i + 2, 1);
+        }
+        put(ui->label_2, 0, 1, compact ? 6 : 1);
+        put(ui->sendIdEdit, 1, 1, compact ? 6 : 1);
+        put(ui->sendButton, 1, compact ? 7 : 10, 1);
+        ui->horizontalLayout_3->setStretch(0, compact ? 0 : 1);
+    }
+
+    QWidget::changeEvent(event);
+}
+
 VescInterface *PageCanAnalyzer::vesc() const
 {
     return mVesc;

@@ -97,7 +97,40 @@ PageRtData::PageRtData(QWidget *parent) :
         Utility::setPlotColors(allPlots[j]);
         allPlots[j]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-        Utility::setPlotLegendRow(allPlots[j]);
+        // The position plot has a single trace, so the axis label is enough
+        if (allPlots[j] != ui->posPlot) {
+            Utility::setPlotLegendRow(allPlots[j]);
+            // As many columns as fit beside the plot tools
+            QCustomPlot *plot = allPlots[j];
+            connect(plot, &QCustomPlot::beforeReplot, this, [this, plot]() {
+                Utility::fitPlotLegend(plot, ui->buttonFrame->width() + 16);
+            });
+            // A press on a trace in the legend hides it, and shows it again. What is hidden is kept by name, for
+            // when the traces of the temperatures are made anew.
+            auto entryAt = [plot](QPoint pos) {
+                for (int i = 0;i < plot->legend->itemCount();i++) {
+                    QCPPlottableLegendItem *entry = qobject_cast<QCPPlottableLegendItem*>(plot->legend->item(i));
+                    if (entry && entry->outerRect().contains(pos)) {
+                        return entry;
+                    }
+                }
+                return (QCPPlottableLegendItem*)nullptr;
+            };
+            connect(plot, &QCustomPlot::mouseMove, this, [plot, entryAt](QMouseEvent *event) {
+                plot->setCursor(entryAt(event->pos()) ? Qt::PointingHandCursor : Qt::ArrowCursor);
+            });
+            connect(plot, &QCustomPlot::mousePress, this, [this, plot, entryAt](QMouseEvent *event) {
+                if (QCPPlottableLegendItem *entry = entryAt(event->pos())) {
+                    QString name = entry->plottable()->name().split("   ").first();
+                    if (!mHiddenTraces.remove(name)) {
+                        mHiddenTraces.insert(name);
+                    }
+                    entry->plottable()->setVisible(!mHiddenTraces.contains(name));
+                    plot->rescaleAxes(true);
+                    plot->replot();
+                }
+            });
+        }
     }
 
     // Current and duty
@@ -208,6 +241,47 @@ void PageRtData::setVesc(VescInterface *vesc)
     }
 }
 
+// A compact window has the tiles in two rows beside the strip of values, and the second half of the strip and of the
+// buttons of the rotor position under the first
+void PageRtData::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+
+    if (event->type() != QEvent::StyleChange || window()->property("compact").toBool() == mCompact) {
+        return;
+    }
+
+    mCompact = !mCompact;
+
+    // The tiles stand at the left of the strip, the two currents in a second row
+    ui->valueLayout->setDirection(mCompact ? QBoxLayout::LeftToRight : QBoxLayout::TopToBottom);
+    for (QFrame *tile: {ui->powerTile, ui->dutyTile, ui->erpmTile, ui->currentInTile, ui->currentMotorTile}) {
+        tile->layout()->setContentsMargins(mCompact ? 8 : 12, mCompact ? 4 : 8, mCompact ? 8 : 12, mCompact ? 4 : 8);
+        if (tile == ui->currentInTile || tile == ui->currentMotorTile) {
+            (mCompact ? ui->tileRow2 : ui->tileLayout)->addWidget(tile);
+        }
+    }
+
+    QList<QPair<QGridLayout*, int>> grids = {{ui->stripLayout, 6}, {ui->horizontalLayout_7, 4}};
+    for (auto grid: grids) {
+        for (int i = grid.first->count() - 1;i >= 0;i--) {
+            int row, column, rowSpan, columnSpan;
+            grid.first->getItemPosition(i, &row, &column, &rowSpan, &columnSpan);
+            if (mCompact ? column >= grid.second : row >= 3) {
+                QLayoutItem *item = grid.first->takeAt(i);
+                grid.first->addItem(item, mCompact ? row + 3 : row - 3, mCompact ? column - grid.second : column + grid.second,
+                                    rowSpan, columnSpan);
+            }
+        }
+    }
+    for (int c = 6;c < 12;c++) {
+        ui->stripLayout->setColumnStretch(c, (mCompact || c == 9) ? 0 : 4);
+    }
+    ui->stripLayout->setHorizontalSpacing(mCompact ? 10 : 16);
+    ui->stripLayout->setVerticalSpacing(mCompact ? 5 : 2);
+    ui->stripLayout->setContentsMargins(mCompact ? 8 : 12, 8, mCompact ? 8 : 12, 8);
+}
+
 void PageRtData::timerSlot()
 {
     if (mVesc) {
@@ -228,7 +302,7 @@ void PageRtData::timerSlot()
         mRateCount = 0;
         mRateStart = now;
     }
-    mLiveChip->setVisible(now - mLastUpdateTime < 2000 && !mLiveChip->text().isEmpty());
+    mLiveChip->setVisible(now - mLastUpdateTime < 2000 && !mLiveChip->text().isEmpty() && !mCompact);
 
     if (mUpdateValPlot) {
         int dataSize = mTempMosVec.size();
@@ -253,48 +327,27 @@ void PageRtData::timerSlot()
         ui->currentInSpark->setData(mCurrInVec);
         ui->currentMotorSpark->setData(mCurrMotorVec);
 
-        // Temperature plot
-        ui->tempPlot->clearGraphs();
-
-        graphIndex = 0;
-
-        ui->tempPlot->addGraph();
-        ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph1")));
-        ui->tempPlot->graph(graphIndex)->setName(Utility::plotLegendName("MOSFET", mTempMosVec.last(), 1, " \u00B0C"));
-        ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMosVec);
-        ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
-
-        graphIndex++;
-
+        // Temperature plot. The hardware decides which traces there are, so they are made anew only when that changes.
+        QVector<QPair<QString, QVector<double>*>> temps = {{"MOSFET", &mTempMosVec}};
         if (!mTempMos1Vec.isEmpty() && mTempMos1Vec.last() != 0.0) {
-            ui->tempPlot->addGraph();
-            ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph2")));
-            ui->tempPlot->graph(graphIndex)->setName(Utility::plotLegendName("MOSFET 1", mTempMos1Vec.last(), 1, " \u00B0C"));
-            ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMos1Vec);
-            ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
-            graphIndex++;
-
-            ui->tempPlot->addGraph();
-            ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph3")));
-            ui->tempPlot->graph(graphIndex)->setName(Utility::plotLegendName("MOSFET 2", mTempMos2Vec.last(), 1, " \u00B0C"));
-            ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMos2Vec);
-            ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
-            graphIndex++;
-
-            ui->tempPlot->addGraph();
-            ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph4")));
-            ui->tempPlot->graph(graphIndex)->setName(Utility::plotLegendName("MOSFET 3", mTempMos3Vec.last(), 1, " \u00B0C"));
-            ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMos3Vec);
-            ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
-            graphIndex++;
+            temps.append({"MOSFET 1", &mTempMos1Vec});
+            temps.append({"MOSFET 2", &mTempMos2Vec});
+            temps.append({"MOSFET 3", &mTempMos3Vec});
         }
-
-        ui->tempPlot->addGraph(ui->tempPlot->xAxis, ui->tempPlot->yAxis2);
-        ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph5")));
-        ui->tempPlot->graph(graphIndex)->setName(Utility::plotLegendName("Motor", mTempMotorVec.last(), 1, " \u00B0C"));
-        ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMotorVec);
-        ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMotorBox->isChecked());
-        graphIndex++;
+        temps.append({"Motor", &mTempMotorVec});
+        if (ui->tempPlot->graphCount() != temps.size()) {
+            ui->tempPlot->clearGraphs();
+            for (int i = 0;i < temps.size();i++) {
+                bool motor = i == temps.size() - 1;
+                ui->tempPlot->addGraph(ui->tempPlot->xAxis, motor ? ui->tempPlot->yAxis2 : ui->tempPlot->yAxis);
+                ui->tempPlot->graph(i)->setPen(QPen(Utility::getAppQColor(QString("plot_graph%1").arg(motor ? 5 : i + 1))));
+                ui->tempPlot->graph(i)->setVisible(!mHiddenTraces.contains(temps.at(i).first));
+            }
+        }
+        for (int i = 0;i < temps.size();i++) {
+            ui->tempPlot->graph(i)->setName(Utility::plotLegendName(temps.at(i).first, temps.at(i).second->last(), 1, " \u00B0C"));
+            ui->tempPlot->graph(i)->setData(xAxis, *temps.at(i).second);
+        }
 
         // RPM plot
         graphIndex = 0;
@@ -313,10 +366,10 @@ void PageRtData::timerSlot()
         ui->focPlot->graph(3)->setName(Utility::plotLegendName("Q Voltage", mVqVec.last(), 2, " V"));
 
         if (ui->autoscaleButton->isChecked()) {
-            ui->currentPlot->rescaleAxes();
-            ui->tempPlot->rescaleAxes();
-            ui->rpmPlot->rescaleAxes();
-            ui->focPlot->rescaleAxes();
+            ui->currentPlot->rescaleAxes(true);
+            ui->tempPlot->rescaleAxes(true);
+            ui->rpmPlot->rescaleAxes(true);
+            ui->focPlot->rescaleAxes(true);
         }
 
         ui->currentPlot->replotWhenVisible();
@@ -449,10 +502,10 @@ void PageRtData::on_zoomVButton_toggled(bool checked)
 
 void PageRtData::on_rescaleButton_clicked()
 {
-    ui->currentPlot->rescaleAxes();
-    ui->tempPlot->rescaleAxes();
-    ui->rpmPlot->rescaleAxes();
-    ui->focPlot->rescaleAxes();
+    ui->currentPlot->rescaleAxes(true);
+    ui->tempPlot->rescaleAxes(true);
+    ui->rpmPlot->rescaleAxes(true);
+    ui->focPlot->rescaleAxes(true);
     ui->posPlot->rescaleAxes();
 
     ui->currentPlot->replotWhenVisible();
@@ -508,20 +561,6 @@ void PageRtData::on_posStopButton_clicked()
 {
     if (mVesc) {
         mVesc->commands()->setDetect(DISP_POS_MODE_NONE);
-    }
-}
-
-void PageRtData::on_tempShowMosfetBox_toggled(bool checked)
-{
-    if (ui->tempPlot->graphCount() > 0) {
-        ui->tempPlot->graph(0)->setVisible(checked);
-    }
-}
-
-void PageRtData::on_tempShowMotorBox_toggled(bool checked)
-{
-    if (ui->tempPlot->graphCount() > 1) {
-        ui->tempPlot->graph(1)->setVisible(checked);
     }
 }
 

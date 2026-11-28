@@ -24,6 +24,7 @@
 
 #include <QLayout>
 #include <QFileDialog>
+#include <QScrollArea>
 #include <QDebug>
 
 PageDisplayTool::PageDisplayTool(QWidget *parent) :
@@ -36,8 +37,16 @@ PageDisplayTool::PageDisplayTool(QWidget *parent) :
     mOverlayUpdating = false;
     on_updateSizeButton_clicked();
 
-    // The settings of each editor go under its preview
-    ui->fullEditor->addSideWidget(ui->tabWidget_2);
+    // The settings of each editor go under its preview. The overlay settings scroll on a low window.
+    QScrollArea *sideScroll = new QScrollArea;
+    sideScroll->setWidget(ui->tabWidget_2);
+    sideScroll->setWidgetResizable(true);
+    sideScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    sideScroll->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    QSizePolicy sidePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    sidePolicy.setVerticalStretch(1);
+    sideScroll->setSizePolicy(sidePolicy);
+    ui->fullEditor->addSideWidget(sideScroll);
     ui->fontEditor->addSideWidget(ui->fontEditBox);
     ui->fullEditor->addEditorHeader(ui->sizeWidgetDisp);
     ui->customEditor->addEditorHeader(ui->sizeWidget);

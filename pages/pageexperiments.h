@@ -126,6 +126,7 @@ private:
 
     void victronGetCurrent();
     void victronGetVoltage();
+    void changeEvent(QEvent *event) override;
 
 };
 

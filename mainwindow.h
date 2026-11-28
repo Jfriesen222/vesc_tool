@@ -85,6 +85,7 @@ public:
     ~MainWindow();
     bool eventFilter(QObject *object, QEvent *e);
     void closeEvent(QCloseEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 protected:
     void dragEnterEvent(QDragEnterEvent* event);
@@ -175,6 +176,7 @@ private:
     VescInterface *mVesc;
     QTimer *mDebugTimer;
     QTimer *mTimer;
+    QTimer *mPolishTimer;
     QLabel *mStatusLabel;
     int mStatusInfoTime;
     bool mKeyLeft;
@@ -187,6 +189,8 @@ private:
     bool mConfReadRequested;
     bool mConfReadFailed;
     QMap<QString, int> mPageNameIdList;
+    // The room around the content of the pages, less when the window is compact
+    QMap<QLayout*, QMargins> mPagePadding;
     QString mLastParamParserCPath;
     QString mLastMCConfigXMLPath;
     QString mLastAppConfigXMLPath;
@@ -243,6 +247,8 @@ private:
     Preferences *mPreferences;
 
     void setRunning(QWidget *cell);
+    void polishPage(QWidget *page);
+    void polishPages();
     void addPageItem(QString name,
                      QString icon = "",
                      QString groupIcon = "",

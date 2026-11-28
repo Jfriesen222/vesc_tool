@@ -42,6 +42,19 @@ DetectFocHall::~DetectFocHall()
     delete ui;
 }
 
+// A compact window has no room for "Table" in the names of the results
+void DetectFocHall::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::StyleChange) {
+        int i = 0;
+        for (auto *l: {ui->hall0Label, ui->hall1Label, ui->hall2Label, ui->hall3Label,
+             ui->hall4Label, ui->hall5Label, ui->hall6Label, ui->hall7Label}) {
+            l->setText(QString(window()->property("compact").toBool() ? "[%1]" : "Table [%1]").arg(i++));
+        }
+    }
+}
+
 void DetectFocHall::on_helpButton_clicked()
 {
     if (mVesc) {

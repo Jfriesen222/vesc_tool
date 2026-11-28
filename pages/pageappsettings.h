@@ -38,6 +38,9 @@ public:
     VescInterface *vesc() const;
     void setVesc(VescInterface *vesc);
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void on_appWizardButton_clicked();
 

@@ -82,6 +82,7 @@ protected:
     void list(bool checked, QTextListFormat::Style style);
     void indent(int delta);
     void focusInEvent(QFocusEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
     QStringList m_paragraphItems;
     int m_fontsize_h1;

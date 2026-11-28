@@ -126,6 +126,7 @@ CANListItem::CANListItem(FW_RX_PARAMS p,
 
 void CANListItem::setName(const QString &name)
 {
+    mName = name;
     mNameLabel->setText(name);
     QFont f = mNameLabel->font();
     f.setPointSize(this->font().pointSize()*0.9);
@@ -163,7 +164,7 @@ int CANListItem::getID()
 
 QString CANListItem::name()
 {
-    return mNameLabel->text();
+    return mName;
 }
 
 void CANListItem::setBold(bool bold)
@@ -171,6 +172,20 @@ void CANListItem::setBold(bool bold)
     QFont f = mNameLabel->font();
     f.setBold(bold);
     mNameLabel->setFont(f);
+}
+
+// A name that does not fit ends with an ellipsis. The logo in front of it is an image in the text.
+void CANListItem::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    layout()->activate();
+    mNameLabel->setText(mName);
+    int over = mNameLabel->sizeHint().width() - (mIdLabel->x() - layout()->spacing() - mNameLabel->x());
+    if (over > 0) {
+        QString text = mName.section("/> ", -1);
+        QFontMetrics fm(mNameLabel->font());
+        mNameLabel->setText(mName.chopped(text.size()) + fm.elidedText(text, Qt::ElideRight, fm.horizontalAdvance(text) - over));
+    }
 }
 
 void CANListItem::setIndented(bool indented)

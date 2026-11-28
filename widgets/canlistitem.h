@@ -47,7 +47,11 @@ signals:
 
 public slots:
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
+    QString mName;
     QLabel *mIconLabel;
     QLabel *mNameLabel;
     QLabel *mIdLabel;

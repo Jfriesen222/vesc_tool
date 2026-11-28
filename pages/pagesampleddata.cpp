@@ -52,6 +52,14 @@ PageSampledData::PageSampledData(QWidget *parent) :
     // The sampling controls sit under the plot of every tab and the plot tools over the top right of its well.
     Utility::placeOnTabs(ui->tabWidget, ui->toolFrame, ui->sampleWidget);
 
+    // A compact window has the plot tools beside the tabs instead
+    connect(ui->tabWidget, &QTabWidget::currentChanged, [this]() {
+        if (mCompact) {
+            ui->tabWidget->setCornerWidget(ui->toolFrame);
+            ui->toolFrame->show();
+        }
+    });
+
     mDoReplot = false;
     mDoFilterReplot = false;
     mDoRescale = false;
@@ -128,6 +136,35 @@ void PageSampledData::setVesc(VescInterface *vesc)
             clearBuffers();
             mSamplesToWait = samples;
         });
+    }
+}
+
+// A compact window has the plot tools beside the tabs, the filter settings in two rows and the sample buttons
+// without text
+void PageSampledData::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+
+    if (event->type() != QEvent::StyleChange || window()->property("compact").toBool() == mCompact) {
+        return;
+    }
+
+    mCompact = !mCompact;
+    ui->tabWidget->setCornerWidget(nullptr);
+    emit ui->tabWidget->currentChanged(ui->tabWidget->currentIndex());
+    ui->toolFrame->show();
+    for (int i = 0;i < 3;i++) {
+        QLayoutItem *item = ui->horizontalLayout_3->itemAtPosition(mCompact ? 0 : 1, mCompact ? i + 5 : i);
+        ui->horizontalLayout_3->removeItem(item);
+        ui->horizontalLayout_3->addItem(item, mCompact ? 1 : 0, mCompact ? i : i + 5);
+    }
+
+    ui->horizontalLayout_5->setSpacing(mCompact ? 8 : 16);
+    for (auto b: ui->sampleGroup->findChildren<QPushButton*>()) {
+        if (mCompact) {
+            b->setProperty("fullText", b->text());
+        }
+        b->setText(mCompact ? QString() : b->property("fullText").toString());
     }
 }
 

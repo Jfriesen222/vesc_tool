@@ -40,6 +40,9 @@ public:
     void setVesc(VescInterface *vesc);
     void startPairing();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void nrfPairingRes(int res);
     void timerSlot();

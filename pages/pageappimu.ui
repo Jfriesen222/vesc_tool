@@ -21,12 +21,6 @@
      </property>
      <widget class="ParamTable" name="tableWidget"/>
      <widget class="QWidget" name="layoutWidget">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>320</height>
-       </size>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
        <property name="spacing">
         <number>10</number>

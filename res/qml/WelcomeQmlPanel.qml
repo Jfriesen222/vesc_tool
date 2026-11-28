@@ -19,6 +19,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.2
 
@@ -35,6 +36,8 @@ Item {
     property int notchRight: 0
     property int notchBot: 0
     property int notchTop: 0
+    // Set by PageWelcome: the window is compact and the header is lower
+    property bool compact: false
 
     // Globals that the mobile components expect from mobile/main.qml
     property bool mainIsHorizontal: container.width > container.height
@@ -156,8 +159,8 @@ Item {
         width: implicitWidth
         // Marks a tab whose page comes from the connected hardware or app
         property string badge: ""
-        implicitWidth: tabRow.implicitWidth + 4
-        implicitHeight: 44
+        implicitWidth: tabRow.implicitWidth + 24
+        implicitHeight: TabBar.tabBar ? TabBar.tabBar.height : 37
         padding: 0
         hoverEnabled: true
 
@@ -172,7 +175,7 @@ Item {
                     text: headerTab.text
                     font.pixelSize: 13
                     font.weight: headerTab.checked ? Font.Medium : Font.Normal
-                    color: Utility.getAppHexColor(headerTab.checked ? "titleText" : headerTab.hovered ? "lightText" : "mutedText")
+                    color: Utility.getAppHexColor(headerTab.checked ? "accentText" : headerTab.hovered ? "titleText" : "lightText")
                 }
 
                 Rectangle {
@@ -197,14 +200,15 @@ Item {
             }
         }
 
+        // A pill, as the tabs of the other pages
         background: Item {
             Rectangle {
-                anchors.bottom: parent.bottom
+                anchors.centerIn: parent
                 width: parent.width
-                height: 2
-                radius: 1
-                visible: headerTab.checked
-                color: Utility.getAppHexColor("accent")
+                height: parent.height - (parent.height < 32 ? 8 : 13)
+                radius: height / 2
+                color: Utility.getAppHexColor(headerTab.checked ? "accentDim" : "cardBackground")
+                border.color: Utility.getAppHexColor(headerTab.checked ? "accent" : "lightestBackground")
             }
         }
     }
@@ -217,14 +221,14 @@ Item {
         Item {
             id: header
             Layout.fillWidth: true
-            Layout.preferredHeight: 44
+            Layout.preferredHeight: compact ? 30 : 39
 
             Text {
                 id: pageTitle
-                x: 16
+                x: compact ? 9 : 14
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("Welcome & Wizards")
-                font.pointSize: 14
+                font.pointSize: compact ? 12 : 14
                 font.weight: Font.Medium
                 color: Utility.getAppHexColor("titleText")
             }
@@ -245,8 +249,10 @@ Item {
                 anchors.leftMargin: 16
                 anchors.right: parent.right
                 height: parent.height
-                spacing: 14
+                spacing: 6
                 clip: true
+                // The open tab is a pill, without the bar of the style under it
+                Material.accent: "transparent"
 
                 onCurrentIndexChanged: {
                     if (swipeView.currentIndex !== currentIndex) {

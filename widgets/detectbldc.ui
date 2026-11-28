@@ -82,6 +82,9 @@
                <property name="muted" stdset="0">
                 <bool>true</bool>
                </property>
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -141,16 +144,13 @@
              </item>
              <item>
               <widget class="QLabel" name="applyHint">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="text">
                 <string>Result goes to the sensorless and hall sensor parameters</string>
                </property>
                <property name="muted" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="bonus" stdset="0">
                 <bool>true</bool>
                </property>
               </widget>

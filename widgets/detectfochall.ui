@@ -82,6 +82,9 @@
                <property name="muted" stdset="0">
                 <bool>true</bool>
                </property>
+               <property name="bonus" stdset="0">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -151,6 +154,9 @@
                 <string>Result goes to Hall Table [0] to [7]</string>
                </property>
                <property name="muted" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="bonus" stdset="0">
                 <bool>true</bool>
                </property>
               </widget>
@@ -778,6 +784,9 @@
          <bool>true</bool>
         </property>
         <property name="hint" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="bonus" stdset="0">
          <bool>true</bool>
         </property>
        </widget>

@@ -46,6 +46,7 @@ PageExperiments::PageExperiments(QWidget *parent) :
 {
     ui->setupUi(this);
     layout()->setContentsMargins(0, 0, 0, 0);
+    ui->stripLayout->setAlignment(ui->saveLayout, Qt::AlignRight);
     mVesc = 0;
 
     ui->currentRunButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
@@ -92,6 +93,16 @@ PageExperiments::PageExperiments(QWidget *parent) :
     Utility::setPlotColors(ui->plot);
     Utility::setPlotLegendRow(ui->plot);
     ui->plot->legend->setWrap(4);
+    // The legend has three columns where four are wider than the plot
+    connect(ui->plot, &QCustomPlot::beforeReplot, this, [this]() {
+        for (int wrap: {4, 3}) {
+            ui->plot->legend->setWrap(wrap);
+            ui->plot->legend->setFillOrder(QCPLayoutGrid::foColumnsFirst, true);
+            if (ui->plot->legend->minimumOuterSizeHint().width() <= ui->plot->width()) {
+                break;
+            }
+        }
+    });
     ui->plot->xAxis->setLabel("Seconds (s)");
     ui->plot->yAxis2->setLabel("ERPM");
     ui->plot->yAxis2->setVisible(true);
@@ -170,6 +181,25 @@ PageExperiments::PageExperiments(QWidget *parent) :
 PageExperiments::~PageExperiments()
 {
     delete ui;
+}
+
+// A compact window has the strip in two rows, the Run buttons beside the fields, an ERPM box that is wider than the
+// duty box above it and only the icon on the key that closes the comparison
+void PageExperiments::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::StyleChange) {
+        bool compact = window()->property("compact").toBool();
+        ui->stripLayout->setDirection(compact ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
+        ui->gridLayout->addWidget(ui->dutyRunButton, compact ? 3 : 4, compact ? 2 : 0, 1, compact ? 1 : 2);
+        ui->gridLayout_2->addWidget(ui->currentRunButton, compact ? 3 : 4, compact ? 2 : 0, 1, compact ? 1 : 2);
+        ui->gridLayout_3->addWidget(ui->rpmRunButton, compact ? 3 : 4, compact ? 3 : 0, 1, compact ? 1 : 3);
+        ui->gridLayout_4->addWidget(ui->groupBox_2, 0, 1, 1, compact ? 2 : 1);
+        ui->gridLayout_4->addWidget(ui->groupBox_3, 1, 0, 1, compact ? 2 : 1);
+        ui->gridLayout_4->addWidget(ui->groupBox_5, 1, compact ? 2 : 1, Qt::AlignTop);
+        ui->gridLayout_4->setColumnMinimumWidth(1, compact ? 130 : 0);
+        ui->compCloseButton->setToolButtonStyle(compact ? Qt::ToolButtonIconOnly : Qt::ToolButtonTextBesideIcon);
+    }
 }
 
 VescInterface *PageExperiments::vesc() const

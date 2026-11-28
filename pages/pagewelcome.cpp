@@ -38,6 +38,7 @@
 #include <QLibraryInfo>
 #include <QVersionNumber>
 #include <QQuickWindow>
+#include <QQuickItem>
 #include <QNativeGestureEvent>
 
 namespace {
@@ -99,6 +100,15 @@ bool PageWelcome::eventFilter(QObject *object, QEvent *event)
     }
 #endif
     return QWidget::eventFilter(object, event);
+}
+
+// The header in QML is as low as the ones of the other pages when the window is compact
+void PageWelcome::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::StyleChange && ui->qmlWidget->rootObject()) {
+        ui->qmlWidget->rootObject()->setProperty("compact", window()->property("compact"));
+    }
+    QWidget::changeEvent(event);
 }
 
 PageWelcome::~PageWelcome()

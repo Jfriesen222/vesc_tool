@@ -70,12 +70,13 @@ PageMotorComparison::PageMotorComparison(QWidget *parent) :
     mVerticalLine->setPen(QPen(Utility::getAppQColor("normalText")));
     mVerticalLinePosLast = -1.0;
 
-    // The name takes the room the value and plot scale columns leave
     for (QTableWidget *table: {ui->m1PlotTable, ui->m2PlotTable}) {
         table->verticalHeader()->hide();
-        table->horizontalHeader()->setStretchLastSection(false);
         table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        // The name takes the room the value and plot scale columns leave, but is never squeezed away
+        table->horizontalHeader()->setStretchLastSection(false);
         table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+        table->horizontalHeader()->setMinimumSectionSize(70);
     }
 
     Utility::setPlotLegendRow(ui->plot);
@@ -397,6 +398,29 @@ PageMotorComparison::~PageMotorComparison()
 {
     saveStateToSettings();
     delete ui;
+}
+
+// A compact window has the number of points and the scatter box in a row of their own, under the names
+void PageMotorComparison::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+
+    if (event->type() != QEvent::StyleChange || window()->property("compact").toBool() == mCompact) {
+        return;
+    }
+
+    mCompact = !mCompact;
+    ui->splitter_3->setOrientation(mCompact ? Qt::Vertical : Qt::Horizontal);
+
+    // The plot points go to the header, so that the name fields get the first row to themselves
+    if (mCompact) {
+        ui->headerLayout->insertWidget(2, ui->pointsBox);
+    } else {
+        ui->horizontalLayout_4->addWidget(ui->pointsBox, 0, 3);
+    }
+    ui->horizontalLayout_4->addWidget(ui->scatterPlotBox, mCompact ? 1 : 0, mCompact ? 0 : 4);
+    ui->horizontalLayout_4->addWidget(ui->buttonFrame, mCompact ? 1 : 0, mCompact ? 1 : 5, 1, mCompact ? 2 : 1,
+                                      mCompact ? Qt::AlignRight : Qt::Alignment());
 }
 
 void PageMotorComparison::saveStateToSettings()

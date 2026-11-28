@@ -40,6 +40,9 @@ public:
     VescInterface *vesc() const;
     void setVesc(VescInterface *vesc);
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void timerSlot();
     void sampleGetTimerSlot();
@@ -97,6 +100,7 @@ private:
 
     bool mDoReplot;
     bool mDoRescale;
+    bool mCompact = false;
     bool mDoFilterReplot;
     int mSamplesToWait;
 

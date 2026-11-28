@@ -40,7 +40,11 @@ public:
     VescInterface *vesc() const;
     void setVesc(VescInterface *vesc);
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
+    void fitTab();
     void timerSlot();
     void bleScanDone(QVariantMap devs, bool done);
     void pingCanRx(QVector<int> devs, bool isTimeout);

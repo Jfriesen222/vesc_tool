@@ -39,6 +39,9 @@ public:
     VescInterface *vesc() const;
     void setVesc(VescInterface *newVesc);
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private slots:
     void on_experimentLoadXmlButton_clicked();
     void on_experimentSaveXmlButton_clicked();
@@ -67,6 +70,8 @@ private:
     Ui::ExperimentPlot *ui;
     VescInterface *mVesc;
     QTimer *mTimer;
+    bool mBeside = false;
+    int mUnderWidth = 930;
 
 };
 

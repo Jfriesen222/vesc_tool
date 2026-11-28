@@ -29,6 +29,8 @@ import "qrc:/mobile"
 // Start tab of the welcome page: the device finder or the connected device, the setup wizards and the tools
 ScrollView {
     id: start
+    // A narrow page stacks what is side by side: the finder under the title, the cards in fewer columns
+    readonly property bool narrow: availableWidth < 760
 
     // WelcomeQmlPanel, which runs the wizards and tools
     property var panel
@@ -396,6 +398,13 @@ ScrollView {
         }
     }
 
+    component AutoConnectBtn: Btn {
+        text: qsTr("AutoConnect")
+        iconPath: "desktop/icons/Connected-96.png"
+        ToolTip.text: qsTr("Automatically connect to the VESC using the USB connection.")
+        onClicked: QmlUi.autoConnect()
+    }
+
     component WizardCard: Tile {
         id: card
         property string iconPath: ""
@@ -405,6 +414,8 @@ ScrollView {
         property bool optional: false
         property bool ready: false
         property var facts: []
+        // Only the name and the key, for a narrow page
+        property bool compact: false
         signal run()
 
         implicitHeight: cardColumn.implicitHeight + 27
@@ -423,6 +434,7 @@ ScrollView {
                 spacing: 11
 
                 IconBox {
+                    visible: !card.compact
                     iconPath: card.iconPath
                 }
 
@@ -441,6 +453,7 @@ ScrollView {
 
                     Text {
                         Layout.fillWidth: true
+                        visible: !card.compact
                         text: card.subtitle
                         elide: Text.ElideRight
                         font.pixelSize: 12
@@ -450,7 +463,7 @@ ScrollView {
 
                 Rectangle {
                     Layout.alignment: Qt.AlignTop
-                    visible: card.optional
+                    visible: card.optional && !card.compact
                     implicitWidth: optionalText.implicitWidth + 16
                     implicitHeight: 20
                     radius: 10
@@ -471,12 +484,12 @@ ScrollView {
                 Layout.fillWidth: true
                 Layout.topMargin: 12
                 height: 1
-                visible: card.facts.length > 0
+                visible: card.facts.length > 0 && !card.compact
                 color: Utility.getAppHexColor("line")
             }
 
             Repeater {
-                model: card.facts
+                model: card.compact ? [] : card.facts
 
                 ColumnLayout {
                     Layout.fillWidth: true
@@ -520,6 +533,7 @@ ScrollView {
                 spacing: 12
 
                 Btn {
+                    Layout.fillWidth: card.compact
                     text: qsTr("Run wizard")
                     iconPath: "desktop/icons/Wizard-96.png"
                     enabled: card.ready
@@ -528,7 +542,7 @@ ScrollView {
                 }
 
                 Image {
-                    visible: !card.ready
+                    visible: !card.ready && !card.compact
                     Layout.preferredWidth: 11
                     Layout.preferredHeight: 11
                     source: "qrc" + Utility.getThemePath() + "desktop/icons/Lock-96.png"
@@ -537,7 +551,7 @@ ScrollView {
                 }
 
                 Text {
-                    visible: !card.ready
+                    visible: !card.ready && !card.compact
                     text: qsTr("Connect first")
                     font.pixelSize: 12
                     color: Utility.getAppHexColor("mutedText")
@@ -555,7 +569,7 @@ ScrollView {
             Layout.fillWidth: true
             Layout.topMargin: 16
             // Not connected, the finder gets the height that the setup and the tools leave free, for a long device list
-            Layout.preferredHeight: connected ? 214 : Math.max(286, heroLeft.implicitHeight + 48, start.availableHeight -
+            Layout.preferredHeight: connected ? (start.narrow ? heroInfo.implicitHeight + 150 : 214) : Math.max(start.narrow ? heroLeft.implicitHeight + 340 : 286, heroLeft.implicitHeight + 48, start.availableHeight -
                                     setupTitle.implicitHeight - setupRow.implicitHeight - toolsTitle.implicitHeight -
                                     toolsRow.implicitHeight - 84)
             radius: 12
@@ -581,7 +595,7 @@ ScrollView {
             // Three link waves behind the connected device, fading out before the tiles
             Canvas {
                 anchors.fill: parent
-                visible: connected
+                visible: connected && !start.narrow
                 opacity: 0.42
                 onWidthChanged: requestPaint()
 
@@ -616,34 +630,53 @@ ScrollView {
             }
 
             // Not connected: what to do on the left, the device finder on the right
-            RowLayout {
+            GridLayout {
                 anchors.fill: parent
                 visible: !connected
-                spacing: 0
+                columns: start.narrow ? 1 : 2
+                rowSpacing: 0
+                columnSpacing: 0
 
                 ColumnLayout {
                     id: heroLeft
-                    Layout.fillWidth: false
+                    Layout.fillWidth: start.narrow
                     Layout.preferredWidth: 272
-                    Layout.fillHeight: true
+                    Layout.fillHeight: !start.narrow
                     Layout.leftMargin: 26
                     Layout.rightMargin: 6
                     Layout.topMargin: 26
-                    Layout.bottomMargin: 22
+                    Layout.bottomMargin: start.narrow ? 4 : 22
                     spacing: 0
 
-                    Eyebrow {
-                        text: qsTr("Not connected")
-                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.rightMargin: start.narrow ? 20 : 14
+                        spacing: 10
 
-                    HeroTitle {
-                        text: qsTr("Connect your VESC")
-                        wrapMode: Text.WordWrap
-                        lineHeight: 1.05
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 0
+
+                            Eyebrow {
+                                text: qsTr("Not connected")
+                            }
+
+                            HeroTitle {
+                                text: qsTr("Connect your VESC")
+                                wrapMode: Text.WordWrap
+                                lineHeight: 1.05
+                            }
+                        }
+
+                        // A narrow page has the key here, so that the list of devices under it is longer
+                        AutoConnectBtn {
+                            visible: start.narrow
+                        }
                     }
 
                     Text {
                         Layout.fillWidth: true
+                        visible: !start.narrow
                         text: qsTr("Devices in range appear as they are found, over Bluetooth, USB, Wi-Fi or a TCP hub.")
                         wrapMode: Text.WordWrap
                         font.pixelSize: 13
@@ -653,13 +686,16 @@ ScrollView {
                     Caption {
                         Layout.topMargin: 20
                         Layout.bottomMargin: 7
-                        visible: lastDevice.name !== ""
+                        visible: lastDevice.name !== "" && !start.narrow
                         text: qsTr("Last connected")
                     }
 
+                    // On a narrow page it is the first row over the list of devices
                     Rectangle {
                         Layout.fillWidth: true
-                        implicitHeight: 54
+                        Layout.topMargin: start.narrow ? 12 : 0
+                        Layout.rightMargin: start.narrow ? 20 : 0
+                        implicitHeight: start.narrow ? 44 : 54
                         visible: lastDevice.name !== ""
                         radius: 11
                         color: Utility.getAppHexColor("cardBackground")
@@ -690,7 +726,8 @@ ScrollView {
 
                                 Text {
                                     Layout.fillWidth: true
-                                    text: panel.timeAgo(lastDevice.time)
+                                    text: start.narrow ? qsTr("Last connected %1").arg(panel.timeAgo(lastDevice.time)) :
+                                                         panel.timeAgo(lastDevice.time)
                                     elide: Text.ElideRight
                                     font.pixelSize: 11
                                     color: Utility.getAppHexColor("mutedText")
@@ -708,13 +745,11 @@ ScrollView {
                     Item {
                         Layout.fillHeight: true
                         Layout.minimumHeight: 16
+                        visible: !start.narrow
                     }
 
-                    Btn {
-                        text: qsTr("AutoConnect")
-                        iconPath: "desktop/icons/Connected-96.png"
-                        ToolTip.text: qsTr("Automatically connect to the VESC using the USB connection.")
-                        onClicked: QmlUi.autoConnect()
+                    AutoConnectBtn {
+                        visible: !start.narrow
                     }
                 }
 
@@ -735,14 +770,17 @@ ScrollView {
             }
 
             // Connected: the device and its live values
-            RowLayout {
+            GridLayout {
                 anchors.fill: parent
                 visible: connected
-                spacing: 0
+                columns: start.narrow ? 1 : 2
+                rowSpacing: 0
+                columnSpacing: 0
 
                 ColumnLayout {
+                    id: heroInfo
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    Layout.fillHeight: !start.narrow
                     Layout.leftMargin: 28
                     Layout.rightMargin: 16
                     Layout.topMargin: 26
@@ -802,14 +840,15 @@ ScrollView {
                 }
 
                 GridLayout {
-                    Layout.fillWidth: false
+                    Layout.fillWidth: start.narrow
                     Layout.preferredWidth: 404
                     Layout.fillHeight: true
                     Layout.margins: 12
-                    columns: 2
+                    columns: start.narrow ? 4 : 2
                     rowSpacing: 8
                     columnSpacing: 8
                     uniformCellHeights: true
+                    uniformCellWidths: true
 
                     Tile {
                         Layout.columnSpan: 2
@@ -877,7 +916,7 @@ ScrollView {
                     }
 
                     Tile {
-                        Layout.columnSpan: 2
+                        Layout.columnSpan: start.narrow ? 4 : 2
 
                         RowLayout {
                             anchors.fill: parent
@@ -939,6 +978,7 @@ ScrollView {
             WizardCard {
                 iconPath: "desktop/icons/motor.png"
                 title: qsTr("Setup Motors FOC")
+                compact: start.narrow
                 subtitle: qsTr("Motor detection and limits")
                 tip: qsTr("Simple FOC setup for all VESCs on CAN-bus")
                 ready: connected
@@ -949,6 +989,7 @@ ScrollView {
             WizardCard {
                 iconPath: "desktop/icons/Controller-96.png"
                 title: qsTr("Setup Input")
+                compact: start.narrow
                 subtitle: qsTr("PPM, ADC, UART or remote")
                 ready: connected
                 facts: connected ? inputFacts : []
@@ -958,6 +999,7 @@ ScrollView {
             WizardCard {
                 iconPath: "desktop/icons/Gyroscope-96.png"
                 title: qsTr("Setup IMU")
+                compact: start.narrow
                 subtitle: qsTr("Orientation and calibration")
                 optional: true
                 ready: connected
@@ -971,12 +1013,14 @@ ScrollView {
             text: qsTr("Tools")
         }
 
-        RowLayout {
+        GridLayout {
             id: toolsRow
             Layout.fillWidth: true
             Layout.bottomMargin: 16
-            spacing: 10
-            uniformCellSizes: true
+            columns: start.narrow ? 2 : 4
+            rowSpacing: 10
+            columnSpacing: 10
+            uniformCellWidths: true
 
             ToolBtn {
                 text: qsTr("Multi Settings")

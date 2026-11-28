@@ -38,13 +38,34 @@ QStatusBar QLabel {
     border-radius: 6px;
 }
 
+/* A small window is compact (MainWindow::resizeEvent): the frame is tighter, and tabs, rows, fields and buttons
+   are lower */
+MainWindow[compact="true"] QStatusBar QLabel {
+    padding: 0px 10px;
+    margin-bottom: 0px;
+}
+
 /* The page panel and its header */
 
 #pageWidget {
     background: @darkBackground;
     border: 1px solid @line;
     border-radius: 12px;
-    margin-top: 8px;
+    margin-top: 6px;
+}
+
+MainWindow[compact="true"] #pageWidget {
+    margin-top: 4px;
+}
+
+#pageLabel {
+    max-width: 120px;
+    max-height: 36px;
+}
+
+MainWindow[compact="true"] #pageLabel {
+    max-width: 80px;
+    max-height: 24px;
 }
 
 #pageTitle {
@@ -52,15 +73,25 @@ QStatusBar QLabel {
     font-size: 14pt;
     font-weight: 500;
     padding: 0px 18px 0px 2px;
-    min-height: 36px;
+    min-height: 32px;
 }
 
+/* Beside tabs that start at the edge of the page, the name lines up with the content of the other pages */
 QTabWidget #pageTitle {
-    padding: 0px 18px 0px 18px;
-    min-height: 45px;
+    padding: 0px 18px 0px 14px;
+    min-height: 39px;
 }
 
-QTabWidget #pageTitle[inset="true"] {
+MainWindow[compact="true"] #pageTitle {
+    font-size: 12pt;
+    min-height: 30px;
+}
+
+MainWindow[compact="true"] QTabWidget #pageTitle {
+    padding-left: 9px;
+}
+
+QTabWidget #pageTitle[inset="true"], MainWindow[compact="true"] QTabWidget #pageTitle[inset="true"] {
     padding-left: 2px;
 }
 
@@ -91,6 +122,12 @@ QPushButton {
     padding: 4px 11px;
     min-height: 18px;
     font-weight: 500;
+}
+
+MainWindow[compact="true"] QPushButton {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    min-height: 16px;
 }
 
 QPushButton:hover, QPushButton:checked {
@@ -168,6 +205,12 @@ QLineEdit, QAbstractSpinBox, QComboBox, QTextEdit, QPlainTextEdit {
 QLineEdit, QAbstractSpinBox, QComboBox {
     padding: 3px 8px;
     min-height: 18px;
+}
+
+MainWindow[compact="true"] QLineEdit, MainWindow[compact="true"] QAbstractSpinBox, MainWindow[compact="true"] QComboBox {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    min-height: 16px;
 }
 
 QLineEdit:focus, QAbstractSpinBox:focus, QComboBox:focus, QTextEdit:focus, QPlainTextEdit:focus {
@@ -371,7 +414,7 @@ QSlider::handle:vertical {
     background: @titleText;
 }
 
-/* Tabs: text with a line under the open one */
+/* Tabs */
 
 QTabWidget::pane {
     border: none;
@@ -382,23 +425,25 @@ QTabBar {
     background: transparent;
 }
 
+/* Tabs are pills, as the filters of the device list: the open one has the accent */
 QTabBar::tab {
-    background: transparent;
-    color: @mutedText;
-    border: none;
-    border-bottom: 2px solid transparent;
-    padding: 0px 2px;
-    margin: 0px 7px;
-    min-height: 44px;
+    background: @cardBackground;
+    color: @lightText;
+    border: 1px solid @lightestBackground;
+    border-radius: 13px;
+    padding: 0px 11px;
+    margin: 6px 3px;
+    min-height: 24px;
 }
 
 QTabBar::tab:hover {
-    color: @lightText;
+    color: @titleText;
 }
 
 QTabBar::tab:selected {
-    color: @titleText;
-    border-bottom-color: @accent;
+    background: @accentDim;
+    color: @accentText;
+    border-color: @accent;
     font-weight: 500;
 }
 
@@ -408,12 +453,42 @@ QTabBar::tab:disabled {
 
 /* Tabs inside a page are lower */
 QTabWidget QTabWidget QTabBar::tab, QDialog QTabBar::tab, QSplitter QTabBar::tab {
-    min-height: 30px;
+    border-radius: 11px;
+    padding: 0px 10px;
+    margin: 4px 2px;
+    min-height: 20px;
+}
+
+/* Under another row of tabs the open one has the border only, the row above keeps the main mark */
+QTabWidget QTabWidget QTabBar::tab:selected {
+    background: @cardBackground;
+}
+
+MainWindow[compact="true"] QTabBar::tab {
+    border-radius: 11px;
+    padding: 0px 9px;
+    margin: 4px 2px;
+    min-height: 20px;
+}
+
+MainWindow[compact="true"] QTabWidget QTabWidget QTabBar::tab, MainWindow[compact="true"] QSplitter QTabBar::tab {
+    border-radius: 10px;
+    padding: 0px 8px;
+    margin: 2px 2px;
+    min-height: 18px;
 }
 
 QTabBar QToolButton {
     background: @darkBackground;
     border: none;
+}
+
+/* The close key of a file tab */
+QTabBar QPushButton, QTabBar QPushButton:flat {
+    background: transparent;
+    border: none;
+    padding: 0px;
+    min-height: 0px;
 }
 
 /* Lists, tables and trees */
@@ -428,7 +503,7 @@ QAbstractItemView {
 }
 
 QAbstractItemView::item {
-    padding: 3px 6px;
+    padding: 2px 6px;
 }
 
 QAbstractItemView::item:selected {
@@ -448,6 +523,11 @@ QHeaderView::section {
     padding: 5px 8px;
     font-size: 9pt;
     font-weight: 500;
+}
+
+MainWindow[compact="true"] QHeaderView::section {
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 QTableCornerButton::section {
@@ -627,6 +707,28 @@ QFrame[keys="true"] {
     qproperty-iconSize: 52px 26px;
 }
 
+/* In compact the keys are in one column, without the names of the groups */
+MainWindow[compact="true"] #rail QToolButton {
+    min-height: 18px;
+    max-height: 18px;
+}
+
+MainWindow[compact="true"] #rail #liveKeys QToolButton {
+    min-height: 18px;
+    max-height: 18px;
+    qproperty-iconSize: 18px;
+}
+
+MainWindow[compact="true"] #rail #liveKeys #actionCanFwdButton {
+    min-width: 24px;
+    max-width: 24px;
+    qproperty-iconSize: 14px;
+}
+
+MainWindow[compact="true"] #rail QFrame[keys="true"] QLabel {
+    font-size: 8pt;
+}
+
 #rail QToolButton:hover {
     background: @lightestBackground;
 }
@@ -640,6 +742,7 @@ QFrame[keys="true"] {
     font-size: 7pt;
     font-weight: 500;
     letter-spacing: 1.2px;
+    margin-bottom: 9px;
 }
 
 #rail QFrame[keys="true"] QLabel {
@@ -757,13 +860,56 @@ QFrame[cell="true"][running="true"] > QLabel {
     letter-spacing: 1.8px;
     min-width: 90px;
     max-width: 90px;
-    min-height: 56px;
-    max-height: 56px;
+    min-height: 50px;
+    max-height: 50px;
     qproperty-iconSize: 17px;
 }
 
 #deck #stopButton:hover {
     background: @danger;
+}
+
+/* In compact the bottom bar is lower and narrower */
+MainWindow[compact="true"] QFrame[cell="true"] {
+    min-width: 120px;
+    max-width: 120px;
+    min-height: 18px;
+    max-height: 18px;
+}
+
+MainWindow[compact="true"] #brakeCurrentCell, MainWindow[compact="true"] #handbrakeCell {
+    min-width: 132px;
+    max-width: 132px;
+}
+
+MainWindow[compact="true"] QFrame[cell="true"] QLabel {
+    font-size: 7pt;
+    letter-spacing: 0.5px;
+}
+
+MainWindow[compact="true"] QFrame[cell="true"] QPushButton {
+    min-width: 20px;
+    max-width: 20px;
+    min-height: 18px;
+}
+
+MainWindow[compact="true"] #fullBrakeButton {
+    padding: 4px 0px 3px 0px;
+    min-width: 50px;
+    max-width: 50px;
+    min-height: 37px;
+    max-height: 37px;
+    qproperty-iconSize: 18px;
+}
+
+MainWindow[compact="true"] #deck #stopButton {
+    font-size: 10pt;
+    letter-spacing: 1px;
+    min-width: 64px;
+    max-width: 64px;
+    min-height: 44px;
+    max-height: 44px;
+    qproperty-iconSize: 14px;
 }
 
 /* The key that also stops, in the corner of the stop key */
@@ -1051,6 +1197,20 @@ QFrame[tile="true"] QLabel[reading="true"] {
     font-size: 17pt;
 }
 
+MainWindow[compact="true"] QFrame[tile="true"] QLabel[reading="true"] {
+    font-size: 15pt;
+}
+
+/* The tiles and the strip of Realtime Data share one row in a compact window */
+MainWindow[compact="true"] PageRtData QLabel[caption="true"] {
+    font-size: 7pt;
+    letter-spacing: 0.4px;
+}
+
+MainWindow[compact="true"] #stripFrame QLabel[reading="true"] {
+    font-size: 11pt;
+}
+
 /* conn 2: key and value rows, a state line in small capitals, quiet buttons, a tinted warning, lists with row rules
    or cells, text to read on a card, a bar with a rule above it */
 QLabel[kv] {
@@ -1281,4 +1441,49 @@ QTableView[rowButtons="true"]::item:hover:enabled {
 
 QFrame[seg="true"] QToolButton:checked, QFrame[seg="true"] QPushButton:checked {
     border: 1px solid @lineStrong;
+}
+
+/* When compact, the buttons of the script pages and the Display Tool are narrower */
+MainWindow[compact="true"] PageLisp QPushButton[small="true"], MainWindow[compact="true"] PageScripting QPushButton[small="true"] {
+    padding: 2px 5px;
+}
+
+MainWindow[compact="true"] PageScripting QPushButton, MainWindow[compact="true"] PageDisplayTool QPushButton {
+    padding: 4px 6px;
+}
+
+MainWindow[compact="true"] PageDisplayTool QPushButton[swatch="true"] {
+    padding: 0px;
+}
+
+/* In a compact window the lists of server addresses and clients can be one line high, and the rows of
+   keys and values are lower */
+MainWindow[compact="true"] PageConnection QPlainTextEdit {
+    min-height: 24px;
+}
+
+MainWindow[compact="true"] QLabel[kv] {
+    min-height: 18px;
+}
+
+/* The plot toggles of Experiments and the result of the BLDC detection are lower in a compact window */
+MainWindow[compact="true"] #showFrame QToolButton, MainWindow[compact="true"] #showFrame QLabel {
+    min-height: 18px;
+    max-height: 18px;
+}
+
+MainWindow[compact="true"] DetectBldc QTextBrowser {
+    max-height: 60px;
+}
+
+/* In a compact window the four Firmware tabs fit beside the version card */
+MainWindow[compact="true"] PageFirmware QTabBar::tab {
+    padding: 0px 5px;
+    margin: 4px 1px;
+}
+
+/* When compact, the tabs under the LispBM editor sit closer, so that all five fit */
+MainWindow[compact="true"] PageLisp #tabWidget QTabBar::tab {
+    padding: 0px 5px;
+    margin: 2px 1px;
 }

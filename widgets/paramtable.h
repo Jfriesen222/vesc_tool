@@ -40,7 +40,7 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+    void changeEvent(QEvent *event) override;
     bool viewportEvent(QEvent *event) override;
     bool eventFilter(QObject *object, QEvent *event) override;
 
@@ -58,7 +58,6 @@ private:
 
     void scheduleLayout();
     void layoutRows();
-    int wantedColumns() const;
     bool rowChanged(int row);
     QString referenceString(int row);
     void updateChanged();

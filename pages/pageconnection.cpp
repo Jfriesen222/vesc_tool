@@ -90,16 +90,8 @@ PageConnection::PageConnection(QWidget *parent) :
     ui->tabWidget->setTabVisible(1, false);
 #endif
 
-    // The tab widget is as high as the content of the open tab, so that the CAN forward block follows it
-    auto fitTab = [this]() {
-        for (int i = 0;i < ui->tabWidget->count();i++) {
-            ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Preferred, i == ui->tabWidget->currentIndex() ?
-                                                        QSizePolicy::Preferred : QSizePolicy::Ignored);
-        }
-        ui->tabWidget->setMaximumHeight(ui->tabWidget->minimumSizeHint().height());
-    };
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, fitTab);
-    QTimer::singleShot(0, this, fitTab);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &PageConnection::fitTab);
+    QTimer::singleShot(0, this, &PageConnection::fitTab);
 
     connect(mUdpListen, &UdpServerSimple::dataRx, [this](const QByteArray &data) {
         QString str(data);
@@ -202,6 +194,42 @@ void PageConnection::setVesc(VescInterface *vesc)
 
     pairingListUpdated();
     on_serialRefreshButton_clicked();
+}
+
+// In a compact window the status card goes beside CAN forward with only Autoconnect (the status bar has the port
+// name), so that the tabs can have the whole width
+void PageConnection::changeEvent(QEvent *event)
+{
+    bool compact = window()->property("compact").toBool();
+    if (event->type() == QEvent::StyleChange && compact != (ui->canRowLayout->indexOf(ui->statusBox) >= 0)) {
+        if (compact) {
+            ui->canRowLayout->addWidget(ui->statusBox);
+        } else {
+            ui->statusLayout->addWidget(ui->statusBox, 0, Qt::AlignTop);
+        }
+        ui->statusBox->setMinimumWidth(compact ? 0 : ui->statusBox->maximumWidth());
+        ui->gridLayout_35->setContentsMargins(0, compact ? 0 : 8, 0, compact ? 0 : 8);
+        for (QWidget *w: {ui->statusNameLabel, ui->statusLabel}) {
+            w->setVisible(!compact);
+        }
+        // The open tab has another height once its content is restyled
+        QTimer::singleShot(0, this, &PageConnection::fitTab);
+    }
+    QWidget::changeEvent(event);
+}
+
+// The tab widget is as high as the content of the open tab, so that the CAN forward block follows it. A tab
+// with wrapped text gets its height from the layout and on Bluetooth LE the device list takes the free height.
+void PageConnection::fitTab()
+{
+    for (int i = 0;i < ui->tabWidget->count();i++) {
+        ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Preferred, i == ui->tabWidget->currentIndex() ?
+                                                    QSizePolicy::Preferred : QSizePolicy::Ignored);
+    }
+    QWidget *tab = ui->tabWidget->currentWidget();
+    ui->tabWidget->setMaximumHeight(tab == ui->tab_3 || tab->hasHeightForWidth() ?
+                                        QWIDGETSIZE_MAX : ui->tabWidget->minimumSizeHint().height());
+    ui->verticalLayout->setStretch(0, tab == ui->tab_3 ? 1 : 0);
 }
 
 void PageConnection::timerSlot()
