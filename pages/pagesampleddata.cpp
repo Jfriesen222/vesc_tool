@@ -50,15 +50,7 @@ PageSampledData::PageSampledData(QWidget *parent) :
     mVesc = 0;
 
     // The sampling controls sit under the plot of every tab and the plot tools over the top right of its well.
-    auto placeOnTab = [this]() {
-        QWidget *tab = ui->tabWidget->currentWidget();
-        tab->layout()->addWidget(ui->sampleWidget);
-        QFrame *well = tab->findChild<QFrame*>(QString(), Qt::FindDirectChildrenOnly);
-        static_cast<QGridLayout*>(well->layout())->addWidget(ui->toolFrame, 0, 0, Qt::AlignTop | Qt::AlignRight);
-        ui->toolFrame->raise();
-    };
-    connect(ui->tabWidget, &QTabWidget::currentChanged, placeOnTab);
-    placeOnTab();
+    Utility::placeOnTabs(ui->tabWidget, ui->toolFrame, ui->sampleWidget);
 
     mDoReplot = false;
     mDoFilterReplot = false;
@@ -78,7 +70,6 @@ PageSampledData::PageSampledData(QWidget *parent) :
         plots[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
         Utility::setPlotLegendRow(plots[i]);
-        plots[i]->legend->setVisible(true);
     }
 
     // Axis names of the time plots, shown before samples arrive

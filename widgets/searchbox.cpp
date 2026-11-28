@@ -711,28 +711,19 @@ void SearchBox::activate(int entry)
             break;
         }
         open(e);
-        if (!table->showParam(e.key)) {
+        QWidget *editor = table->showParam(e.key);
+        if (!editor) {
             break;
         }
         // The keyboard goes to the number or text of the editor, selected so that typing replaces it. Not to
-        // choices and switches, which the arrow keys would change, not while the arrow keys drive the motor, and
-        // not when another row has the same name.
+        // choices and switches, which the arrow keys would change, and not while the arrow keys drive the motor.
         QAction *keys = mWindow->findChild<QAction*>("actionKeyboardControl");
-        QList<QWidget*> boxes;
-        for (int r = 0;r < table->rowCount();r++) {
-            for (int c = 0;c < table->columnCount();c++) {
-                QWidget *editor = table->item(r, c) && table->item(r, c)->text() == e.title ? table->cellWidget(r, c + 1) : nullptr;
-                if (editor) {
-                    QList<QWidget*> all = editor->findChildren<QWidget*>();
-                    auto box = std::find_if(all.begin(), all.end(), [](QWidget *w) {
-                        return qobject_cast<QAbstractSpinBox*>(w) || qobject_cast<QLineEdit*>(w); });
-                    boxes.append(box == all.end() ? nullptr : *box);
-                }
-            }
-        }
-        if (boxes.size() == 1 && boxes.first() && !(keys && keys->isChecked())) {
-            boxes.first()->setFocus(Qt::OtherFocusReason);
-            QMetaObject::invokeMethod(boxes.first(), "selectAll");
+        QList<QWidget*> all = editor->findChildren<QWidget*>();
+        auto box = std::find_if(all.begin(), all.end(), [](QWidget *w) {
+            return qobject_cast<QAbstractSpinBox*>(w) || qobject_cast<QLineEdit*>(w); });
+        if (box != all.end() && !(keys && keys->isChecked())) {
+            (*box)->setFocus(Qt::OtherFocusReason);
+            QMetaObject::invokeMethod(*box, "selectAll");
         }
     } break;
     case Page:

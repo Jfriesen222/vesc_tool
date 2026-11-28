@@ -125,13 +125,7 @@ void PageListItem::updateColors()
     p.setColor(QPalette::WindowText, Utility::getAppQColor(mSelected || top ? "titleText" : "lightText"));
     mNameLabel->setPalette(p);
 
-    QPixmap pm = mIcon;
-    if (!pm.isNull()) {
-        QPainter painter(&pm);
-        painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-        painter.fillRect(pm.rect(), Utility::getAppQColor(mSelected ? "accentText" : top ? "lightText" : "mutedText"));
-    }
-    mIconLabel->setPixmap(pm);
+    mIconLabel->setPixmap(Utility::tinted(mIcon, Utility::getAppQColor(mSelected ? "accentText" : top ? "lightText" : "mutedText")));
 }
 
 void PageListItem::setChanged(bool changed)

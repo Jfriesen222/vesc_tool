@@ -29,10 +29,6 @@
 #include "vescinterface.h"
 #include "widgets/vtextbrowser.h"
 
-// Gives a wizard its look: page title and subtitle on top, the steps of the run beside the page,
-// Cancel apart from Back and Next
-void setUpWizardFrame(QWizard *wizard);
-
 class StartupWizard : public QWizard
 {
     Q_OBJECT

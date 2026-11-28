@@ -52,6 +52,7 @@ PageLisp::PageLisp(QWidget *parent) :
     ui->streamButton->setIcon(Utility::getIcon("icons/Download-96.png"));
     ui->recentFilterClearButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
     ui->exampleFilterClearButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
+    ui->rescaleButton->setIcon(Utility::getIcon("icons/size_off.png"));
 
     QIcon mycon = Utility::getIcon( "icons/expand_off.png");
     mycon.addPixmap(Utility::getIcon("icons/expand_on.png"), QIcon::Normal, QIcon::On);
@@ -152,7 +153,6 @@ PageLisp::PageLisp(QWidget *parent) :
 
     ui->bindingPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
     Utility::setPlotLegendRow(ui->bindingPlot);
-    ui->bindingPlot->legend->setVisible(true);
     ui->bindingPlot->xAxis->setLabel("Age (s)");
     ui->bindingPlot->yAxis->setLabel("Value");
     ui->bindingPlot->xAxis->setRangeReversed(true);

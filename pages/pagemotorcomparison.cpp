@@ -40,6 +40,7 @@ PageMotorComparison::PageMotorComparison(QWidget *parent) :
     ui->rescaleButton->setIcon(Utility::getIcon("icons/size_off.png"));
     ui->qmlChooseButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->qmlRunButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
+    ui->qmlStopButton->setIcon(Utility::getIcon("icons/Stop Sign-96.png"));
     ui->savePlotPdfButton->setIcon(Utility::getIcon("icons/Line Chart-96.png"));
     ui->savePlotPngButton->setIcon(Utility::getIcon("icons/Line Chart-96.png"));
 
@@ -78,7 +79,6 @@ PageMotorComparison::PageMotorComparison(QWidget *parent) :
     }
 
     Utility::setPlotLegendRow(ui->plot);
-    ui->plot->legend->setVisible(true);
     ui->plot->xAxis->setLabel("Torque (Nm)");
 
     auto updateZoom = [&]() {

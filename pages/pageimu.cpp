@@ -47,7 +47,6 @@ PageImu::PageImu(QWidget *parent) :
         plots[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
         Utility::setPlotLegendRow(plots[i]);
-        plots[i]->legend->setVisible(true);
     }
 
     int graphIndex = 0;
@@ -197,9 +196,8 @@ void PageImu::timerSlot()
                                        &mGyroXVec, &mGyroYVec, &mGyroZVec, &mMagXVec, &mMagYVec, &mMagZVec};
         QStringList units = {"\u00B0", " g", " \u00B0/s", " \u00B5T"};
         for (int i = 0;i < 12;i++) {
-            plots[i / 3]->graph(i % 3)->setName(QString("%1   %2%3").arg(names.at(i)).
-                                                arg(values[i]->last(), 0, 'f', i / 3 == 1 ? 2 : 1).
-                                                arg(units.at(i / 3)));
+            plots[i / 3]->graph(i % 3)->setName(Utility::plotLegendName(names.at(i), values[i]->last(),
+                                                                         i / 3 == 1 ? 2 : 1, units.at(i / 3)));
         }
 
         ui->rpyPlot->rescaleAxes();

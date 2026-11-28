@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="tabPosition">
+      <enum>QTabWidget::TabPosition::North</enum>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -36,7 +39,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
             <item>
-             <widget class="QLabel" name="uiScaleLabel">
+             <widget class="QLabel" name="label">
               <property name="maximumSize">
                <size>
                 <width>16777215</width>

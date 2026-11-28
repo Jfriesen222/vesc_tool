@@ -1205,12 +1205,12 @@
   <customwidget>
    <class>Sparkline</class>
    <extends>QWidget</extends>
-   <header>pages/pagertdata.h</header>
+   <header>widgets/sparkline.h</header>
   </customwidget>
   <customwidget>
    <class>LevelBar</class>
    <extends>QWidget</extends>
-   <header>pages/pagertdata.h</header>
+   <header>widgets/sparkline.h</header>
   </customwidget>
   <customwidget>
    <class>QCustomPlot</class>

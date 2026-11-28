@@ -20,7 +20,6 @@
 #include "canlistitem.h"
 #include "utility.h"
 #include <QHBoxLayout>
-#include <QPainter>
 
 CANListItem::CANListItem(FW_RX_PARAMS p,
                          int ID,
@@ -139,12 +138,7 @@ void CANListItem::setName(const QString &name)
 void CANListItem::setIcon(const QString &path)
 {
     if (!path.isEmpty()) {
-        QPixmap pm(path);
-        QPainter painter(&pm);
-        painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-        painter.fillRect(pm.rect(), Utility::getAppQColor("mutedText"));
-        painter.end();
-        mIconLabel->setPixmap(pm);
+        mIconLabel->setPixmap(Utility::tinted(QPixmap(path), Utility::getAppQColor("mutedText")));
 
         QFontMetrics fm(this->font());
         int height = fm.height()*1.1;

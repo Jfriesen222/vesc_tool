@@ -61,6 +61,7 @@ PageExperiments::PageExperiments(QWidget *parent) :
     ui->savePngButton->setIcon(Utility::getIcon("icons/Save-96.png"));
     ui->savePdfButton->setIcon(Utility::getIcon("icons/Save-96.png"));
     ui->compCloseButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
+    ui->stopButton->setIcon(Utility::getIcon("icons/Stop Sign-96.png"));
     ui->extNoteIcon->setPixmap(Utility::getIcon("icons/About-96.png"));
 
     QIcon mycon = QIcon(Utility::getIcon("icons/expand_off.png"));
@@ -91,7 +92,6 @@ PageExperiments::PageExperiments(QWidget *parent) :
     Utility::setPlotColors(ui->plot);
     Utility::setPlotLegendRow(ui->plot);
     ui->plot->legend->setWrap(4);
-    ui->plot->legend->setVisible(true);
     ui->plot->xAxis->setLabel("Seconds (s)");
     ui->plot->yAxis2->setLabel("ERPM");
     ui->plot->yAxis2->setVisible(true);

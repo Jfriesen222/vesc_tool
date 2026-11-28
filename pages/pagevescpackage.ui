@@ -32,26 +32,14 @@
       <attribute name="title">
        <string>Package Store</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="2,3">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>14</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="2,3">
        <property name="spacing">
         <number>16</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <layout class="QVBoxLayout" name="verticalLayout_7">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QLineEdit" name="filterEdit">
              <property name="placeholderText">
@@ -79,7 +67,7 @@
             <property name="flat">
              <bool>true</bool>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_1">
+            <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
               <widget class="QListWidget" name="applicationList">
                <property name="minimumSize">
@@ -102,7 +90,7 @@
             <property name="flat">
              <bool>true</bool>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
               <widget class="QListWidget" name="libraryList">
                <property name="editTriggers">
@@ -117,7 +105,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_8">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
           <widget class="QGroupBox" name="storeBox">
            <property name="title">
@@ -126,7 +114,7 @@
            <property name="flat">
             <bool>true</bool>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
              <widget class="VTextBrowser" name="storeBrowser">
               <property name="doc" stdset="0">
@@ -145,7 +133,7 @@
            <property name="title">
             <string>Install</string>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
             <property name="spacing">
              <number>10</number>
             </property>
@@ -192,19 +180,7 @@
       <attribute name="title">
        <string>Load Custom</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_12">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>14</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="spacing">
         <number>16</number>
        </property>
@@ -213,9 +189,9 @@
          <property name="title">
           <string>Load Package</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLineEdit" name="loadEdit" />
+           <widget class="QLineEdit" name="loadEdit"/>
           </item>
           <item>
            <widget class="QPushButton" name="chooseLoadButton">
@@ -229,7 +205,7 @@
              <string>Choose file...</string>
             </property>
             <property name="text">
-             <string />
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="../res.qrc">
@@ -240,7 +216,7 @@
           <item>
            <widget class="QPushButton" name="loadRefreshButton">
             <property name="text">
-             <string />
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="../res.qrc">
@@ -293,24 +269,12 @@
       <attribute name="title">
        <string>Create Package</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_19" stretch="0,1,0">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>14</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0">
        <property name="spacing">
         <number>16</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_15">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="QGroupBox" name="lispBox">
            <property name="title">
@@ -319,9 +283,9 @@
            <property name="checkable">
             <bool>true</bool>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QLineEdit" name="lispEdit" />
+             <widget class="QLineEdit" name="lispEdit"/>
             </item>
             <item>
              <widget class="QPushButton" name="chooseLispButton">
@@ -335,7 +299,7 @@
                <string>Choose file...</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../res.qrc">
@@ -356,7 +320,7 @@
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_14">
             <item>
-             <widget class="QLineEdit" name="qmlEdit" />
+             <widget class="QLineEdit" name="qmlEdit"/>
             </item>
             <item>
              <widget class="QPushButton" name="chooseQmlButton">
@@ -370,7 +334,7 @@
                <string>Choose file...</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../res.qrc">
@@ -412,16 +376,16 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLabel" name="packageNameLabel">
+             <widget class="QLabel" name="label">
               <property name="text">
                <string>Package Name</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="nameEdit" />
+             <widget class="QLineEdit" name="nameEdit"/>
             </item>
            </layout>
           </item>
@@ -436,7 +400,7 @@
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
-            <widget class="QMarkdownTextEdit" name="descriptionEdit" />
+            <widget class="QMarkdownTextEdit" name="descriptionEdit"/>
             <widget class="VTextBrowser" name="descriptionBrowser">
              <property name="doc" stdset="0">
               <bool>true</bool>
@@ -452,14 +416,14 @@
          <property name="title">
           <string>Output</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_18">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLineEdit" name="outputEdit" />
+           <widget class="QLineEdit" name="outputEdit"/>
           </item>
           <item>
            <widget class="QPushButton" name="outputRefreshButton">
             <property name="text">
-             <string />
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="../res.qrc">
@@ -479,7 +443,7 @@
              <string>Choose file...</string>
             </property>
             <property name="text">
-             <string />
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="../res.qrc">
@@ -513,7 +477,7 @@
      <property name="bar" stdset="0">
       <bool>true</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_20">
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -574,7 +538,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../res.qrc" />
+  <include location="../res.qrc"/>
  </resources>
- <connections />
+ <connections/>
 </ui>

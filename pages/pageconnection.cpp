@@ -68,6 +68,8 @@ PageConnection::PageConnection(QWidget *parent) :
     ui->hubDefaultButton->setIcon(Utility::getIcon("icons/Restart-96.png"));
     ui->tcpDetectConnectButton->setIcon(Utility::getIcon("icons/Connected-96.png"));
     ui->tcpDetectDisconnectButton->setIcon(Utility::getIcon("icons/Disconnected-96.png"));
+    ui->virtualConnectButton->setIcon(Utility::getIcon("icons/Connected-96.png"));
+    ui->virtualDisconnectButton->setIcon(Utility::getIcon("icons/Disconnected-96.png"));
 
     ui->canFwdBox->setPlaceholderText(tr("No CAN device selected"));
 

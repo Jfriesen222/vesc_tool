@@ -47,6 +47,7 @@ PageScripting::PageScripting(QWidget *parent) :
     plusButton->setIcon(Utility::getIcon("icons/Plus Math-96.png"));
     ui->runButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
     ui->runWindowButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
+    ui->reloadAndRunButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
     ui->fullscreenButton->setIcon(Utility::getIcon("icons/size_off.png"));
     ui->stopButton->setIcon(Utility::getIcon("icons/Shutdown-96.png"));
     ui->helpButton->setIcon(Utility::getIcon("icons/Help-96.png"));

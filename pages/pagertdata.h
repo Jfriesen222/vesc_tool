@@ -23,40 +23,9 @@
 #include <QWidget>
 #include <QVector>
 #include <QTimer>
-#include <QLabel>
 #include "vescinterface.h"
 
-// A small trend line of the latest values, ending in a dot
-class Sparkline : public QWidget
-{
-public:
-    explicit Sparkline(QWidget *parent = nullptr);
-    void setColor(QColor color);
-    void setData(const QVector<double> &values);
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-
-private:
-    QVector<double> mValues;
-    QColor mColor;
-};
-
-// A level bar on a scale up to a limit, with the zone where limiting starts
-class LevelBar : public QWidget
-{
-public:
-    explicit LevelBar(QWidget *parent = nullptr);
-    void setLevel(double value, double limitStart, double limitEnd);
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-
-private:
-    double mValue = 0.0;
-    double mLimitStart = 0.0;
-    double mLimitEnd = 0.0;
-};
+class QLabel;
 
 namespace Ui {
 class PageRtData;

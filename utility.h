@@ -39,6 +39,8 @@
 #define STR(x)          STR1(x)
 
 class VTextBrowser;
+class QTabWidget;
+class QWizard;
 
 class Utility : public QObject
 {
@@ -142,8 +144,13 @@ public:
 
     static void setPlotColors(QCustomPlot* plot);
     static void setPlotLegendRow(QCustomPlot *plot);
+    static QString plotLegendName(QString name, double value, int decimals, QString unit = "");
+    static void setupThrottlePlot(QCustomPlot *plot);
+    static void placeOnTabs(QTabWidget *tabs, QWidget *tools, QWidget *bottom = nullptr);
     static void drawSectionHeader(QPainter *painter, const QRect &rect, const QString &text);
-    static void setStyleProperty(QWidget *widget, const char *name, bool value);
+    static void setStyleProperty(QWidget *widget, const char *name, const QVariant &value);
+    static QPixmap tinted(QPixmap pm, const QColor &color);
+    static void setUpWizardFrame(QWizard *wizard);
     static void setSpinUnit(QAbstractSpinBox *box);
     static void setToolDescription(VTextBrowser *edit, const QString &name);
     static void plotSavePdf(QCustomPlot* plot, int width = 1280, int height = 720, QString title = "");

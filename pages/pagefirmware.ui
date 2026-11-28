@@ -32,23 +32,11 @@
          <string>Included Files</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_7">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>14</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
          <property name="spacing">
           <number>16</number>
          </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
             <widget class="DisplayPercentage" name="displayDlFw" native="true">
              <property name="sizePolicy">
@@ -94,7 +82,7 @@
               <property name="flat">
                <bool>true</bool>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_1">
+              <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
                 <widget class="QListWidget" name="hwList">
                  <property name="rows" stdset="0">
@@ -113,7 +101,7 @@
               <property name="flat">
                <bool>true</bool>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_2">
+              <layout class="QVBoxLayout" name="verticalLayout_6">
                <item>
                 <widget class="QListWidget" name="fwList">
                  <property name="rows" stdset="0">
@@ -135,7 +123,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QCheckBox" name="showNonDefaultBox">
              <property name="toolTip">
@@ -157,7 +145,7 @@
             </widget>
            </item>
            <item>
-            <spacer name="spacer_6">
+            <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -191,19 +179,7 @@
         <attribute name="title">
          <string>Custom File</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_9">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>14</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
           <number>16</number>
          </property>
@@ -242,7 +218,7 @@
                <string>Choose file...</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../res.qrc">
@@ -276,7 +252,7 @@
                <string>Choose file...</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../res.qrc">
@@ -310,7 +286,7 @@
                <string>Choose file...</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../res.qrc">
@@ -344,7 +320,7 @@
                <string>Choose file...</string>
               </property>
               <property name="text">
-               <string />
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../res.qrc">
@@ -369,7 +345,7 @@
           </widget>
          </item>
          <item>
-          <spacer name="spacer_10">
+          <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
@@ -387,19 +363,7 @@
         <attribute name="title">
          <string>Bootloader</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_12">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>14</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
           <number>16</number>
          </property>
@@ -411,7 +375,7 @@
            <property name="flat">
             <bool>true</bool>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_11">
+           <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
              <widget class="QListWidget" name="blList">
               <property name="sizePolicy">
@@ -453,24 +417,12 @@
         <attribute name="title">
          <string>Archive</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_18" stretch="0,0,1,0">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>14</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0,0,1,0">
          <property name="spacing">
           <number>16</number>
          </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <widget class="DisplayPercentage" name="displayDl" native="true">
              <property name="sizePolicy">
@@ -498,7 +450,7 @@
            <property name="flat">
             <bool>true</bool>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_14">
+           <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
              <widget class="QListWidget" name="archVersionList">
               <property name="flow">
@@ -535,7 +487,7 @@
            <property name="flat">
             <bool>true</bool>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_15">
+           <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
              <widget class="QListWidget" name="archFwList">
               <property name="rows" stdset="0">
@@ -547,7 +499,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QCheckBox" name="showNonDefaultArchBox">
              <property name="toolTip">
@@ -569,7 +521,7 @@
             </widget>
            </item>
            <item>
-            <spacer name="spacer_17">
+            <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -638,7 +590,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_19">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QPushButton" name="readVersionButton">
             <property name="sizePolicy">
@@ -722,7 +674,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_22">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QPushButton" name="uploadButton">
             <property name="sizePolicy">
@@ -755,7 +707,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Upload firmware to the connected VESC, as well as to the VESCs connected over CAN-bus. Only available in FW3.45+.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" color:#cc0000;"&gt;WARNING&lt;/span&gt;: This function should &lt;span style=" font-weight:600;"&gt;only&lt;/span&gt; be used if all VESCs on the CAN-bus have the same hardware version. Otherwise, the firmware has to be updated on them individually.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Upload firmware to the connected VESC, as well as to the VESCs connected over CAN-bus. Only available in FW3.45+.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#cc0000;&quot;&gt;WARNING&lt;/span&gt;: This function should &lt;span style=&quot; font-weight:600;&quot;&gt;only&lt;/span&gt; be used if all VESCs on the CAN-bus have the same hardware version. Otherwise, the firmware has to be updated on them individually.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>All</string>
@@ -778,7 +730,7 @@
              <string>Cancel upload</string>
             </property>
             <property name="text">
-             <string />
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="../res.qrc">
@@ -817,7 +769,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../res.qrc" />
+  <include location="../res.qrc"/>
  </resources>
- <connections />
+ <connections/>
 </ui>

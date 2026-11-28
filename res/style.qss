@@ -60,6 +60,10 @@ QTabWidget #pageTitle {
     min-height: 45px;
 }
 
+QTabWidget #pageTitle[inset="true"] {
+    padding-left: 2px;
+}
+
 /* Beside the tabs of a page, the name ends with a short line */
 #pageTitleRule {
     background: @lineStrong;
@@ -372,10 +376,6 @@ QSlider::handle:vertical {
 QTabWidget::pane {
     border: none;
     border-top: 1px solid @line;
-}
-
-QTabWidget[roomy="true"]::pane {
-    padding-top: 14px;
 }
 
 QTabBar {

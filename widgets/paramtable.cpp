@@ -280,8 +280,8 @@ QVector<QPair<QPointer<ConfigParams>, QString>> ParamTable::params() const
     return res;
 }
 
-// Scrolls to the parameter and marks it for a moment. False if it is not here.
-bool ParamTable::showParam(const QString &paramName)
+// Scrolls to the parameter and marks it for a moment. Returns its editor, or null if it is not here.
+QWidget *ParamTable::showParam(const QString &paramName)
 {
     int row = -1;
     for (int i = 0;i < mRows.size() && row < 0;i++) {
@@ -290,7 +290,7 @@ bool ParamTable::showParam(const QString &paramName)
         }
     }
     if (row < 0) {
-        return false;
+        return nullptr;
     }
 
     if (mLayoutPending) {
@@ -304,7 +304,7 @@ bool ParamTable::showParam(const QString &paramName)
         mMarkedRow = -1;
         viewport()->update();
     });
-    return true;
+    return cellWidget(mCells.at(row).y(), mCells.at(row).x() + 1);
 }
 
 bool ParamTable::rowChanged(int row)
@@ -408,12 +408,8 @@ void ParamTable::setRowActive(int row, bool active)
     }
 
     for (QPushButton *button: editor->findChildren<QPushButton*>()) {
-        QPixmap pm = button->icon().pixmap(button->iconSize(), devicePixelRatioF());
-        QPainter painter(&pm);
-        painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-        painter.fillRect(pm.rect(), Utility::getAppQColor(active ? "lightText" : "disabledText"));
-        painter.end();
-        button->setIcon(pm);
+        button->setIcon(Utility::tinted(button->icon().pixmap(button->iconSize(), devicePixelRatioF()),
+                                        Utility::getAppQColor(active ? "lightText" : "disabledText")));
     }
 }
 

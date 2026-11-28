@@ -21,7 +21,6 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include "utility.h"
-#include "startupwizard.h"
 
 SetupWizardMotor::SetupWizardMotor(VescInterface *vesc, QWidget *parent)
     : QWizard(parent)
@@ -40,7 +39,7 @@ SetupWizardMotor::SetupWizardMotor(VescInterface *vesc, QWidget *parent)
     setPage(Page_Conclusion, new ConclusionPage(vesc));
 
     setStartId(Page_Intro);
-    setUpWizardFrame(this);
+    Utility::setUpWizardFrame(this);
     setWindowTitle(tr("Motor Setup Wizard"));
 }
 

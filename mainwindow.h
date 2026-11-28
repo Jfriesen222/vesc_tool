@@ -252,7 +252,6 @@ private:
     void showPage(const QString &name);
     void reloadPages();
     void updateConfigChanges();
-    void setStatusState(const QString &state);
     void checkUdev();
 #ifdef Q_OS_LINUX
     bool waitProcess(QProcess &process, bool block = true, int timeoutMs = 300000);

@@ -22,7 +22,6 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include "utility.h"
-#include "startupwizard.h"
 #include "setupwizardapp.h"
 
 SetupWizardApp::SetupWizardApp(VescInterface *vesc, QWidget *parent)
@@ -44,7 +43,7 @@ SetupWizardApp::SetupWizardApp(VescInterface *vesc, QWidget *parent)
     setPage(Page_Conclusion, new AppConclusionPage(vesc));
 
     setStartId(Page_Intro);
-    setUpWizardFrame(this);
+    Utility::setUpWizardFrame(this);
     setWindowTitle(tr("App Setup Wizard"));
 
     connect(this, SIGNAL(rejected()), this, SLOT(ended()));

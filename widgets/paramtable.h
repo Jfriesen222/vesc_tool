@@ -36,7 +36,7 @@ public:
     void clearParams();
     bool hasChanges();
     QVector<QPair<QPointer<ConfigParams>, QString>> params() const;
-    bool showParam(const QString &paramName);
+    QWidget *showParam(const QString &paramName);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

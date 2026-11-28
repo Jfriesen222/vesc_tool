@@ -46,7 +46,6 @@ PageAppImu::PageAppImu(QWidget *parent) :
         Utility::setPlotColors(plots[i]);
         plots[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
         Utility::setPlotLegendRow(plots[i]);
-        plots[i]->legend->setVisible(true);
     }
 
     int graphIndex = 0;
@@ -162,22 +161,26 @@ void PageAppImu::timerSlot()
         ui->rpyPlot->graph(graphIndex++)->setData(xAxis, mRollVec);
         ui->rpyPlot->graph(graphIndex++)->setData(xAxis, mPitchVec);
         ui->rpyPlot->graph(graphIndex++)->setData(xAxis, mYawVec);
-        setLegendValues(ui->rpyPlot, {"Roll", "Pitch", "Yaw"},
-                        {mRollVec.last(), mPitchVec.last(), mYawVec.last()}, "°");
 
         graphIndex = 0;
         ui->accelPlot->graph(graphIndex++)->setData(xAxis, mAccXVec);
         ui->accelPlot->graph(graphIndex++)->setData(xAxis, mAccYVec);
         ui->accelPlot->graph(graphIndex++)->setData(xAxis, mAccZVec);
-        setLegendValues(ui->accelPlot, {"Acc X", "Acc Y", "Acc Z"},
-                        {mAccXVec.last(), mAccYVec.last(), mAccZVec.last()}, " G");
 
         graphIndex = 0;
         ui->gyroPlot->graph(graphIndex++)->setData(xAxis, mGyroXVec);
         ui->gyroPlot->graph(graphIndex++)->setData(xAxis, mGyroYVec);
         ui->gyroPlot->graph(graphIndex++)->setData(xAxis, mGyroZVec);
-        setLegendValues(ui->gyroPlot, {"Gyro X", "Gyro Y", "Gyro Z"},
-                        {mGyroXVec.last(), mGyroYVec.last(), mGyroZVec.last()}, " °/s");
+
+        // The legend shows the latest value of each trace
+        QCustomPlot *plots[3] = {ui->rpyPlot, ui->accelPlot, ui->gyroPlot};
+        QStringList names = {"Roll", "Pitch", "Yaw", "Acc X", "Acc Y", "Acc Z", "Gyro X", "Gyro Y", "Gyro Z"};
+        QVector<double> *values[9] = {&mRollVec, &mPitchVec, &mYawVec, &mAccXVec, &mAccYVec, &mAccZVec,
+                                      &mGyroXVec, &mGyroYVec, &mGyroZVec};
+        QStringList units = {"°", " G", " °/s"};
+        for (int i = 0;i < 9;i++) {
+            plots[i / 3]->graph(i % 3)->setName(Utility::plotLegendName(names.at(i), values[i]->last(), 3, units.at(i / 3)));
+        }
 
         ui->rpyPlot->rescaleAxes();
         ui->accelPlot->rescaleAxes();
@@ -230,14 +233,5 @@ void PageAppImu::appendDoubleAndTrunc(QVector<double> *vec, double num, int maxS
 
     if(vec->size() > maxSize) {
         vec->remove(0, vec->size() - maxSize);
-    }
-}
-
-// Shows the latest value of each trace after its name in the legend
-void PageAppImu::setLegendValues(QCustomPlot *plot, const QStringList &names,
-                                 const QList<double> &values, const QString &unit)
-{
-    for (int i = 0;i < names.size();i++) {
-        plot->graph(i)->setName(QString("%1   %2%3").arg(names.at(i)).arg(values.at(i), 0, 'f', 3).arg(unit));
     }
 }

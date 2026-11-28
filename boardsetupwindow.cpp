@@ -18,14 +18,6 @@
 #include "widgets/paramdialog.h"
 #include "widgets/detectallfocdialog.h"
 
-// Marks a result label as passed ("ok"), failed ("bad") or not tested (empty); the style sheet colors it
-static void setState(QLabel *label, const QString &state)
-{
-    label->setProperty("state", state);
-    label->style()->unpolish(label);
-    label->style()->polish(label);
-}
-
 BoardSetupWindow::BoardSetupWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::BoardSetupWindow)
@@ -123,7 +115,7 @@ void BoardSetupWindow::timerSlot()
     if (mStatusInfoTime) {
         mStatusInfoTime--;
         if (!mStatusInfoTime) {
-            setState(mStatusLabel, "");
+            Utility::setStyleProperty(mStatusLabel, "state", "");
         }
     } else {
         QString str = mVesc->getConnectedPortName();
@@ -321,7 +313,7 @@ void BoardSetupWindow::resetRoutine(){
                                      QMessageBox::Ok);
     mVesc->disconnectPort();
     ui->startButton->setEnabled(true);
-    setState(ui->usbConnectLabel, "");
+    Utility::setStyleProperty(ui->usbConnectLabel, "state", "");
 
     is_Dual = false;
     num_VESCs = 0;
@@ -342,15 +334,15 @@ void BoardSetupWindow::resetRoutine(){
     ui->appCheckBox->setEnabled(true);
     ui->motorDetectionCheckBox->setEnabled(true);
 
-    setState(ui->CANScanLabel, "");
-    setState(ui->bootloaderLabel, "");
-    setState(ui->firmwareLabel, "");
-    setState(ui->bleFirmwareLabel, "");
-    setState(ui->motorDetectionLabel, "");
-    setState(ui->motorDirectionLabel, "");
-    setState(ui->motorTestLabel, "");
-    setState(ui->appSetupLabel, "");
-    setState(ui->remoteTestLabel, "");
+    Utility::setStyleProperty(ui->CANScanLabel, "state", "");
+    Utility::setStyleProperty(ui->bootloaderLabel, "state", "");
+    Utility::setStyleProperty(ui->firmwareLabel, "state", "");
+    Utility::setStyleProperty(ui->bleFirmwareLabel, "state", "");
+    Utility::setStyleProperty(ui->motorDetectionLabel, "state", "");
+    Utility::setStyleProperty(ui->motorDirectionLabel, "state", "");
+    Utility::setStyleProperty(ui->motorTestLabel, "state", "");
+    Utility::setStyleProperty(ui->appSetupLabel, "state", "");
+    Utility::setStyleProperty(ui->remoteTestLabel, "state", "");
 
     ui->usbConnectLabel->setText("Connect USB Port");
     ui->CANScanLabel->setText("CAN Bus Scan");
@@ -373,9 +365,9 @@ bool BoardSetupWindow::trySerialConnect(){
         Utility::waitSignal(mVesc, SIGNAL(fwRxChanged(bool, bool)), 5000);
     }
     if(mVesc->isPortConnected()){
-        setState(ui->usbConnectLabel, "ok");
+        Utility::setStyleProperty(ui->usbConnectLabel, "state", "ok");
     }else{
-        setState(ui->usbConnectLabel, "bad");
+        Utility::setStyleProperty(ui->usbConnectLabel, "state", "bad");
         testResultMsg = "Could not connect USB. Make sure the unit is powered on, connected to the computer, and the correct Serial port is selected.";
         testResult = false;
     }
@@ -390,7 +382,7 @@ bool BoardSetupWindow::tryCANScan(){
     }
     if(CAN_Timeout){
         res = false;
-        setState(ui->CANScanLabel, "ok");
+        Utility::setStyleProperty(ui->CANScanLabel, "state", "ok");
         testResultMsg = "Could not connect USB. Make sure the unit is powered on, connected to the computer, and the correct Serial port is selected.";
         testResult = false;
     }else{
@@ -398,7 +390,7 @@ bool BoardSetupWindow::tryCANScan(){
         mVesc->commands()->setSendCan(false);
         mVesc->commands()->getAppConf();
         if(!Utility::waitSignal(mVesc->appConfig(), SIGNAL(updated()), 5000)){
-            setState(ui->CANScanLabel, "bad");
+            Utility::setStyleProperty(ui->CANScanLabel, "state", "bad");
             testResultMsg = "Failed to read app config during CAN Scan.";
             return false;
         }
@@ -409,7 +401,7 @@ bool BoardSetupWindow::tryCANScan(){
         }
         canTxt = canTxt + " (" + QString::number(CAN_IDs.size() + 1) + " motors total)";
         ui->CANScanLabel->setText(canTxt);
-        setState(ui->CANScanLabel, "ok");
+        Utility::setStyleProperty(ui->CANScanLabel, "state", "ok");
     }
     HW_Name = mVesc->getFirmwareNow().split("Hw: ").last();
     HW_Name = HW_Name.split("\n").first();
@@ -449,9 +441,9 @@ bool BoardSetupWindow::tryBootloaderUpload(){
 
     bool fwRes = mVesc->fwUpload(data, is_Bootloader, num_VESCs > 1);
     if(fwRes){
-        setState(ui->bootloaderLabel, "ok");
+        Utility::setStyleProperty(ui->bootloaderLabel, "state", "ok");
     }else{
-        setState(ui->bootloaderLabel, "bad");
+        Utility::setStyleProperty(ui->bootloaderLabel, "state", "bad");
         testResultMsg = "The bootloader upload timed out. Please try the routine again, you may need to update the firmware first seperatley from the VESC tool.";
         testResult = false;
     }
@@ -486,13 +478,13 @@ bool BoardSetupWindow::tryFirmwareUpload(){
 
         fwRes = mVesc->fwUpload(data, is_Bootloader, num_VESCs > 1);
         if(!fwRes){
-            setState(ui->firmwareLabel, "bad");
+            Utility::setStyleProperty(ui->firmwareLabel, "state", "bad");
             testResultMsg = "The firmware upload timed out. Please try the routine again, you may need to update the firmware first seperatley from the VESC tool.";
             return false;
         }
     }else{
         // Didn't find any supported default firmwares
-        setState(ui->bootloaderLabel, "bad");
+        Utility::setStyleProperty(ui->bootloaderLabel, "state", "bad");
         testResultMsg = "The firmware file path is non-existent.";
         return false;
     }
@@ -508,10 +500,10 @@ bool BoardSetupWindow::tryFirmwareUpload(){
     bool reconnected = trySerialConnect();
     if(reconnected){
         ui->firmwareLabel->setText("Firmware Uploaded Succesfully and Reconnected");
-        setState(ui->firmwareLabel, "ok");
+        Utility::setStyleProperty(ui->firmwareLabel, "state", "ok");
     }else{
         ui->firmwareLabel->setText("Unit did not reconnect after firmware upload.");
-        setState(ui->firmwareLabel, "bad");
+        Utility::setStyleProperty(ui->firmwareLabel, "state", "bad");
         testResult = false;
     }
     return reconnected;
@@ -527,7 +519,7 @@ bool BoardSetupWindow::tryFOCCalibration(){
     mVesc->ignoreCanChange(true);
     mVesc->commands()->getAppConf();
     if(!Utility::waitSignal(mVesc->appConfig(), SIGNAL(updated()), 5000)){
-        setState(ui->motorDetectionLabel, "bad");
+        Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
         testResultMsg = "Failed to read app config during motor setup routine.";
         return false;
     }
@@ -536,7 +528,7 @@ bool BoardSetupWindow::tryFOCCalibration(){
     Utility::sleepWithEventLoop(100);
     mVesc->commands()->setAppConf();
     if(!Utility::waitSignal(mVesc->commands(), SIGNAL(ackReceived(QString)), 2000)){
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "Failed to write app config during motor routine.";
         return false;
     }
@@ -547,7 +539,7 @@ bool BoardSetupWindow::tryFOCCalibration(){
 
     bool xml_res = mVesc->mcConfig()->loadXml(mcXmlPath, "MCConfiguration");
     if(!xml_res){
-        setState(ui->motorDetectionLabel, "bad");
+        Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
         testResultMsg = "motor XML read failed during FOC calibration";
         return false;
     }
@@ -577,7 +569,7 @@ bool BoardSetupWindow::tryFOCCalibration(){
                                         mMcConfig_Target->getParamDouble("foc_openloop_rpm"),
                                         mMcConfig_Target->getParamDouble("foc_sl_erpm"));
     if(!res.startsWith("Success!")){
-        setState(ui->motorDetectionLabel, "bad");
+        Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
         return false;
     }
     ui->motorDetectionLabel->setText("Checking Detected Values for Accuracy");
@@ -602,7 +594,7 @@ bool BoardSetupWindow::tryFOCCalibration(){
         Utility::waitSignal(mVesc->mcConfig(), SIGNAL(updated()), 5000);
 
         if(mcConfigOutsideParamBounds("foc_motor_r",tolerance )){
-            setState(ui->motorDetectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
             testResultMsg = "Motor Resistance of CAN ID " + canid + " is outside the tolerance for the target value." +
                     " Check your motors and winding connections. The measured resistance was " +
                     QString::number(mVesc->mcConfig()->getParamDouble("foc_motor_r")*1.0e3)+" mOhm";
@@ -610,7 +602,7 @@ bool BoardSetupWindow::tryFOCCalibration(){
         }
 
         if(mcConfigOutsideParamBounds("foc_motor_l",tolerance )){
-            setState(ui->motorDetectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
             testResultMsg = "Motor Inductance of CAN ID " + canid + " is outside the tolerance for the target value." +
                     " Check your motors and winding connections. The measured inductance was " +
                     QString::number(mVesc->mcConfig()->getParamDouble("foc_motor_l")*1.0e6)+" uH";
@@ -618,14 +610,14 @@ bool BoardSetupWindow::tryFOCCalibration(){
         }
 
         if(mcConfigOutsideParamBounds("foc_motor_flux_linkage",tolerance)){
-            setState(ui->motorDetectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
             testResultMsg = "Motor Flux Linkage of CAN ID " + canid + " is outside the tolerance for the target value." +
                     " Check your motors and winding connections and ensure the motors are able to spin freely. The measured flux linkage was " +
                     QString::number(mVesc->mcConfig()->getParamDouble("foc_motor_flux_linkage")*1.0e3)+" mWb";
             return false;
         }
         if(mVesc->mcConfig()->getParamEnum("foc_sensor_mode") != mMcConfig_Target->getParamEnum("foc_sensor_mode")){
-            setState(ui->motorDetectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
             testResultMsg = "Motor Sensors of CAN ID " + canid + " does not match the target setting." +
                     " Ensure that the sensors are plugged in and wired correctly.";
             return false;
@@ -634,7 +626,7 @@ bool BoardSetupWindow::tryFOCCalibration(){
     mVesc->ignoreCanChange(false);
     mVesc->commands()->setSendCan(false);
     ui->motorDetectionLabel->setText("Detection Completed Succesfully");
-    setState(ui->motorDetectionLabel, "ok");
+    Utility::setStyleProperty(ui->motorDetectionLabel, "state", "ok");
     return true;
 }
 
@@ -666,7 +658,7 @@ bool BoardSetupWindow::tryMotorDirection(){
 
         mVesc->commands()->getValues();
         if(!Utility::waitSignal(mVesc->commands(), SIGNAL(valuesReceived(MC_VALUES, unsigned int)), 2000)){
-            setState(ui->motorDirectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDirectionLabel, "state", "bad");
             testResultMsg = "Failed to read tachometer value during motor direction routine.";
             return false;
         }
@@ -709,12 +701,12 @@ bool BoardSetupWindow::tryMotorDirection(){
 
         msgBox->setText(directionStatus);
         if(!msgBox->isVisible()){
-            setState(ui->motorDirectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDirectionLabel, "state", "bad");
             testResultMsg = "Direction routine canceled by the user.";
             return false;
         }
         if(!mVesc->isPortConnected()){
-            setState(ui->motorDirectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDirectionLabel, "state", "bad");
             testResultMsg = "Disconnected during direction calibration.";
             msgBox->close();
             msgBox->deleteLater();
@@ -738,7 +730,7 @@ bool BoardSetupWindow::tryMotorDirection(){
         Utility::sleepWithEventLoop(100);
         mVesc->commands()->getMcconf();
         if(!Utility::waitSignal(mVesc->mcConfig(), SIGNAL(updated()), 5000)){
-            setState(ui->motorDirectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDirectionLabel, "state", "bad");
             testResultMsg = "Failed to read config during motor direction routine.";
             return false;
         }
@@ -752,13 +744,13 @@ bool BoardSetupWindow::tryMotorDirection(){
         mVesc->commands()->setMcconf(false);
 
         if(!Utility::waitSignal(mVesc->commands(), SIGNAL(ackReceived(QString)), 2000)){
-            setState(ui->motorDirectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDirectionLabel, "state", "bad");
             testResultMsg = "Failed to write config during during motor direction routine.";
             return false;
         }
     }
 
-    setState(ui->motorDirectionLabel, "ok");
+    Utility::setStyleProperty(ui->motorDirectionLabel, "state", "ok");
     ui->motorDirectionLabel->setText("Motor Directions Set");
 
 
@@ -773,14 +765,14 @@ bool BoardSetupWindow::tryTestMotorParameters(){
         mVesc->commands()->setSendCan(false);
         mVesc->commands()->getAppConf();
         if(!Utility::waitSignal(mVesc->appConfig(), SIGNAL(updated()), 5000)){
-            setState(ui->motorDetectionLabel, "bad");
+            Utility::setStyleProperty(ui->motorDetectionLabel, "state", "bad");
             testResultMsg = "Failed to read app config after motor setup routine.";
             return false;
         }
         mVesc->appConfig()->updateParamEnum("app_to_use",app_enum_old); // set to use no app
         mVesc->commands()->setAppConf();
         if(!Utility::waitSignal(mVesc->commands(), SIGNAL(ackReceived(QString)), 2000)){
-            setState(ui->appSetupLabel, "bad");
+            Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
             testResultMsg = "Failed to write app config after motor routine.";
             return false;
         }
@@ -797,7 +789,7 @@ bool BoardSetupWindow::tryApplySlaveAppSettings(){
     mVesc->commands()->setSendCan(false);
     mVesc->commands()->getAppConf();
     if(!Utility::waitSignal(mVesc->appConfig(), SIGNAL(updated()), 5000)){
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "Failed to read app config during slave setup routine.";
         return false;
     }
@@ -805,14 +797,14 @@ bool BoardSetupWindow::tryApplySlaveAppSettings(){
     mVesc->appConfig()->updateParamEnum("app_to_use",0); // set to use uart
     mVesc->commands()->setAppConf();
     if(!Utility::waitSignal(mVesc->commands(), SIGNAL(ackReceived(QString)), 5000)){
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "Failed to write master config during slave app routine.";
         return false;
     }
 
     bool xml_res = mVesc->appConfig()->loadXml(appXmlPath, "APPConfiguration");
     if(!xml_res){
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "app XML read failed during App Setup";
         return false;
     }
@@ -847,7 +839,7 @@ bool BoardSetupWindow::tryApplySlaveAppSettings(){
             Utility::sleepWithEventLoop(100);
             mVesc->commands()->setAppConf();
             if(!Utility::waitSignal(mVesc->commands(), SIGNAL(ackReceived(QString)), 2000)){
-                setState(ui->appSetupLabel, "bad");
+                Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
                 testResultMsg = "Failed to write config during slave app routine.";
                 return false;
             }
@@ -863,7 +855,7 @@ bool BoardSetupWindow::tryApplyMasterAppSettings(){
     mVesc->commands()->setSendCan(false);
     mVesc->commands()->getAppConf();
     if(!Utility::waitSignal(mVesc->appConfig(), SIGNAL(updated()), 5000)){
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "Failed to read app config during slave setup routine.";
         return false;
     }
@@ -871,7 +863,7 @@ bool BoardSetupWindow::tryApplyMasterAppSettings(){
 
     bool xml_res = mVesc->appConfig()->loadXml(appXmlPath, "APPConfiguration");
     if(!xml_res){
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "app XML read failed during App Setup";
         return false;
     }
@@ -897,7 +889,7 @@ bool BoardSetupWindow::tryApplyMasterAppSettings(){
         success_msg = "ADC Config Applied";
         break;
     default:
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "Your app type is not compatible with this setup tool currently.";
         return false;
     }
@@ -905,12 +897,12 @@ bool BoardSetupWindow::tryApplyMasterAppSettings(){
     mVesc->commands()->setSendCan(false);
     mVesc->commands()->setAppConf();
     if(!Utility::waitSignal(mVesc->commands(), SIGNAL(ackReceived(QString)), 2000)){
-        setState(ui->appSetupLabel, "bad");
+        Utility::setStyleProperty(ui->appSetupLabel, "state", "bad");
         testResultMsg = "Failed to write config during master app routine.";
         return false;
     }
 
-    setState(ui->appSetupLabel, "ok");
+    Utility::setStyleProperty(ui->appSetupLabel, "state", "ok");
     ui->appSetupLabel->setText(success_msg);
     return true;
 }
@@ -1031,10 +1023,10 @@ void BoardSetupWindow::on_motorTolSlider_valueChanged(int value){
 void BoardSetupWindow::showStatusInfo(QString info, bool isGood)
 {
     if (isGood) {
-        setState(mStatusLabel, "ok");
+        Utility::setStyleProperty(mStatusLabel, "state", "ok");
         // mPageDebugPrint->printConsole("Status: " + info + "<br>");
     } else {
-        setState(mStatusLabel, "bad");
+        Utility::setStyleProperty(mStatusLabel, "state", "bad");
         // mPageDebugPrint->printConsole("<font color=\"red\">Status: " + info + "</font><br>");
     }
 

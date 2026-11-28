@@ -896,7 +896,7 @@ void MainWindow::timerSlot()
     if (mStatusInfoTime) {
         mStatusInfoTime--;
         if (!mStatusInfoTime) {
-            setStatusState("");
+            Utility::setStyleProperty(mStatusLabel, "state", "");
         }
     } else {
         QString str = mVesc->getConnectedPortName();
@@ -1094,21 +1094,13 @@ void MainWindow::timerSlot()
     }
 }
 
-// The status label is green for a good message, red for a bad one and plain for the connection
-void MainWindow::setStatusState(const QString &state)
-{
-    mStatusLabel->setProperty("state", state);
-    mStatusLabel->style()->unpolish(mStatusLabel);
-    mStatusLabel->style()->polish(mStatusLabel);
-}
-
 void MainWindow::showStatusInfo(QString info, bool isGood)
 {
     if (isGood) {
-        setStatusState("ok");
+        Utility::setStyleProperty(mStatusLabel, "state", "ok");
         mPageDebugPrint->printConsole("Status: " + info + "<br>");
     } else {
-        setStatusState("bad");
+        Utility::setStyleProperty(mStatusLabel, "state", "bad");
         mPageDebugPrint->printConsole("<font color=\"#00A1E4\">Status: " + info + "</font><br>");
     }
 
@@ -1566,9 +1558,17 @@ void MainWindow::addPageItem(QString name, QString icon, QString groupIcon, bool
             w->layout()->setContentsMargins(16, (w == page && title) ? 1 : 14, 16, 14);
         }
     }
-    // The room above the content is then inside the tabs, when they are over the whole page
-    if (tabs && layout && padded.first() == page && title && title->parentWidget() != page) {
-        tabs->setProperty("roomy", true);
+    // Where the tabs share the page, the room at the sides is around the page: the name lines up with the names of
+    // the other pages and every tab starts its content at the same height
+    if (tabs && padded.first() == page) {
+        if (title && title->parentWidget() != page) {
+            title->setProperty("inset", true);
+        }
+        for (int i = 0;i < tabs->count();i++) {
+            if (tabs->widget(i)->layout()) {
+                tabs->widget(i)->layout()->setContentsMargins(0, 14, 0, 0);
+            }
+        }
     }
 }
 

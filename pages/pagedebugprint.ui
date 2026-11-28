@@ -92,12 +92,12 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>649</x>
-     <y>22</y>
+     <x>646</x>
+     <y>24</y>
     </hint>
     <hint type="destinationlabel">
-     <x>317</x>
-     <y>232</y>
+     <x>547</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>

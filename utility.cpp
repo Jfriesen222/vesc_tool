@@ -45,6 +45,9 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QTabWidget>
+#include <QWizard>
+#include <QPushButton>
 
 #include "maddy/parser.h"
 #include "heatshrink/heatshrinkif.h"
@@ -2508,18 +2511,172 @@ void Utility::setPlotLegendRow(QCustomPlot *plot)
             }
         }
     });
+    legend->setVisible(true);
 }
 
-// Sets a property that the style sheet selects on, for the widget and the widgets in it
-void Utility::setStyleProperty(QWidget *widget, const char *name, bool value)
+// Name of a trace with its latest value, for the legend
+QString Utility::plotLegendName(QString name, double value, int decimals, QString unit)
 {
-    if (widget && widget->property(name).toBool() != value) {
+    return QString("%1   %2%3").arg(name).arg(value, 0, 'f', decimals).arg(unit);
+}
+
+// The throttle curve plot of the app pages, with both axes from -1 to 1
+void Utility::setupThrottlePlot(QCustomPlot *plot)
+{
+    setPlotColors(plot);
+    plot->addGraph();
+    plot->graph()->setName("Throttle Curve");
+    plot->graph()->setPen(QPen(getAppQColor("plot_graph1")));
+    plot->xAxis->setLabel("Throttle Value");
+    plot->yAxis->setLabel("Output Value");
+    for (QCPAxis *axis: {plot->xAxis, plot->yAxis}) {
+        axis->setRange(-1.0, 1.0);
+        axis->setNumberFormat("f");
+        axis->setNumberPrecision(1);
+    }
+    setPlotLegendRow(plot);
+}
+
+// Keeps the plot tools over the top right of the well of the open tab, and the bottom widget under it if given
+void Utility::placeOnTabs(QTabWidget *tabs, QWidget *tools, QWidget *bottom)
+{
+    auto place = [tabs, tools, bottom]() {
+        QWidget *tab = tabs->currentWidget();
+        if (bottom) {
+            tab->layout()->addWidget(bottom);
+        }
+        QFrame *well = tab->findChild<QFrame*>(QString(), Qt::FindDirectChildrenOnly);
+        static_cast<QGridLayout*>(well->layout())->addWidget(tools, 0, 0, Qt::AlignTop | Qt::AlignRight);
+        tools->raise();
+    };
+    QObject::connect(tabs, &QTabWidget::currentChanged, tabs, place);
+    place();
+}
+
+// Sets a property that the style sheet selects on, for the widget and the widgets in it. A property that is not
+// set counts as false or empty.
+void Utility::setStyleProperty(QWidget *widget, const char *name, const QVariant &value)
+{
+    QVariant now = widget ? widget->property(name) : QVariant();
+    if (widget && now != value && (now.isValid() || value.toBool())) {
         widget->setProperty(name, value);
         for (QWidget *w: QList<QWidget*>({widget}) + widget->findChildren<QWidget*>()) {
             w->style()->unpolish(w);
             w->style()->polish(w);
         }
     }
+}
+
+// The pixmap with every pixel that is not transparent in the color, for line icons
+QPixmap Utility::tinted(QPixmap pm, const QColor &color)
+{
+    if (!pm.isNull()) {
+        QPainter painter(&pm);
+        painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        painter.fillRect(pm.rect(), color);
+    }
+    return pm;
+}
+
+// Gives a wizard its look: page title and subtitle on top, the steps of the run beside the page,
+// Cancel apart from Back and Next
+void Utility::setUpWizardFrame(QWizard *wizard)
+{
+    // The Mac style puts the title and subtitle above the page, on every platform. A transparent
+    // background replaces its default picture.
+    QPixmap background(1, 1);
+    background.fill(Qt::transparent);
+    wizard->setWizardStyle(QWizard::MacStyle);
+    wizard->setPixmap(QWizard::BackgroundPixmap, background);
+    wizard->setButtonLayout({QWizard::CancelButton, QWizard::Stretch, QWizard::BackButton,
+                             QWizard::NextButton, QWizard::CommitButton, QWizard::FinishButton});
+    wizard->setButtonText(QWizard::BackButton, QWizard::tr("Back"));
+    wizard->setButtonText(QWizard::NextButton, QWizard::tr("Next"));
+    wizard->resize(880, 560);
+
+    // Back and Next point the way they go, Cancel is a plain outline
+    wizard->button(QWizard::BackButton)->setIcon(getIcon("icons/chevron_l.png"));
+    wizard->button(QWizard::NextButton)->setIcon(getIcon("icons/chevron_r.png"));
+    wizard->button(QWizard::NextButton)->setLayoutDirection(Qt::RightToLeft);
+    qobject_cast<QPushButton*>(wizard->button(QWizard::CancelButton))->setFlat(true);
+
+    // The pages visited, the current one and those that follow from the choices made so far
+    QLabel *steps = new QLabel;
+    steps->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    steps->setFixedWidth(236);
+    steps->setProperty("steps", true);
+    wizard->setSideWidget(steps);
+
+    QObject::connect(wizard, &QWizard::currentIdChanged, steps, [wizard, steps](int id) {
+        if (!wizard->page(id)) {
+            return;
+        }
+
+        // The page sits on the dialog without a frame, its subtitle as a caption under the title
+        if (auto *frame = qobject_cast<QFrame*>(wizard->page(id)->parentWidget())) {
+            frame->setFrameShape(QFrame::NoFrame);
+            frame->setAutoFillBackground(false);
+            frame->layout()->setContentsMargins(0, 0, 0, 0);
+            for (QLabel *subTitle: frame->findChildren<QLabel*>(QString(), Qt::FindDirectChildrenOnly)) {
+                setStyleProperty(subTitle, "hint", true);
+            }
+        }
+
+        QList<int> ids = wizard->visitedIds();
+        if (!ids.contains(id)) {
+            ids.append(id);
+        }
+        for (int n = wizard->page(id)->nextId();wizard->page(n) && !ids.contains(n);n = wizard->page(n)->nextId()) {
+            ids.append(n);
+        }
+
+        // One row per page: a numbered circle, green with a tick when done, ringed when current, joined by lines
+        const int rowH = 38;
+        QPixmap pm(QSize(steps->width(), 16 + ids.size() * rowH) * steps->devicePixelRatioF());
+        pm.setDevicePixelRatio(steps->devicePixelRatioF());
+        pm.fill(Qt::transparent);
+        QPainter p(&pm);
+        p.setRenderHint(QPainter::Antialiasing);
+        QFont numberFont = steps->font();
+        numberFont.setPixelSize(10);
+        numberFont.setWeight(QFont::Medium);
+        for (int i = 0;i < ids.size();i++) {
+            bool now = ids.at(i) == id;
+            bool done = !now && wizard->hasVisitedPage(ids.at(i));
+            QRectF circle(16.5, 16.5 + i * rowH + 9, 19, 19);
+            QRectF text(48, 16 + i * rowH, steps->width() - 56, rowH);
+
+            p.setBrush(Qt::NoBrush);
+            if (i > 0) {
+                p.setPen(getAppQColor("lineStrong"));
+                p.drawLine(QPointF(circle.center().x(), circle.top() - 15), QPointF(circle.center().x(), circle.top() - 3));
+            }
+            if (now) {
+                p.setPen(QPen(getAppQColor("accentDim"), 3));
+                p.drawEllipse(circle.adjusted(-2, -2, 2, 2));
+            }
+            p.setPen(done ? Qt::NoPen : QPen(getAppQColor(now ? "accent" : "lineStrong")));
+            p.setBrush(done ? QBrush(getAppQColor("positive")) : QBrush());
+            p.drawEllipse(circle);
+            if (done) {
+                p.setPen(QPen(Qt::white, 1.6, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+                QPointF c = circle.center();
+                p.drawPolyline(QPolygonF({c + QPointF(-4, 0), c + QPointF(-1.2, 2.8), c + QPointF(4, -2.6)}));
+            } else {
+                p.setFont(numberFont);
+                p.setPen(getAppQColor(now ? "accent" : "mutedText"));
+                p.drawText(circle, Qt::AlignCenter, QString::number(i + 1));
+            }
+
+            QFont titleFont = steps->font();
+            titleFont.setWeight(now ? QFont::Medium : QFont::Normal);
+            p.setFont(titleFont);
+            p.setPen(getAppQColor(now ? "titleText" : (done ? "lightText" : "mutedText")));
+            p.drawText(text, Qt::AlignLeft | Qt::AlignVCenter,
+                       QFontMetrics(titleFont).elidedText(wizard->page(ids.at(i))->title(), Qt::ElideRight, text.width()));
+        }
+        steps->setPixmap(pm);
+    });
 }
 
 // Moves the suffix of a spin box to a dimmed unit label at the right end of its field

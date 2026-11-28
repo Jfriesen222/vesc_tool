@@ -54,7 +54,8 @@ HEADERS += \
     $$PWD/dirsetup.h \
     $$PWD/vesc3dview.h \
     $$PWD/superslider.h \
-    $$PWD/searchbox.h
+    $$PWD/searchbox.h \
+    $$PWD/sparkline.h
 
 SOURCES += \
     $$PWD/canlistitem.cpp \
@@ -89,5 +90,6 @@ SOURCES += \
     $$PWD/dirsetup.cpp \
     $$PWD/vesc3dview.cpp \
     $$PWD/superslider.cpp \
-    $$PWD/searchbox.cpp
+    $$PWD/searchbox.cpp \
+    $$PWD/sparkline.cpp
 
