@@ -191,7 +191,8 @@ Item {
                 VescIf.emitMessageDialog("Error",
                                          "Encoder support is not enabled. Enable it in the general settings.",
                                          false, false)
-            } else {
+            } else if (res.offset >= 0.0) {
+                // Flux linkage detection sends -1 when it found no valid encoder
                 VescIf.emitStatusMessage("Encoder Result Received", true)
                 mOffset = res.offset
                 mRatio = res.ratio

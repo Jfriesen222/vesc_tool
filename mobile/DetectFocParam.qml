@@ -33,6 +33,11 @@ Item {
     property real kp: 0.0
     property real ki: 0.0
     property real gain: 0.0
+    property real encOffset: -1.0
+    property real encRatio: -1.0
+    property bool encInverted: false
+    // The firmware sends -1 when no valid encoder was found and 1001 when it is not enabled
+    property bool encOk: encOffset >= 0 && encOffset < 1000 && encRatio >= 0
 
     property Commands mCommands: VescIf.commands()
     property ConfigParams mMcConf: VescIf.mcConfig()
@@ -113,6 +118,12 @@ Item {
             mMcConf.updateParamDouble("foc_current_kp", kp)
             mMcConf.updateParamDouble("foc_current_ki", ki)
             mMcConf.updateParamDouble("foc_observer_gain", gain * 1e6)
+
+            if (encOk) {
+                mMcConf.updateParamDouble("foc_encoder_offset", encOffset)
+                mMcConf.updateParamDouble("foc_encoder_ratio", encRatio)
+                mMcConf.updateParamBool("foc_encoder_inverted", encInverted)
+            }
         }
 
         ScrollView {
@@ -280,6 +291,28 @@ Item {
                         title: qsTr("Observer gain")
                         value: gain > 0 ? gain.toFixed(2) : "\u2013"
                     }
+
+                    ValueTile {
+                        Layout.fillWidth: true
+                        visible: encOk
+                        title: qsTr("Enc. offset")
+                        value: encOffset.toFixed(1)
+                        unit: "°"
+                    }
+
+                    ValueTile {
+                        Layout.fillWidth: true
+                        visible: encOk
+                        title: qsTr("Enc. ratio")
+                        value: encRatio.toFixed(1)
+                    }
+
+                    ValueTile {
+                        Layout.fillWidth: true
+                        visible: encOk
+                        title: qsTr("Enc. inverted")
+                        value: encInverted ? qsTr("Yes") : qsTr("No")
+                    }
                 }
 
                 Text {
@@ -357,6 +390,12 @@ Item {
                 lambda = flux_linkage
                 calcGain()
             }
+        }
+
+        function onEncoderParamReceived(res) {
+            encOffset = res.offset
+            encRatio = res.ratio
+            encInverted = res.inverted
         }
     }
 
