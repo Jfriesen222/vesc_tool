@@ -33,6 +33,22 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="hintLabel">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignVCenter</set>
+          </property>
+          <property name="hint" stdset="0">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Move the throttle between the minimum and maximum values to get them sampled, then apply.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="helpButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -78,12 +94,6 @@
           <property name="text">
            <string>Apply</string>
           </property>
-          <property name="iconSize">
-           <size>
-            <width>45</width>
-            <height>16</height>
-           </size>
-          </property>
          </widget>
         </item>
        </layout>
@@ -91,103 +101,181 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="spacing">
-         <number>2</number>
+         <number>10</number>
         </property>
         <item>
-         <widget class="QDoubleSpinBox" name="minBox">
-          <property name="toolTip">
-           <string>Measured minimum pulselength</string>
-          </property>
-          <property name="readOnly">
+         <widget class="QFrame" name="minBoxFrame">
+          <property name="field" stdset="0">
            <bool>true</bool>
           </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-          <property name="prefix">
-           <string>Min: </string>
-          </property>
-          <property name="suffix">
-           <string> ms</string>
-          </property>
-          <property name="decimals">
-           <number>4</number>
-          </property>
-          <property name="maximum">
-           <double>100.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
+          <layout class="QHBoxLayout" name="minBoxFrameLayout">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="minBoxCaption">
+             <property name="text">
+              <string>MIN</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="minBox">
+             <property name="toolTip">
+              <string>Measured minimum pulselength</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="suffix">
+              <string> ms</string>
+             </property>
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="maximum">
+              <double>100.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="maxBox">
-          <property name="toolTip">
-           <string>Measured maximum pulselength</string>
-          </property>
-          <property name="readOnly">
+         <widget class="QFrame" name="maxBoxFrame">
+          <property name="field" stdset="0">
            <bool>true</bool>
           </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-          <property name="prefix">
-           <string>Max: </string>
-          </property>
-          <property name="suffix">
-           <string> ms</string>
-          </property>
-          <property name="decimals">
-           <number>4</number>
-          </property>
-          <property name="maximum">
-           <double>100.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
+          <layout class="QHBoxLayout" name="maxBoxFrameLayout">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="maxBoxCaption">
+             <property name="text">
+              <string>MAX</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="maxBox">
+             <property name="toolTip">
+              <string>Measured maximum pulselength</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="suffix">
+              <string> ms</string>
+             </property>
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="maximum">
+              <double>100.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="centerBox">
-          <property name="readOnly">
+         <widget class="QFrame" name="centerBoxFrame">
+          <property name="field" stdset="0">
            <bool>true</bool>
           </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-          <property name="prefix">
-           <string>Center: </string>
-          </property>
-          <property name="suffix">
-           <string> ms</string>
-          </property>
-          <property name="decimals">
-           <number>4</number>
-          </property>
+          <layout class="QHBoxLayout" name="centerBoxFrameLayout">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="centerBoxCaption">
+             <property name="text">
+              <string>CENTER</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="centerBox">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="suffix">
+              <string> ms</string>
+             </property>
+             <property name="decimals">
+              <number>4</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
+        <property name="horizontalSpacing">
+         <number>12</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>4</number>
+        </property>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
+          <property name="caption" stdset="0">
+           <bool>true</bool>
+          </property>
           <property name="toolTip">
            <string>VESC Tool preview with the current settings.</string>
           </property>
           <property name="text">
-           <string>VESC Tool</string>
+           <string>VESC TOOL</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
          <widget class="DisplayPercentage" name="display" native="true">
+          <property name="tape" stdset="0">
+           <bool>true</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>25</height>
+            <height>34</height>
            </size>
           </property>
           <property name="toolTip">
@@ -197,20 +285,26 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
+          <property name="caption" stdset="0">
+           <bool>true</bool>
+          </property>
           <property name="toolTip">
            <string>Current VESC output. Will be updated after writing the app configuration.</string>
           </property>
           <property name="text">
-           <string>VESC Firmware</string>
+           <string>VESC FIRMWARE</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
          <widget class="DisplayPercentage" name="displayVesc" native="true">
+          <property name="tape" stdset="0">
+           <bool>true</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>25</height>
+            <height>34</height>
            </size>
           </property>
           <property name="toolTip">

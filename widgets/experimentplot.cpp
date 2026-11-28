@@ -30,67 +30,16 @@ ExperimentPlot::ExperimentPlot(QWidget *parent) :
     ui->setupUi(this);
     layout()->setContentsMargins(0, 0, 0, 0);
 
-    QIcon mycon = QIcon(Utility::getIcon("icons/expand_on.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_off.png"), QIcon::Normal, QIcon::Off);
-    ui->experimentHZoomButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/expand_v_on.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_off.png"), QIcon::Normal, QIcon::Off);
-    ui->experimentVZoomButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/size_on.png"));
-    mycon.addPixmap(Utility::getIcon("icons/size_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/size_off.png"), QIcon::Normal, QIcon::Off);
-    ui->experimentAutoScaleButton->setIcon(mycon);
-
-    auto genPic = [](QString p1, QString p2, QString text) {
-        QPixmap pix(133, 133);
-        pix.fill(Qt::transparent);
-        QPainter p(&pix);
-
-        p.setRenderHint(QPainter::Antialiasing, true);
-        p.setRenderHint(QPainter::TextAntialiasing, true);
-        p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-
-        if (!p1.isEmpty()) {
-            p.drawImage(pix.rect(), Utility::getIcon(p1).toImage());
-        }
-
-        if (!p2.isEmpty()) {
-            p.drawImage(pix.rect(), Utility::getIcon(p2).toImage());
-        }
-
-        if (!text.isEmpty()) {
-            QFont font = p.font();
-            font.setPixelSize(pix.height());
-            font.setBold(true);
-            p.setFont(font);
-            p.setPen(Utility::getAppQColor("lightText"));
-            p.drawText(pix.rect(), Qt::AlignCenter, text);
-        }
-
-        return QPixmap(pix);
-    };
-
-    auto updateIcon = [genPic](QToolButton *btn, QString pic, QString txt) {
-        QIcon mycon = QIcon(genPic(pic, "", txt));
-        mycon.addPixmap(genPic("icons/glow.png", pic, txt), QIcon::Normal, QIcon::On);
-        mycon.addPixmap(genPic("", pic, txt), QIcon::Normal, QIcon::Off);
-        btn->setIcon(mycon);
-    };
-
-    updateIcon(ui->experimentGraph1Button, "", "1");
-    updateIcon(ui->experimentGraph2Button, "", "2");
-    updateIcon(ui->experimentGraph3Button, "", "3");
-    updateIcon(ui->experimentGraph4Button, "", "4");
-    updateIcon(ui->experimentGraph5Button, "", "5");
-    updateIcon(ui->experimentGraph6Button, "", "6");
-    updateIcon(ui->experimentShowLineButton, "icons/3ph_sine.png", "");
-    updateIcon(ui->experimentScatterButton, "icons/Polyline-96.png", "");
+    // The checked state shows as a raised button, so the icons stay the same
+    ui->experimentHZoomButton->setIcon(Utility::getIcon("icons/expand_off.png"));
+    ui->experimentVZoomButton->setIcon(Utility::getIcon("icons/expand_v_off.png"));
+    ui->experimentShowLineButton->setIcon(Utility::getIcon("icons/3ph_sine.png"));
+    ui->experimentScatterButton->setIcon(Utility::getIcon("icons/Polyline-96.png"));
 
     ui->experimentClearDataButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
+    for (QToolButton *button: ui->graphSeg->findChildren<QToolButton*>()) {
+        button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    }
 
     mVesc = 0;
     mExperimentReplot = false;
@@ -105,6 +54,27 @@ ExperimentPlot::ExperimentPlot(QWidget *parent) :
     connect(mTimer, &QTimer::timeout, [=]() {
         if (mExperimentReplot) {
             ui->experimentPlot->clearGraphs();
+
+            // The graph buttons carry the name and colour of their graph, so they are the legend
+            QToolButton *graphButtons[] = {ui->experimentGraph1Button, ui->experimentGraph2Button,
+                                           ui->experimentGraph3Button, ui->experimentGraph4Button,
+                                           ui->experimentGraph5Button, ui->experimentGraph6Button};
+            for (int i = 0;i < 6;i++) {
+                QPixmap swatch(28, 28);
+                swatch.setDevicePixelRatio(2.0);
+                swatch.fill(Qt::transparent);
+                bool hasGraph = i < mExperimentPlots.size();
+                if (hasGraph) {
+                    QPainter painter(&swatch);
+                    painter.setRenderHint(QPainter::Antialiasing);
+                    painter.setPen(Qt::NoPen);
+                    painter.setBrush(mExperimentPlots.at(i).color);
+                    painter.drawRoundedRect(QRectF(1, 5.5, 12, 3), 1.5, 1.5);
+                }
+                graphButtons[i]->setIcon(hasGraph ? QIcon(swatch) : QIcon());
+                graphButtons[i]->setText(hasGraph ? QString("%1  %2").arg(i + 1).arg(mExperimentPlots.at(i).label) :
+                                                    QString::number(i + 1));
+            }
 
             for (int i = 0;i < mExperimentPlots.size();i++) {
                 switch (i) {
@@ -131,8 +101,6 @@ ExperimentPlot::ExperimentPlot(QWidget *parent) :
                     ui->experimentPlot->graph()->setLineStyle(QCPGraph::LineStyle::lsNone);
                 }
             }
-
-            ui->experimentPlot->legend->setVisible(mExperimentPlots.size() > 1);
 
             if (ui->experimentAutoScaleButton->isChecked()) {
                 ui->experimentPlot->rescaleAxes();
@@ -350,10 +318,13 @@ void ExperimentPlot::on_experimentSavePngButton_clicked()
             fileName.append(".png");
         }
 
+        ui->experimentPlot->legend->setVisible(mExperimentPlots.size() > 1);
         ui->experimentPlot->savePng(fileName,
                                     ui->experimentWBox->value(),
                                     ui->experimentHBox->value(),
                                     ui->experimentScaleBox->value());
+        ui->experimentPlot->legend->setVisible(false);
+        ui->experimentPlot->replot();
     }
 }
 
@@ -368,9 +339,12 @@ void ExperimentPlot::on_experimentSavePdfButton_clicked()
             fileName.append(".pdf");
         }
 
+        ui->experimentPlot->legend->setVisible(mExperimentPlots.size() > 1);
         ui->experimentPlot->savePdf(fileName,
                                     ui->experimentWBox->value(),
                                     ui->experimentHBox->value());
+        ui->experimentPlot->legend->setVisible(false);
+        ui->experimentPlot->replot();
     }
 }
 

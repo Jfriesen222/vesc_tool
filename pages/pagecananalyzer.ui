@@ -14,196 +14,314 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Update CAN Baudrate</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+     <property name="spacing">
+      <number>16</number>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>KBits/sec</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="canBaudBox">
-        <item>
-         <property name="text">
-          <string>125</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>250</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>500</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>1000</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>10</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>20</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>50</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>75</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>100</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="updateCanBaudButton">
-        <property name="text">
-         <string>Start Update</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>490</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="ParamTable" name="paramTable">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>100</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTableWidget" name="msgTable">
-     <property name="editTriggers">
-      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-     </property>
-     <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>70</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Ext</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>ID</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Len</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D0</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D2</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D3</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D4</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D5</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D6</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>D7</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="clearRxButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Update CAN Baudrate</string>
        </property>
-       <property name="text">
-        <string>Clear</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../res.qrc">
-         <normaloff>:/res/icons/Delete-96.png</normaloff>:/res/icons/Delete-96.png</iconset>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0,1">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="canBaudLayout">
+          <property name="spacing">
+           <number>5</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_11">
+            <property name="caption" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>KBITS/SEC</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="canBaudBox">
+            <item>
+             <property name="text">
+              <string>125</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>250</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>500</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>1000</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>10</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>20</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>50</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>75</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>100</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignBottom">
+         <widget class="QPushButton" name="updateCanBaudButton">
+          <property name="text">
+           <string>Start Update</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignTop">
+         <widget class="QLabel" name="canBaudNoteIcon"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="canBaudNoteLabel">
+          <property name="hint" stdset="0">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Applies to all connected VESC-based devices. Needs firmware 6.06 or later.</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignTop</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="autoScrollBox">
-       <property name="text">
-        <string>Autoscroll</string>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>CAN Configuration</string>
        </property>
-       <property name="checked">
+       <property name="flat">
         <bool>true</bool>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="ParamTable" name="paramTable"/>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Received Frames</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="framesFrame">
+        <property name="well" stdset="0">
+         <bool>true</bool>
+        </property>
+        <layout class="QVBoxLayout" name="framesFrameLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTableWidget" name="msgTable">
+           <property name="font">
+            <font>
+             <family>Roboto Mono</family>
+            </font>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+           </property>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>70</number>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>Ext</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>ID</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Len</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D0</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D1</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D2</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D3</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D4</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D5</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D6</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>D7</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="clearRxButton">
+             <property name="text">
+              <string>Clear</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../res.qrc">
+               <normaloff>:/res/icons/Delete-96.png</normaloff>:/res/icons/Delete-96.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="autoScrollBox">
+             <property name="text">
+              <string>Autoscroll</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
@@ -212,22 +330,27 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
-       <number>3</number>
+       <number>12</number>
       </property>
       <property name="topMargin">
-       <number>3</number>
+       <number>12</number>
       </property>
       <property name="rightMargin">
-       <number>3</number>
+       <number>12</number>
       </property>
       <property name="bottomMargin">
-       <number>3</number>
+       <number>12</number>
       </property>
       <property name="spacing">
        <number>3</number>
       </property>
       <item row="1" column="1">
        <widget class="QLineEdit" name="sendIdEdit">
+        <property name="font">
+         <font>
+          <family>Roboto Mono</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x00000000</string>
         </property>
@@ -235,16 +358,22 @@
       </item>
       <item row="0" column="3">
        <widget class="QLabel" name="label_4">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D1</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="1" column="3">
        <widget class="QSpinBox" name="sendD1Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -258,16 +387,22 @@
       </item>
       <item row="0" column="2">
        <widget class="QLabel" name="label_3">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D0</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="1" column="4">
        <widget class="QSpinBox" name="sendD2Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -281,6 +416,9 @@
       </item>
       <item row="1" column="9">
        <widget class="QSpinBox" name="sendD7Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -294,6 +432,9 @@
       </item>
       <item row="1" column="2">
        <widget class="QSpinBox" name="sendD0Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -307,16 +448,22 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="label_2">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>ID</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="1" column="5">
        <widget class="QSpinBox" name="sendD3Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -330,6 +477,9 @@
       </item>
       <item row="1" column="6">
        <widget class="QSpinBox" name="sendD4Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -343,16 +493,22 @@
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
-         <string>Extended</string>
+         <string>EXTENDED</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="1" column="7">
        <widget class="QSpinBox" name="sendD5Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -366,6 +522,9 @@
       </item>
       <item row="1" column="8">
        <widget class="QSpinBox" name="sendD6Box">
+        <property name="arrows" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>-1</number>
         </property>
@@ -379,6 +538,9 @@
       </item>
       <item row="1" column="10">
        <widget class="QPushButton" name="sendButton">
+        <property name="primary" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Send</string>
         </property>
@@ -390,61 +552,79 @@
       </item>
       <item row="0" column="4">
        <widget class="QLabel" name="label_5">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D2</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="0" column="5">
        <widget class="QLabel" name="label_6">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D3</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="0" column="6">
        <widget class="QLabel" name="label_7">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D4</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="0" column="7">
        <widget class="QLabel" name="label_8">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D5</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="0" column="8">
        <widget class="QLabel" name="label_9">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D6</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="0" column="9">
        <widget class="QLabel" name="label_10">
+        <property name="caption" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>D7</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>

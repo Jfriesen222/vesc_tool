@@ -21,7 +21,6 @@
 #include "utility.h"
 #include <QPainter>
 #include <QPaintEvent>
-#include <QFont>
 #include <cmath>
 
 DisplayPercentage::DisplayPercentage(QWidget *parent) : QWidget(parent)
@@ -37,9 +36,6 @@ DisplayPercentage::DisplayPercentage(QWidget *parent) : QWidget(parent)
     mTimer = new QTimer(this);
     mTimer->start(34);
     connect(mTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
-
-    setAttribute(Qt::WA_OpaquePaintEvent);
-    setAttribute(Qt::WA_NoSystemBackground);
 }
 
 QString DisplayPercentage::text() const
@@ -83,85 +79,72 @@ void DisplayPercentage::timerSlot()
     }
 }
 
+// The text over a slim level line, or the line alone when a few pixels high. With the tape property it is a
+// tape of segments with the text in a readout at the right, for live inputs.
 void DisplayPercentage::paintEvent(QPaintEvent *event)
 {
+    (void)event;
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    QColor c_bg = Utility::getAppQColor("black");
-    QColor c_hl = Utility::getAppQColor("darkAccent");
-    QColor c_vl = Utility::getAppQColor("red");
-    QColor c_neg = Utility::getAppQColor("red");
-    QColor c_pos = Utility::getAppQColor("lightAccent");
-    QColor c_text = Utility::getAppQColor("white");
-
     if (!isEnabled()) {
-        int c = 80;
-        c_bg = QColor(c, c, c);
-
-        c = 120;
-        c_hl = QColor(c, c, c);
-
-        c = 120;
-        c_vl = QColor(c, c, c);
-
-        c = 120;
-        c_neg = QColor(c, c, c);
-
-        c = 180;
-        c_pos = QColor(c, c, c);
-
-        c = 180;
-        c_text = QColor(c, c, c);
+        painter.setOpacity(0.45);
     }
 
-    int w = width();
-    int h = height();
+    const int w = width(), h = height();
+    const double v = qBound(-1.0, mValue / 100.0, 1.0);
 
-    painter.fillRect(event->rect(), Qt::transparent);
-    painter.setBrush(c_bg);
-    painter.drawRoundedRect(event->rect(), 5.0, 5.0);
-
-    if (mIsDual) {
-        painter.fillRect(w / 2 - 1, 0, 2, h / 3, c_vl);
+    if (!property("tape").toBool()) {
+        const double lineH = h <= 6 ? h : 4.0;
+        const double x0 = mIsDual ? w / 2.0 : (v < 0.0 ? w : 0.0);
+        const double len = v * (mIsDual ? w / 2.0 : w);
+        painter.setPen(Utility::getAppQColor("mutedText"));
+        painter.drawText(QRectF(0, 0, w, h - lineH - 2), Qt::AlignLeft | Qt::AlignVCenter, mText);
+        painter.fillRect(QRectF(0, h - lineH, w, lineH), Utility::getAppQColor("line"));
+        painter.fillRect(QRectF(qMin(x0, x0 + len), h - lineH, fabs(len), lineH), Utility::getAppQColor("lightAccent"));
+        if (mIsDual) {
+            painter.fillRect(QRectF(x0 - 0.5, h - lineH, 1, lineH), Utility::getAppQColor("mutedText"));
+        }
+        return;
     }
 
-    painter.fillRect(0, h / 3 - 1, w, 2, c_hl);
-
-    QPen pen;
-    QFont font;
-
-    // Text
-    pen.setColor(c_text);
-    font.setFamily("DejaVu Sans Mono");
-    font.setBold(true);
-    font.setPixelSize(2 * h / 3 - 2);
-    painter.setPen(pen);
+    // It sits on a black housing in both themes, so the colors are not from the theme
+    QFont font = this->font();
+    font.setWeight(QFont::Medium);
     painter.setFont(font);
-    painter.drawText(QRect(0, h / 3 + 1, w - 2, 2 * h / 3 - 1), Qt::AlignCenter, mText);
+    const int readW = qMax(92, painter.fontMetrics().horizontalAdvance(mText) + 20);
 
-    double valh = (double)h / 3.0 - 2.0;
+    painter.setPen(QColor(255, 255, 255, 18));
+    painter.setBrush(QColor(6, 6, 8));
+    painter.drawRoundedRect(QRectF(0.5, 0.5, w - 1, h - 1), 8, 8);
+
+    QRectF read(w - readW - 3.5, 3.5, readW, h - 7);
+    painter.setPen(QColor(255, 255, 255, 23));
+    painter.setBrush(Qt::black);
+    painter.drawRoundedRect(read, 5, 5);
+    painter.setPen(QColor(244, 244, 245));
+    painter.drawText(read.adjusted(0, 0, -9, 0), Qt::AlignRight | Qt::AlignVCenter, mText);
+
+    // Segments with the pitch and colors of the bottom bar, from the zero mark in the middle when dual
+    const double pitch = 4.5, segW = 3.0, segH = qMin(15.0, h - 14.0), top = (h - segH) / 2.0 - 2.0;
+    const double left = 12.0, right = read.left() - 12.0;
+    const double cx = mIsDual ? std::round((left + right) / 2.0) : left - 2.5;
+    const int n = ((mIsDual ? (right - left) / 2.0 : right - left) - 2.5) / pitch;
+    painter.setPen(Qt::NoPen);
+    for (int side = mIsDual ? -1 : 1;side <= 1;side += 2) {
+        for (int i = 0;i < n;i++) {
+            double f = (i + 0.5) / n;
+            bool lit = side * v > 0.0 && f <= fabs(v) + 0.5 / n;
+            painter.setBrush(lit ? QColor(47, 183, 242) : QColor(255, 255, 255, 19));
+            painter.drawRoundedRect(QRectF(side > 0 ? cx + 2.5 + i * pitch : cx - 2.5 - i * pitch - segW, top, segW, segH), 1, 1);
+        }
+
+        for (double f: {0.25, 0.5, 0.75, 1.0}) {
+            painter.fillRect(QRectF(std::round(cx + side * (2.5 + f * n * pitch)), top + segH + 2, 1, 2), QColor(255, 255, 255, 71));
+        }
+    }
+
     if (mIsDual) {
-        double xsp = (double)w / 2.0 + 1.0;
-        double xsm = (double)w / 2.0 - 1.0;
-        double valw = (mValue / 100.0) * ((double)w / 2.0 - 2.0);
-
-        if (fabs(valw) > 0.1) {
-            if (valw >= 0.0) {
-                painter.setBrush(c_pos);
-                painter.drawRect(xsp, 0, valw, valh);
-            } else {
-                painter.setBrush(c_neg);
-                painter.drawRect(xsm + valw, 1, -valw, valh);
-            }
-        }
-    } else {
-        if (mValue >= 0.0) {
-            painter.setBrush(c_pos);
-            painter.drawRect(0, 1, (w * mValue) / 100.0, valh);
-        } else {
-            painter.setBrush(c_neg);
-            painter.drawRect(w + w * (mValue / 100.0), 1, w, valh);
-        }
+        painter.fillRect(QRectF(cx - 0.5, top - 1, 1, segH + 4), QColor(255, 255, 255, 216));
     }
 }

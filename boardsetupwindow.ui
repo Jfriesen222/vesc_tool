@@ -268,6 +268,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="startButton">
+        <property name="primary" stdset="0">
+         <bool>true</bool>
+        </property>
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -281,11 +284,8 @@
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::WinPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+        <property name="card" stdset="0">
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Connect USB Port</string>
@@ -300,11 +300,8 @@
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::WinPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+        <property name="card" stdset="0">
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>CAN Bus Scan</string>
@@ -339,11 +336,8 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::WinPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+            <property name="card" stdset="0">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Bootloader Upload</string>
@@ -358,11 +352,8 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::WinPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+            <property name="card" stdset="0">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Firmware Upload</string>
@@ -418,11 +409,8 @@
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
-          <property name="frameShape">
-           <enum>QFrame::WinPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
+          <property name="card" stdset="0">
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>BLE Firmware Upload</string>
@@ -532,11 +520,8 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::WinPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+            <property name="card" stdset="0">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Motor Detection</string>
@@ -554,11 +539,8 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::WinPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+            <property name="card" stdset="0">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Motor Direction Calibration</string>
@@ -576,11 +558,8 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::WinPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+            <property name="card" stdset="0">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Motor Openloop Load Test</string>
@@ -644,11 +623,8 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::WinPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+            <property name="card" stdset="0">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>App Setup</string>
@@ -666,11 +642,8 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::WinPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+            <property name="card" stdset="0">
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>App Test</string>

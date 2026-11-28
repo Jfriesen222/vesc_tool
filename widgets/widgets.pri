@@ -44,19 +44,17 @@ HEADERS += \
     $$PWD/detectfochall.h \
     $$PWD/ppmmap.h \
     $$PWD/adcmap.h \
-    $$PWD/rtdatatext.h \
     $$PWD/nrfpair.h \
     $$PWD/scripteditor.h \
     $$PWD/vtextbrowser.h \
-    $$PWD/imagewidget.h \
     $$PWD/parameditstring.h \
     $$PWD/paramdialog.h \
-    $$PWD/aspectimglabel.h \
     $$PWD/historylineedit.h \
     $$PWD/detectallfocdialog.h \
     $$PWD/dirsetup.h \
     $$PWD/vesc3dview.h \
-    $$PWD/superslider.h
+    $$PWD/superslider.h \
+    $$PWD/searchbox.h
 
 SOURCES += \
     $$PWD/canlistitem.cpp \
@@ -81,17 +79,15 @@ SOURCES += \
     $$PWD/detectfochall.cpp \
     $$PWD/ppmmap.cpp \
     $$PWD/adcmap.cpp \
-    $$PWD/rtdatatext.cpp \
     $$PWD/nrfpair.cpp \
     $$PWD/scripteditor.cpp \
     $$PWD/vtextbrowser.cpp \
-    $$PWD/imagewidget.cpp \
     $$PWD/parameditstring.cpp \
     $$PWD/paramdialog.cpp \
-    $$PWD/aspectimglabel.cpp \
     $$PWD/historylineedit.cpp \
     $$PWD/detectallfocdialog.cpp \
     $$PWD/dirsetup.cpp \
     $$PWD/vesc3dview.cpp \
-    $$PWD/superslider.cpp
+    $$PWD/superslider.cpp \
+    $$PWD/searchbox.cpp
 

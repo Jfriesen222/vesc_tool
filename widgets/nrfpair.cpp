@@ -81,14 +81,14 @@ void NrfPair::nrfPairingRes(int res)
     switch (res) {
     case NRF_PAIR_STARTED:
         mPairCnt = ui->timeBox->value();
-        ui->countLabel->setText(tr("%1").arg(mPairCnt, 0, 'f', 1));
+        ui->countBox->setValue(mPairCnt);
         ui->startButton->setEnabled(false);
         break;
 
     case NRF_PAIR_OK:
         ui->startButton->setEnabled(true);
         mPairCnt = 0.0;
-        ui->countLabel->setText(tr("%1").arg(mPairCnt, 0, 'f', 1));
+        ui->countBox->setValue(mPairCnt);
         mVesc->emitStatusMessage("Pairing NRF Sucessful", true);
         QMessageBox::information(this,
                                  tr("NRF Pairing"),
@@ -99,7 +99,7 @@ void NrfPair::nrfPairingRes(int res)
     case NRF_PAIR_FAIL:
         ui->startButton->setEnabled(true);
         mPairCnt = 0.0;
-        ui->countLabel->setText(tr("%1").arg(mPairCnt, 0, 'f', 1));
+        ui->countBox->setValue(mPairCnt);
         mVesc->emitStatusMessage("Pairing NRF Timed Out", false);
         mRunning = false;
 
@@ -136,7 +136,7 @@ void NrfPair::timerSlot()
             mPairCnt = 0.0;
         }
 
-        ui->countLabel->setText(tr("%1").arg(mPairCnt, 0, 'f', 1));
+        ui->countBox->setValue(mPairCnt);
     }
 }
 

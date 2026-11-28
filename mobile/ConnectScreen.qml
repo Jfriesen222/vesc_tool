@@ -36,6 +36,9 @@ Item {
     property bool pingTcpHub: false
     property bool scanning: false
     property bool fullLogo: true
+    // Part of a page instead of a screen of its own: no background, logo, Hide button or last device
+    property bool embedded: false
+    property string iconDir: embedded ? "desktop/icons/" : "icons/"
     property var dialogParent: rootItem.parent
     property int filterType: -1
     property var typeCounts: [0, 0, 0, 0]
@@ -61,11 +64,13 @@ Item {
     Rectangle {
         color: Utility.getAppHexColor("darkBackground")
         anchors.fill: parent
+        visible: !embedded
     }
 
     // Prevents events from passing to components behind
     MouseArea {
         anchors.fill: parent
+        enabled: !embedded
         acceptedButtons: Qt.AllButtons
         onWheel: {wheel.accepted=true}
         hoverEnabled: true
@@ -95,6 +100,7 @@ Item {
         id: column
         anchors.fill: parent
         anchors.margins: 10
+        anchors.topMargin: embedded ? 0 : 10
         anchors.leftMargin: 14 + notchLeft
         anchors.rightMargin: 14 + notchRight
 
@@ -106,6 +112,7 @@ Item {
 
         Image {
             id: image
+            visible: !embedded
             Layout.preferredWidth: Math.min(column.width, column.height*0.8) * 0.5
             Layout.preferredHeight: (sourceSize.height * Layout.preferredWidth) / sourceSize.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
@@ -143,6 +150,7 @@ Item {
         RowLayout {
             id: buttonRow
             Layout.fillWidth: true
+            visible: !embedded
 
             Button {
                 text: qsTr("Hide")
@@ -263,6 +271,7 @@ Item {
             Layout.fillWidth: true
             Layout.leftMargin: 4
             Layout.rightMargin: 4
+            visible: !embedded
 
             Text {
                 Layout.fillWidth: true
@@ -278,27 +287,67 @@ Item {
             }
         }
 
-        ListView {
+        RowLayout {
             Layout.fillWidth: true
+            Layout.fillHeight: false
             Layout.preferredHeight: 44
             Layout.topMargin: -6
             Layout.bottomMargin: -4
-            orientation: ListView.Horizontal
-            spacing: 6
-            clip: true
-            model: [[qsTr("All"), -1, "", deviceCount],
-                    ["BLE", 0, "icons/bluetooth.png", typeCounts[0]],
-                    ["USB", 1, "icons/USB-96.png", typeCounts[1]],
-                    ["Wi-Fi", 2, "icons/LAN-96.png", typeCounts[2]],
-                    ["Hub", 3, "icons/Globe-96.png", typeCounts[3]]]
 
-            delegate: Chip {
-                text: modelData[0] + " " + modelData[3]
-                iconSource: modelData[2] !== "" ? "qrc" + Utility.getThemePath() + modelData[2] : ""
-                checked: filterType === modelData[1]
+            ListView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                orientation: ListView.Horizontal
+                spacing: 6
+                clip: true
+                model: [[qsTr("All"), -1, "", deviceCount],
+                        ["BLE", 0, iconDir + "bluetooth.png", typeCounts[0]],
+                        ["USB", 1, iconDir + "USB-96.png", typeCounts[1]],
+                        ["Wi-Fi", 2, iconDir + "LAN-96.png", typeCounts[2]],
+                        ["Hub", 3, iconDir + "Globe-96.png", typeCounts[3]]]
+
+                delegate: Chip {
+                    text: modelData[0] + " " + modelData[3]
+                    iconSource: modelData[2] !== "" ? "qrc" + Utility.getThemePath() + modelData[2] : ""
+                    checked: filterType === modelData[1]
+                    onClicked: {
+                        filterType = modelData[1]
+                        mBle.emitScanDone()
+                    }
+                }
+            }
+
+            // Embedded, the device count and the scan buttons are at the end of this row
+            Text {
+                visible: embedded
+                color: Utility.getAppHexColor("normalText")
+                text: qsTr("%1 found").arg(deviceCount)
+                font.pointSize: 10
+            }
+
+            ToolButton {
+                visible: embedded
+                Layout.preferredWidth: 30
+                Layout.preferredHeight: 30
+                icon.width: 16
+                icon.height: 16
+                icon.source: "qrc" + Utility.getThemePath() + iconDir + "Refresh-96.png"
+                enabled: !scanning
+                Accessible.name: qsTr("Scan BLE")
+                onClicked: startBleScan()
+            }
+
+            ToolButton {
+                visible: embedded
+                Layout.preferredWidth: 30
+                Layout.preferredHeight: 30
+                icon.width: 16
+                icon.height: 16
+                icon.source: "qrc" + Utility.getThemePath() + "icons_textedit/Menu 2-96.png"
+                Accessible.name: qsTr("Scan options")
                 onClicked: {
-                    filterType = modelData[1]
-                    mBle.emitScanDone()
+                    scanMenu.parent = this
+                    scanMenu.open()
                 }
             }
         }
@@ -327,7 +376,7 @@ Item {
             header: ColumnLayout {
                 width: bleList.width
                 // Only when the last device is in range
-                visible: lastDeviceAddr !== "" && foundAddrs.indexOf(lastDeviceAddr) >= 0
+                visible: !embedded && lastDeviceAddr !== "" && foundAddrs.indexOf(lastDeviceAddr) >= 0
                 height: visible ? implicitHeight + 4 : 0
 
                 SectionHeader {
@@ -444,10 +493,10 @@ Item {
                             width: 22
                             height: 22
                             source: "qrc" + Utility.getThemePath() + ({
-                                0: "icons/bluetooth.png",
-                                1: "icons/USB-96.png",
-                                2: "icons/LAN-96.png",
-                                3: "icons/Globe-96.png"
+                                0: iconDir + "bluetooth.png",
+                                1: iconDir + "USB-96.png",
+                                2: iconDir + "LAN-96.png",
+                                3: iconDir + "Globe-96.png"
                             }[connectionType])
                         }
                     }
@@ -565,7 +614,7 @@ Item {
                         Image {
                             Layout.preferredWidth: 20
                             Layout.preferredHeight: 20
-                            source: "qrc" + Utility.getThemePath() + "icons/Help-96.png"
+                            source: "qrc" + Utility.getThemePath() + iconDir + "Help-96.png"
                         }
 
                         Text {

@@ -21,7 +21,6 @@
 #include "ui_dirsetup.h"
 
 #include "utility.h"
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCheckBox>
@@ -33,6 +32,7 @@ DirSetup::DirSetup(QWidget *parent) :
     ui(new Ui::DirSetup)
 {
     ui->setupUi(this);
+    ui->refreshButton->setIcon(Utility::getIcon("icons/Refresh-96.png"));
     mVesc = 0;
 }
 
@@ -54,11 +54,6 @@ void DirSetup::setVesc(VescInterface *vesc)
 void DirSetup::scanVescs(bool scanCan)
 {
     if (mVesc) {
-        auto *wOld = ui->vescArea->widget();
-        if (wOld) {
-            wOld->deleteLater();
-        }
-
         if (!mVesc->isPortConnected()) {
             mVesc->emitMessageDialog("Direction Setup",
                                      "You are not connected to the VESC. Connect in order to run direction setup.",
@@ -66,45 +61,48 @@ void DirSetup::scanVescs(bool scanCan)
             return;
         }
 
+        auto *wOld = ui->vescArea->widget();
+        if (wOld) {
+            wOld->deleteLater();
+        }
+
         ui->refreshButton->setEnabled(false);
         ui->progressBar->setRange(0, 0);
 
-        auto addViewer = [this](QString name, int dev) {
+        auto addViewer = [this](QString name, int id, int dev) {
             auto *border = new QFrame;
+            border->setProperty("card", true);
             auto *l = new QHBoxLayout;
+            l->setContentsMargins(12, 10, 12, 10);
+            l->setSpacing(10);
 
             auto *imageLabel = new QLabel;
-            QString theme = Utility::getThemePath();
-            imageLabel->setPixmap(QPixmap(dev >= 0 ? theme +"icons/can_off.png" : theme +"icons/Connected-96.png"));
-            imageLabel->setMaximumSize(50, 50);
+            imageLabel->setPixmap(Utility::getIcon(dev >= 0 ? "icons/motor_side.png" : "icons/Connected-96.png"));
+            imageLabel->setFixedSize(22, 22);
             imageLabel->setScaledContents(true);
             l->addWidget(imageLabel);
             auto *nameLabel = new QLabel;
-            nameLabel->setText(name);
+            nameLabel->setText(QString("%1<br><span style=\"color:%2\">ID %3</span>").
+                               arg(name, Utility::getAppHexColor("mutedText")).arg(id));
             l->addWidget(nameLabel);
             auto *invBox = new QCheckBox;
             invBox->setChecked(Utility::getInvertDirection(mVesc, dev));
-            invBox->setText("Inverted");
+            invBox->setText(tr("Inverted"));
             l->addStretch();
             l->addWidget(invBox);
 
-            auto *lc = new QVBoxLayout;
             auto *fwdBt = new QPushButton;
-            fwdBt->setText("Fwd");
-            lc->addWidget(fwdBt);
+            fwdBt->setText(tr("Forward"));
+            l->addWidget(fwdBt);
             auto *revBt = new QPushButton;
-            revBt->setText("Rev");
-            lc->addWidget(revBt);
-            auto *btW = new QWidget;
-            btW->setLayout(lc);
-            l->addWidget(btW);
+            revBt->setText(tr("Reverse"));
+            l->addWidget(revBt);
 
             connect(fwdBt, &QPushButton::clicked, [this,dev]() {
                 setEnabled(false);
                 ui->progressBar->setRange(0, 0);
                 Utility::testDirection(mVesc, dev, 0.1, 2000);
                 ui->progressBar->setRange(0, 100);
-                ui->progressBar->setValue(100);
                 setEnabled(true);
             });
 
@@ -113,7 +111,6 @@ void DirSetup::scanVescs(bool scanCan)
                 ui->progressBar->setRange(0, 0);
                 Utility::testDirection(mVesc, dev, -0.1, 2000);
                 ui->progressBar->setRange(0, 100);
-                ui->progressBar->setValue(100);
                 setEnabled(true);
             });
 
@@ -122,24 +119,22 @@ void DirSetup::scanVescs(bool scanCan)
                 ui->progressBar->setRange(0, 0);
                 Utility::setInvertDirection(mVesc, dev, checked);
                 ui->progressBar->setRange(0, 100);
-                ui->progressBar->setValue(100);
                 setEnabled(true);
             });
 
             border->setLayout(l);
-            border->setFrameShape(QFrame::Box);
-            border->setLineWidth(2);
             return border;
         };
 
         QVBoxLayout *l = new QVBoxLayout;
-        l->setSpacing(4);
-        l->addWidget(addViewer(QString("Local VESC"), -1));
+        l->setContentsMargins(0, 0, 0, 0);
+        l->setSpacing(8);
+        l->addWidget(addViewer(tr("This VESC"), mVesc->appConfig()->getParamInt("controller_id"), -1));
 
         if (scanCan) {
             auto canDevs = Utility::scanCanVescOnly(mVesc);
             for (auto d: canDevs) {
-                l->addWidget(addViewer(QString("CAN VESC\nID: %1").arg(d), d));
+                l->addWidget(addViewer(tr("VESC on CAN-bus"), d, d));
             }
         }
 
@@ -147,9 +142,9 @@ void DirSetup::scanVescs(bool scanCan)
         auto *w = new QWidget;
         w->setLayout(l);
         ui->vescArea->setWidget(w);
+        ui->vescArea->updateGeometry();
 
         ui->progressBar->setRange(0, 100);
-        ui->progressBar->setValue(100);
         ui->refreshButton->setEnabled(true);
     }
 }

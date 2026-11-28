@@ -16,9 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
-     <property name="tabShape">
-      <enum>QTabWidget::Triangular</enum>
-     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -28,13 +25,32 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QSplitter" name="splitter">
+        <widget class="ParamTable" name="motorTab"/>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="dirGroupBox">
+         <property name="title">
+          <string>Direction Setup</string>
+         </property>
+         <layout class="QVBoxLayout" name="dirLayout">
+          <item>
+           <widget class="DirSetup" name="dirSetup" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="generalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="ParamTable" name="motorTab"/>
-         <widget class="DirSetup" name="dirSetup" native="true"/>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -68,6 +84,19 @@
        </item>
        <item>
         <widget class="BatteryCalculator" name="batteryCalc" native="true"/>
+       </item>
+       <item>
+        <spacer name="voltageSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

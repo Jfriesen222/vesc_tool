@@ -18,15 +18,35 @@
     <widget class="VTextBrowser" name="textEdit"/>
    </item>
    <item>
-    <widget class="QPushButton" name="motorSetupWizardButton">
-     <property name="text">
-      <string>Motor Setup Wizard</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../res.qrc">
-       <normaloff>:/res/icons/Wizard-96.png</normaloff>:/res/icons/Wizard-96.png</iconset>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <item>
+      <spacer name="buttonSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="motorSetupWizardButton">
+       <property name="text">
+        <string>Motor Setup Wizard</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../res.qrc">
+         <normaloff>:/res/icons/Wizard-96.png</normaloff>:/res/icons/Wizard-96.png</iconset>
+       </property>
+       <property name="primary" stdset="0">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

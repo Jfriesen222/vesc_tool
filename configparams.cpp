@@ -577,7 +577,7 @@ QStringList ConfigParams::getParamOrder() const
 QStringList ConfigParams::getChangedParams()
 {
     // Fresh while an update is pending, the cached list is replaced and notified with it
-    return mChangedUpdatePending ? checkDifference(mReference) : mChangedParams;
+    return mChangedUpdatePending ? checkDifference(mReference, true) : mChangedParams;
 }
 
 /**
@@ -684,7 +684,7 @@ void ConfigParams::scheduleChangedUpdate()
 void ConfigParams::updateChangedParams()
 {
     mChangedUpdatePending = false;
-    QStringList changed = checkDifference(mReference);
+    QStringList changed = checkDifference(mReference, true);
     if (changed != mChangedParams) {
         mChangedParams = changed;
         emit changedParamsChanged();
@@ -1770,10 +1770,14 @@ bool ConfigParams::saveCDefines(const QString &fileName, bool wrapIfdef)
  * @param config
  * The configuration to check against.
  *
+ * @param editorSteps
+ * Numbers differ when they are at least half a step of their editor apart, which finds every edit however
+ * small the value is. Otherwise the tolerance covers what is lost when a number is sent to the VESC and back.
+ *
  * @return
  * A list with parameters that differ.
  */
-QStringList ConfigParams::checkDifference(ConfigParams *config)
+QStringList ConfigParams::checkDifference(ConfigParams *config, bool editorSteps)
 {
     QStringList res;
 
@@ -1794,6 +1798,14 @@ QStringList ConfigParams::checkDifference(ConfigParams *config)
                     break;
 
                 case CFG_T_DOUBLE: {
+                    if (editorSteps) {
+                        double step = pow(10.0, -thisParam->editorDecimalsDouble) / thisParam->editorScale;
+                        if (fabs(thisParam->valDouble - otherParam->valDouble) > 0.5 * step) {
+                            res.append(p);
+                        }
+                        break;
+                    }
+
                     float eps = 0.0001;
 
                     if (thisParam->vTx == VESC_TX_DOUBLE16) {

@@ -22,17 +22,42 @@
 #include "setupwizardmotor.h"
 #include "setupwizardapp.h"
 #include "widgets/detectallfocdialog.h"
+#include "widgets/dirsetup.h"
+#include "widgets/nrfpair.h"
 
 #include <QMessageBox>
+#include <QAction>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QSettings>
 #include <QmlHighlighter>
-#include <QQuickItem>
 #include <QLibraryInfo>
 #include <QVersionNumber>
 #include <QQuickWindow>
 #include <QNativeGestureEvent>
+
+namespace {
+// Shows a tool of the start page in a dialog with a Close button
+void showTool(QWidget *tool, const QString &title, QWidget *parent)
+{
+    QDialog dialog(parent);
+    dialog.setWindowTitle(title);
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+    layout->addWidget(tool);
+    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Close);
+    layout->addWidget(buttons);
+    QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    // None of the buttons is the one that Return presses
+    for (QPushButton *button: dialog.findChildren<QPushButton*>()) {
+        button->setAutoDefault(false);
+    }
+    dialog.exec();
+}
+}
 
 PageWelcome::PageWelcome(QWidget *parent) :
     QWidget(parent),
@@ -57,33 +82,9 @@ PageWelcome::PageWelcome(QWidget *parent) :
 
     mUtil = new Utility(this);
 
-    ui->autoConnectButton->setIcon(Utility::getIcon("icons/Connected-96.png"));
-    ui->wizardFocSimpleButton->setIcon(Utility::getIcon("icons/Wizard-96.png"));
-    ui->wizardAppButton->setIcon(Utility::getIcon("icons/Wizard-96.png"));
-    ui->nrfPairButton->setIcon(Utility::getIcon("icons/icons8-fantasy-96.png"));
-    ui->multiSettingButton->setIcon(Utility::getIcon("icons/Settings-96.png"));
-    ui->invertDirButton->setIcon(Utility::getIcon("icons/Process-96.png"));
-    ui->setupBluetoothButton->setIcon(Utility::getIcon("icons/bluetooth.png"));
-    ui->wizardIMUButton->setIcon(Utility::getIcon("icons/imu_off.png"));
-
-    layout()->setContentsMargins(0, 0, 0, 0);
+    // Clear of the round corners of the page panel
+    layout()->setContentsMargins(4, 4, 4, 4);
     mVesc = nullptr;
-    ui->bgWidget->setPixmap(QPixmap("://res/bg.png"));
-
-    connect(ui->wizardFocSimpleButton, &QPushButton::clicked, [this]() {
-        QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "setupMotors");
-    });
-
-    connect(ui->wizardAppButton, SIGNAL(clicked(bool)),
-            this, SLOT(startSetupWizardApp()));
-
-    connect(ui->multiSettingButton, &QPushButton::clicked, [this]() {
-        QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "openMultiSettings");
-    });
-
-    connect(ui->invertDirButton, &QPushButton::clicked, [this]() {
-        QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "dirSetup");
-    });
 }
 
 bool PageWelcome::eventFilter(QObject *object, QEvent *event)
@@ -151,23 +152,32 @@ void PageWelcome::setVesc(VescInterface *vesc)
     ui->qmlWidget->setSource(QUrl(QLatin1String("qrc:/res/qml/WelcomeQmlPanel.qml")));
 }
 
-void PageWelcome::on_autoConnectButton_clicked()
+void PageWelcome::autoConnect()
 {
     Utility::autoconnectBlockingWithProgress(mVesc, this);
 }
 
-void PageWelcome::on_nrfPairButton_clicked()
+// Runs an action of the main window, such as the configuration backup
+void PageWelcome::triggerWindowAction(const QString &name)
 {
-    QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "nrfQuickPair");
+    QAction *action = window()->findChild<QAction*>(name);
+    if (action) {
+        action->trigger();
+    }
 }
 
-void PageWelcome::on_setupBluetoothButton_clicked()
+void PageWelcome::showDirSetup()
 {
-    QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "openBleSetup");
+    DirSetup *setup = new DirSetup;
+    setup->setVesc(mVesc);
+    setup->setMinimumSize(560, 420);
+    setup->scanVescs();
+    showTool(setup, tr("Direction Setup"), this);
 }
 
-void PageWelcome::on_wizardIMUButton_clicked()
+void PageWelcome::showNrfPair()
 {
-    QMetaObject::invokeMethod(ui->qmlWidget->rootObject(), "openWizardIMU");
+    NrfPair *pair = new NrfPair;
+    pair->setVesc(mVesc);
+    showTool(pair, tr("NRF Pairing"), this);
 }
-

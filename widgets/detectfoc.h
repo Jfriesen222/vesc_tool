@@ -66,6 +66,7 @@ private:
     bool mEncoderValuesOk;
 
     void updateColors();
+    void setFailed(QList<QWidget*> tiles, bool failed);
 
 };
 

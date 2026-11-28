@@ -35,6 +35,8 @@ public:
     void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
+    void setMaxTextWidth(int width);
     // Run `operation` with a cursor moved to the end of the document, making
     // sure to scroll to the bottom if the operation changed the content's
     // length and the view was at the bottom before.
@@ -75,6 +77,7 @@ private:
     QVector<ConsoleChunk> mConsolePending;
     QTimer mConsoleTimer;
     int mConsolePendingChars = 0;
+    int mMaxTextWidth = 0;
     quint64 mConsoleDropped = 0;
     QString mLastAnchor;
 

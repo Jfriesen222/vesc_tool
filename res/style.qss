@@ -1,0 +1,1284 @@
+/*
+    Style of the desktop UI. Names with an at sign are app colors and the path
+    of the theme icons, replaced in main.cpp.
+
+    The window is one dark frame with the page as a panel in it. Content is
+    grouped on cards, values are edited and plotted in wells that are darker
+    than the page, and actions are on buttons that are lighter. The accent
+    color marks the selection, the primary action and unwritten changes only.
+
+    Group boxes, progress bars and the splitter handles are drawn by the
+    application style in main.cpp, so they have no rules here.
+*/
+
+QMainWindow, QStatusBar, QMenuBar {
+    background: @frameBackground;
+}
+
+QDialog, QWizard {
+    background: @cardBackground;
+}
+
+QToolTip {
+    background: @raisedBackground;
+    color: @titleText;
+    border: 1px solid @lineStrong;
+    border-radius: 6px;
+    padding: 4px 7px;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+QStatusBar QLabel {
+    color: @lightText;
+    padding: 1px 10px;
+    margin: 0px 6px 3px 0px;
+    border-radius: 6px;
+}
+
+/* The page panel and its header */
+
+#pageWidget {
+    background: @darkBackground;
+    border: 1px solid @line;
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+#pageTitle {
+    color: @titleText;
+    font-size: 14pt;
+    font-weight: 500;
+    padding: 0px 18px 0px 2px;
+    min-height: 36px;
+}
+
+QTabWidget #pageTitle {
+    padding: 0px 18px 0px 18px;
+    min-height: 45px;
+}
+
+/* Beside the tabs of a page, the name ends with a short line */
+#pageTitleRule {
+    background: @lineStrong;
+}
+
+#pageWriteButton {
+    border-radius: 7px;
+    padding: 3px 28px 3px 8px;
+    margin-right: 14px;
+    font-weight: 500;
+}
+
+/* The CAN devices keep their look while a switch to another one is under way */
+#canList QLabel:disabled {
+    color: @lightText;
+}
+
+/* Buttons */
+
+QPushButton {
+    background: @raisedBackground;
+    color: @titleText;
+    border: 1px solid @line;
+    border-radius: 7px;
+    padding: 4px 11px;
+    min-height: 18px;
+    font-weight: 500;
+}
+
+QPushButton:hover, QPushButton:checked {
+    background: @lightestBackground;
+}
+
+QPushButton:pressed {
+    background: @cardBackground;
+}
+
+QPushButton:disabled {
+    background: transparent;
+    color: @disabledText;
+}
+
+QPushButton:flat {
+    background: transparent;
+    border-color: @lineStrong;
+}
+
+/* The primary button has a light top edge */
+QPushButton:default, QPushButton[primary="true"], #pageWriteButton {
+    background: @accentFill;
+    border-color: transparent;
+    border-top-color: rgba(255, 255, 255, 0.22);
+    color: white;
+}
+
+QPushButton:default:hover, QPushButton[primary="true"]:hover, #pageWriteButton:hover {
+    background: @accent;
+}
+
+QPushButton:default:disabled, QPushButton[primary="true"]:disabled {
+    background: transparent;
+    border-color: @line;
+    color: @disabledText;
+}
+
+QPushButton::menu-indicator {
+    image: url("@icons/chevron.png");
+    width: 10px;
+    height: 10px;
+    subcontrol-position: right center;
+    right: 8px;
+}
+
+QToolButton {
+    background: transparent;
+    color: @lightText;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 3px;
+}
+
+QToolButton:hover, QToolButton:checked {
+    background: @raisedBackground;
+    color: @titleText;
+}
+
+QToolButton:disabled {
+    color: @disabledText;
+}
+
+/* Wells: everything that is typed into or picked from */
+
+QLineEdit, QAbstractSpinBox, QComboBox, QTextEdit, QPlainTextEdit {
+    background: @wellBackground;
+    color: @titleText;
+    border: 1px solid @line;
+    border-radius: 6px;
+    selection-background-color: @midAccent;
+    selection-color: white;
+}
+
+QLineEdit, QAbstractSpinBox, QComboBox {
+    padding: 3px 8px;
+    min-height: 18px;
+}
+
+QLineEdit:focus, QAbstractSpinBox:focus, QComboBox:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border-color: @accent;
+}
+
+QLineEdit:disabled, QAbstractSpinBox:disabled, QComboBox:disabled, QTextEdit:disabled, QPlainTextEdit:disabled {
+    color: @disabledText;
+}
+
+QLineEdit[readOnly="true"] {
+    color: @lightText;
+}
+
+QAbstractSpinBox {
+    qproperty-alignment: AlignRight;
+    padding-right: 4px;
+}
+
+/* The arrows show while the box is edited */
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
+    border: none;
+    width: 0px;
+}
+
+QAbstractSpinBox::up-button:focus, QAbstractSpinBox::down-button:focus {
+    width: 14px;
+}
+
+QAbstractSpinBox::up-arrow, QAbstractSpinBox::down-arrow {
+    image: none;
+    width: 8px;
+    height: 8px;
+}
+
+QAbstractSpinBox::up-arrow:focus {
+    image: url("@icons/spin_up.png");
+}
+
+QAbstractSpinBox::down-arrow:focus {
+    image: url("@icons/spin_down.png");
+}
+
+/* The unit after a value */
+QAbstractSpinBox QLabel#unit {
+    color: @mutedText;
+    font-size: 9pt;
+    font-weight: 400;
+    letter-spacing: 0px;
+}
+
+QAbstractSpinBox::up-arrow:disabled, QAbstractSpinBox::up-arrow:off,
+QAbstractSpinBox::down-arrow:disabled, QAbstractSpinBox::down-arrow:off {
+    image: none;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 22px;
+}
+
+QComboBox::down-arrow {
+    image: url("@icons/chevron.png");
+    width: 10px;
+    height: 10px;
+}
+
+QComboBox QAbstractItemView, QMenu {
+    background: @raisedBackground;
+    color: @lightText;
+    border: 1px solid @lineStrong;
+    border-radius: 8px;
+    padding: 4px;
+    outline: none;
+}
+
+QComboBox QAbstractItemView::item, QMenu::item {
+    padding: 5px 22px 5px 10px;
+    border-radius: 5px;
+    min-height: 16px;
+}
+
+QComboBox QAbstractItemView::item:selected, QMenu::item:selected {
+    background: @accentDim;
+    color: @titleText;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: @accentDim;
+    selection-color: @titleText;
+}
+
+/* The window that holds the list of a combo box is see-through, so that only the rounded list shows */
+QComboBoxPrivateContainer {
+    background: transparent;
+    border: none;
+}
+
+QMenu::item:disabled {
+    color: @disabledText;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: @line;
+    margin: 4px 6px;
+}
+
+QMenu::icon {
+    padding-left: 8px;
+}
+
+QMenuBar {
+    color: @lightText;
+    border-bottom: 1px solid @line;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 4px 9px;
+    border-radius: 5px;
+}
+
+QMenuBar::item:selected {
+    background: @raisedBackground;
+    color: @titleText;
+}
+
+/* Check boxes, radio buttons and sliders */
+
+QCheckBox, QRadioButton {
+    color: @lightText;
+    spacing: 8px;
+}
+
+/* A bit field has many check boxes in the width of one field, so they are smaller */
+ParamEditBitfield QCheckBox {
+    spacing: 5px;
+}
+
+ParamEditBitfield QCheckBox::indicator {
+    width: 13px;
+    height: 13px;
+}
+
+QCheckBox:disabled, QRadioButton:disabled {
+    color: @disabledText;
+}
+
+QCheckBox::indicator, QRadioButton::indicator, QAbstractItemView::indicator {
+    width: 14px;
+    height: 14px;
+    border: 1px solid @lineStrong;
+    border-radius: 4px;
+    background: transparent;
+}
+
+QRadioButton::indicator {
+    border-radius: 8px;
+}
+
+QCheckBox::indicator:checked, QAbstractItemView::indicator:checked {
+    background: @accentFill;
+    border-color: transparent;
+    image: url("@icons/check.png");
+}
+
+QRadioButton::indicator:checked {
+    border-color: @accent;
+    image: url("@icons/radio.png");
+}
+
+QSlider::groove:horizontal {
+    height: 3px;
+    border-radius: 1px;
+    background: @lineStrong;
+}
+
+QSlider::sub-page:horizontal {
+    border-radius: 1px;
+    background: @accent;
+}
+
+QSlider::handle:horizontal {
+    width: 14px;
+    margin: -6px 0px;
+    border-radius: 7px;
+    background: @titleText;
+}
+
+QSlider::groove:vertical {
+    width: 3px;
+    border-radius: 1px;
+    background: @lineStrong;
+}
+
+QSlider::handle:vertical {
+    height: 14px;
+    margin: 0px -6px;
+    border-radius: 7px;
+    background: @titleText;
+}
+
+/* Tabs: text with a line under the open one */
+
+QTabWidget::pane {
+    border: none;
+    border-top: 1px solid @line;
+}
+
+QTabWidget[roomy="true"]::pane {
+    padding-top: 14px;
+}
+
+QTabBar {
+    background: transparent;
+}
+
+QTabBar::tab {
+    background: transparent;
+    color: @mutedText;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0px 2px;
+    margin: 0px 7px;
+    min-height: 44px;
+}
+
+QTabBar::tab:hover {
+    color: @lightText;
+}
+
+QTabBar::tab:selected {
+    color: @titleText;
+    border-bottom-color: @accent;
+    font-weight: 500;
+}
+
+QTabBar::tab:disabled {
+    color: @disabledText;
+}
+
+/* Tabs inside a page are lower */
+QTabWidget QTabWidget QTabBar::tab, QDialog QTabBar::tab, QSplitter QTabBar::tab {
+    min-height: 30px;
+}
+
+QTabBar QToolButton {
+    background: @darkBackground;
+    border: none;
+}
+
+/* Lists, tables and trees */
+
+QAbstractItemView {
+    background: @cardBackground;
+    color: @lightText;
+    border: none;
+    border-radius: 10px;
+    gridline-color: @line;
+    outline: none;
+}
+
+QAbstractItemView::item {
+    padding: 3px 6px;
+}
+
+QAbstractItemView::item:selected {
+    background: @accentDim;
+    color: @titleText;
+}
+
+QHeaderView {
+    background: transparent;
+}
+
+QHeaderView::section {
+    background: transparent;
+    color: @mutedText;
+    border: none;
+    border-bottom: 1px solid @lineStrong;
+    padding: 5px 8px;
+    font-size: 9pt;
+    font-weight: 500;
+}
+
+QTableCornerButton::section {
+    background: transparent;
+    border: none;
+}
+
+/* The parameter rows and their actions are on cards that the table draws */
+ParamTable, ParamTable::item {
+    background: transparent;
+}
+
+ParamTable::item {
+    color: @lightText;
+    padding: 0px 4px 0px 14px;
+}
+
+ParamTable QPushButton {
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    padding: 0px;
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 26px;
+    qproperty-iconSize: 14px;
+}
+
+ParamTable QPushButton:hover {
+    background: @raisedBackground;
+}
+
+ParamTable QAbstractSpinBox, ParamTable QComboBox, ParamTable QLineEdit {
+    margin-right: 6px;
+}
+
+ParamTable QWidget[changed="true"] QAbstractSpinBox, ParamTable QWidget[changed="true"] QComboBox,
+ParamTable QWidget[changed="true"] QLineEdit {
+    border-color: @accent;
+}
+
+/* The page list and the CAN devices are on the frame */
+#pageList, #canList {
+    background: transparent;
+    border-radius: 0px;
+}
+
+#pageList::item, #pageList::item:selected {
+    background: transparent;
+    padding: 0px;
+}
+
+#canList::item {
+    border-radius: 6px;
+    padding: 0px;
+}
+
+#canList::item:selected {
+    background: @line;
+}
+
+#canId {
+    background: @line;
+    color: @mutedText;
+    border-radius: 4px;
+    padding: 0px 5px;
+    min-width: 14px;
+    font-size: 9pt;
+    font-weight: 500;
+}
+
+#canList QWidget[selected="true"] #canId {
+    background: @accentFill;
+    color: white;
+}
+
+/* Long text and code are in a softer color than values */
+QTextEdit, QPlainTextEdit {
+    color: @lightText;
+    border-radius: 10px;
+}
+
+/* Text that is only read is on the card surface: wells are for what is typed into or watched live */
+QTextBrowser, QTextEdit[readOnly="true"], QPlainTextEdit[readOnly="true"] {
+    background: @cardBackground;
+}
+
+/* A frame around a plot or another live view makes it a well with round corners */
+QFrame[well="true"] {
+    background: @wellBackground;
+    border: 1px solid @line;
+    border-radius: 10px;
+}
+
+/* A plain frame is a card */
+QFrame[card="true"] {
+    background: @cardBackground;
+    border: 1px solid @line;
+    border-radius: 10px;
+}
+
+/* Scroll bars: a slim handle, no buttons */
+
+QScrollBar {
+    background: transparent;
+    border: none;
+}
+
+QScrollBar:vertical {
+    width: 9px;
+}
+
+QScrollBar:horizontal {
+    height: 9px;
+}
+
+QScrollBar::handle {
+    background: @lineStrong;
+    border-radius: 2px;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical {
+    min-height: 26px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 26px;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line, QScrollBar::add-page, QScrollBar::sub-page {
+    background: transparent;
+    border: none;
+    width: 0px;
+    height: 0px;
+}
+
+QAbstractScrollArea::corner {
+    background: transparent;
+}
+
+QScrollArea, QScrollArea > QWidget > QWidget {
+    background: transparent;
+    border: none;
+}
+
+/* The keys of the toolbar: 26 px keys with 14 px drawings in three groups, each with its name under it */
+
+QFrame[keys="true"] {
+    background: @darkBackground;
+    border: 1px solid @line;
+    border-radius: 9px;
+}
+
+#rail QToolButton {
+    background: @raisedBackground;
+    border: 1px solid transparent;
+    border-top-color: @line;
+    border-radius: 6px;
+    padding: 0px;
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 26px;
+    max-height: 26px;
+    qproperty-iconSize: 14px;
+}
+
+#rail #liveKeys QToolButton {
+    min-height: 30px;
+    max-height: 30px;
+    qproperty-iconSize: 26px;
+}
+
+#rail #liveKeys #actionCanFwdButton {
+    min-width: 53px;
+    max-width: 53px;
+    qproperty-iconSize: 52px 26px;
+}
+
+#rail QToolButton:hover {
+    background: @lightestBackground;
+}
+
+#rail QToolButton[changed="true"] {
+    background: @accent;
+}
+
+#rail QLabel {
+    color: @mutedText;
+    font-size: 7pt;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+}
+
+#rail QFrame[keys="true"] QLabel {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0px;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    margin: 0px 5px;
+}
+
+#rail QFrame[keys="true"] QLabel[current="true"] {
+    color: @titleText;
+    border-bottom-color: @accent;
+}
+
+/* The bottom bar: a cell for each command, the brake and stop keys and the housing of the two gauges */
+
+QFrame[cell="true"] {
+    background: @wellBackground;
+    border: 1px solid @line;
+    border-radius: 7px;
+    min-width: 148px;
+    max-width: 148px;
+    min-height: 25px;
+    max-height: 25px;
+}
+
+#brakeCurrentCell, #handbrakeCell {
+    min-width: 170px;
+    max-width: 170px;
+}
+
+QFrame[cell="true"][running="true"] {
+    border-color: @accent;
+}
+
+QFrame[cell="true"] QLabel {
+    color: @mutedText;
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+QFrame[cell="true"] QAbstractSpinBox {
+    background: transparent;
+    border: none;
+    padding: 0px 7px 0px 0px;
+    min-height: 0px;
+    font-weight: 500;
+}
+
+QFrame[cell="true"] QPushButton {
+    background: @raisedBackground;
+    border: none;
+    border-left: 1px solid @line;
+    border-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    padding: 0px;
+    min-width: 26px;
+    max-width: 26px;
+    min-height: 25px;
+    qproperty-iconSize: 11px;
+}
+
+QFrame[cell="true"][running="true"] QPushButton {
+    background: @accentFill;
+}
+
+QFrame[cell="true"][running="true"] > QLabel {
+    color: @accentText;
+}
+
+#gaugeFrame {
+    background: #060608;
+    border: 1px solid @line;
+    border-radius: 10px;
+}
+
+#fullBrakeButton {
+    background: @raisedBackground;
+    border: 1px solid @line;
+    border-radius: 9px;
+    color: @lightText;
+    padding: 7px 0px 5px 0px;
+    font-size: 6pt;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    min-width: 64px;
+    max-width: 64px;
+    min-height: 44px;
+    max-height: 44px;
+    qproperty-iconSize: 25px;
+}
+
+#fullBrakeButton:hover {
+    background: @lightestBackground;
+}
+
+#fullBrakeButton[running="true"] {
+    border-color: @accent;
+    color: @accentText;
+}
+
+#deck #stopButton {
+    background: @stop;
+    border: 1px solid @frameBackground;
+    border-top-color: rgba(255, 255, 255, 0.16);
+    border-radius: 9px;
+    color: white;
+    padding: 0px;
+    font-size: 12pt;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    min-width: 90px;
+    max-width: 90px;
+    min-height: 56px;
+    max-height: 56px;
+    qproperty-iconSize: 17px;
+}
+
+#deck #stopButton:hover {
+    background: @danger;
+}
+
+/* The key that also stops, in the corner of the stop key */
+#stopKeyLabel {
+    color: #D9FFFFFF;
+    border: 1px solid #66FFFFFF;
+    border-radius: 3px;
+    padding: 0px 2px;
+    font-size: 6pt;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+QLabel[badge="true"], #rail QLabel[badge="true"] {
+    background: white;
+    color: @accentFill;
+    border-radius: 7px;
+    padding: 0px 4px;
+    border: none;
+    margin: 0px;
+    min-width: 6px;
+    min-height: 14px;
+    max-height: 14px;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0px;
+}
+
+#canList, #centralWidget > #searchEdit {
+    max-width: 196px;
+}
+
+#scanCanButton {
+    padding: 1px 8px;
+    min-height: 16px;
+    font-size: 9pt;
+}
+
+#canListLabel {
+    color: @mutedText;
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/* Small parts used on many pages. A chip is a label with the chip property: plain, or live for the larger one in
+   a page header. */
+
+QLabel[chip] {
+    background: rgba(128, 128, 128, 0.14);
+    color: @lightText;
+    border-radius: 10px;
+    padding: 0px 8px;
+    min-height: 20px;
+    max-height: 20px;
+    font-size: 9pt;
+    font-weight: 500;
+}
+
+QLabel[chip="live"] {
+    background: @positiveDim;
+    color: @positiveText;
+    border-radius: 12px;
+    padding: 0px 12px 0px 7px;
+    min-height: 24px;
+    max-height: 24px;
+}
+
+/* In the corner of a tab bar it keeps clear of the edge of the page panel */
+QTabWidget > QLabel[chip="live"] {
+    margin: 0px 14px 8px 0px;
+}
+
+/* Buttons that belong together sit in a frame with the seg property; the checked ones are raised */
+
+QFrame[seg="true"] {
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid @line;
+    border-radius: 7px;
+}
+
+QFrame[seg="true"] QToolButton, QFrame[seg="true"] QPushButton {
+    background: transparent;
+    color: @mutedText;
+    border: none;
+    border-radius: 5px;
+    padding: 0px 6px;
+    min-width: 12px;
+    min-height: 22px;
+    max-height: 22px;
+    font-size: 9pt;
+    font-weight: 500;
+}
+
+QFrame[seg="true"] QToolButton:hover, QFrame[seg="true"] QPushButton:hover,
+QFrame[seg="true"] QToolButton:checked, QFrame[seg="true"] QPushButton:checked {
+    background: @raisedBackground;
+    color: @titleText;
+}
+
+/* conn: status texts: muted captions, a large name, and a state that is green while it holds */
+QLabel[muted="true"], QLabel[hint="true"] {
+    color: @mutedText;
+}
+
+QLabel[headline="true"] {
+    color: @titleText;
+    font-size: 20pt;
+    font-weight: 600;
+}
+
+#statusStateLabel {
+    color: @mutedText;
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+#statusStateLabel[connected="true"] {
+    color: @positiveText;
+}
+
+QLabel[warning="true"] {
+    color: @warningText;
+    background: @warningDim;
+    border: 1px solid @warningEdge;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 9pt;
+}
+
+/* dev: text, code and lists in a well are drawn on the well, without their own frame */
+QFrame[well="true"] QTextEdit, QFrame[well="true"] QPlainTextEdit, QFrame[well="true"] QAbstractItemView {
+    background: transparent;
+    border: none;
+    border-radius: 0px;
+}
+
+QFrame[well="true"] QTabWidget::tab-bar {
+    left: 10px;
+}
+
+QFrame[well="true"] QPushButton:flat {
+    border-color: transparent;
+}
+
+VTextBrowser {
+    padding: 6px 8px;
+}
+
+/* motor: detection steps and result tiles; a tile is neutral until it has a value (ok) or a measurement failed */
+QFrame[step="true"] {
+    background: @raisedBackground;
+    border: 1px solid @line;
+    border-radius: 9px;
+}
+
+QFrame[result="true"] {
+    background: @wellBackground;
+    border: 1px solid @line;
+    border-radius: 8px;
+}
+
+QFrame[result="true"][ok="true"] {
+    border-color: @positive;
+}
+
+QFrame[result="true"][failed="true"] {
+    border-color: @danger;
+}
+
+QFrame[result="true"] QLabel {
+    color: @mutedText;
+    font-size: 10pt;
+}
+
+QFrame[result="true"] QAbstractSpinBox {
+    background: transparent;
+    border: none;
+    padding: 0px;
+    font-size: 13pt;
+    font-weight: 500;
+    qproperty-alignment: AlignLeft;
+}
+
+/* The buttons are hidden here instead of with NoButtons, which leaves no room for the text under a style sheet */
+QAbstractSpinBox[arrows="false"]::up-button, QAbstractSpinBox[arrows="false"]::down-button,
+QAbstractSpinBox[arrows="false"]::up-arrow, QAbstractSpinBox[arrows="false"]::down-arrow,
+QFrame[cell="true"] QAbstractSpinBox::up-button, QFrame[cell="true"] QAbstractSpinBox::down-button,
+QFrame[cell="true"] QAbstractSpinBox::up-arrow, QFrame[cell="true"] QAbstractSpinBox::down-arrow,
+QFrame[result="true"] QAbstractSpinBox::up-button, QFrame[result="true"] QAbstractSpinBox::down-button,
+QFrame[result="true"] QAbstractSpinBox::up-arrow, QFrame[result="true"] QAbstractSpinBox::down-arrow,
+QFrame[field="true"] QAbstractSpinBox::up-button, QFrame[field="true"] QAbstractSpinBox::down-button,
+QFrame[field="true"] QAbstractSpinBox::up-arrow, QFrame[field="true"] QAbstractSpinBox::down-arrow {
+    width: 0px;
+    height: 0px;
+    image: none;
+}
+
+QLabel[mark="true"] {
+    min-width: 16px;
+    max-width: 16px;
+    min-height: 16px;
+    max-height: 16px;
+    border-radius: 11px;
+    padding: 3px;
+}
+
+QFrame[step="true"] QLabel[mark="true"] {
+    border: 1px solid @lineStrong;
+    color: @lightText;
+    font-size: 9pt;
+}
+
+QFrame[ok="true"] QLabel[mark="true"] {
+    background: @positive;
+    border-color: transparent;
+    color: transparent;
+    image: url("@icons/check.png");
+}
+
+QFrame[failed="true"] QLabel[mark="true"] {
+    background: @danger;
+    image: url("@icons/cross.png");
+}
+
+/* motor: a value watched live, large in its well */
+QLabel[readout="true"] {
+    color: @titleText;
+    font-size: 18pt;
+    font-weight: 500;
+}
+
+/* motor: the plot toggles of Experiments line up with the names between them */
+#showFrame QToolButton, #showFrame QLabel {
+    min-height: 22px;
+    max-height: 22px;
+    min-width: 30px;
+    padding: 0px;
+    border: 1px solid transparent;
+}
+
+/* dialogs: the status message and the pass/fail labels of the board setup are on green or red, tool box page headers */
+QLabel[state="ok"] {
+    background: @positive;
+    color: black;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+QLabel[state="bad"] {
+    background: @danger;
+    color: white;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+QToolBox::tab {
+    background: transparent;
+    color: @lightText;
+    border: none;
+    border-bottom: 1px solid @line;
+}
+
+QToolBox::tab:selected {
+    color: @titleText;
+    font-weight: 500;
+}
+
+/* data: live readings, a small caption over the value, larger on a tile */
+QLabel[caption="true"], QFrame[field="true"] QLabel {
+    color: @mutedText;
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+QLabel[reading="true"] {
+    color: @titleText;
+    font-size: 12pt;
+    font-weight: 500;
+}
+
+QFrame[tile="true"] QLabel[reading="true"] {
+    font-size: 17pt;
+}
+
+/* conn 2: key and value rows, a state line in small capitals, quiet buttons, a tinted warning, lists with row rules
+   or cells, text to read on a card, a bar with a rule above it */
+QLabel[kv] {
+    border: 0px solid @line;
+    border-bottom-width: 1px;
+    qproperty-indent: 0;
+    min-height: 26px;
+}
+
+QLabel[kv="first"] {
+    border-top-width: 1px;
+}
+
+QLabel[headline="true"][muted="true"] {
+    color: @mutedText;
+}
+
+QPushButton[muted="true"] {
+    color: @mutedText;
+}
+
+QPushButton#canFwdButton:checked {
+    background: @accentDim;
+    border-color: @accent;
+    color: @accentText;
+}
+
+QListView[rows="true"]::item {
+    border-bottom: 1px solid @line;
+    min-height: 28px;
+}
+
+VTextBrowser[doc="true"] {
+    background: @cardBackground;
+    padding: 12px 16px;
+}
+
+QFrame[bar="true"] {
+    border: 0px solid @line;
+    border-top-width: 1px;
+}
+
+QListView[grid="true"]::item {
+    border: 0px solid @line;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    min-width: 56px;
+    min-height: 28px;
+}
+
+/* dev 2: small header buttons, an input line drawn on its well */
+QPushButton[small="true"] {
+    padding: 2px 9px;
+    border-radius: 6px;
+    font-size: 11pt;
+}
+
+QFrame[well="true"] QLineEdit[frame="false"] {
+    background: transparent;
+    border: none;
+    min-height: 30px;
+}
+
+QPushButton[swatch="true"] {
+    background: transparent;
+    border: 1px solid @lineStrong;
+    border-radius: 5px;
+    padding: 0px;
+    min-width: 28px;
+    max-width: 28px;
+    min-height: 18px;
+    max-height: 18px;
+}
+
+QPushButton[swatch="true"]:checked {
+    border: 2px solid @accent;
+}
+
+/* motor 2: a field with a small caption inside it (also a value in a small well with its caption at the left, in the
+   app maps and the NRF pairing), the next detection step, results not measured yet */
+QFrame[field="true"] {
+    background: @wellBackground;
+    border: 1px solid @line;
+    border-radius: 6px;
+    min-height: 28px;
+}
+
+QFrame[field="true"] QLabel {
+    background: transparent;
+    border: none;
+}
+
+QFrame[field="true"] QLineEdit, QFrame[field="true"] QAbstractSpinBox {
+    background: transparent;
+    border: none;
+}
+
+QFrame[field="true"] QAbstractSpinBox {
+    font-weight: 500;
+}
+
+QFrame[step="true"][next="true"] {
+    border: 2px solid @accentEdge;
+}
+
+QFrame[next="true"] QLabel[mark="true"] {
+    border-color: @accent;
+    color: @accentText;
+}
+
+QFrame[result="true"] QAbstractSpinBox {
+    color: @mutedText;
+}
+
+QFrame[result="true"][ok="true"] QAbstractSpinBox {
+    color: @titleText;
+}
+
+QFrame[result="true"][failed="true"] QAbstractSpinBox {
+    color: @dangerText;
+}
+
+MRichTextEdit QToolButton::menu-indicator {
+    image: none;
+}
+
+/* dialogs 2: the step list of the wizards */
+QLabel[steps="true"] {
+    background: rgba(0, 0, 0, 20);
+    border-right: 1px solid @line;
+}
+
+QListWidget[choices="true"] {
+    background: transparent;
+}
+
+QListWidget[choices="true"]::item {
+    color: @titleText;
+    border: 1px solid @lineStrong;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    padding: 9px 14px;
+}
+
+QListWidget[choices="true"]::item:hover {
+    background: @line;
+}
+
+QListWidget[choices="true"]::item:selected {
+    background: @accentDim;
+    border-color: @accent;
+}
+
+/* dialogs 2: the title of a dialog drawn in its body, long text on the dialog instead of a well */
+QLabel[dialogTitle="true"] {
+    color: @titleText;
+    font-size: 14pt;
+    font-weight: 500;
+}
+
+HelpDialog QTextEdit, QWizardPage QTextEdit {
+    background: transparent;
+    color: @lightText;
+}
+
+HelpDialog QTextEdit {
+    border: none;
+}
+
+/* The help of a parameter row is a child of its table, so the row key rules reach its button */
+HelpDialog QPushButton {
+    min-width: 84px;
+    max-width: 16777215px;
+    padding: 4px 11px;
+    qproperty-iconSize: 16px;
+}
+
+Preferences QLabel[hint="true"] {
+    font-size: 11pt;
+}
+
+/* data 2: thin dividers between groups of readings, a reading that is fine shows in the positive colour */
+QFrame[divider="true"] {
+    background: @line;
+    border: none;
+}
+
+QLabel[reading="true"][ok="true"] {
+    color: @positiveText;
+}
+
+#servoSlider::sub-page:horizontal {
+    background: @lightAccent;
+}
+
+#servoSlider::handle:horizontal {
+    width: 12px;
+    margin: -8px 0px;
+    border-radius: 4px;
+}
+
+/* search: the results list, the key at the right of the field and the frame that marks a control for a moment */
+SearchBox QListView {
+    background: transparent;
+    border: none;
+    padding: 0px;
+}
+
+#searchKey {
+    color: @mutedText;
+    border: 1px solid @lineStrong;
+    border-radius: 4px;
+    padding: 0px 4px;
+    font-size: 8pt;
+    font-weight: 500;
+}
+
+#searchMark {
+    border: 2px solid @accent;
+    border-radius: 8px;
+    background: transparent;
+}
+
+/* log 2: rows that act on a click light up under the mouse; the checked side of a segmented group has an edge */
+QTableView[rowButtons="true"]::item:hover:enabled {
+    background: rgba(128, 128, 128, 0.14);
+}
+
+QFrame[seg="true"] QToolButton:checked, QFrame[seg="true"] QPushButton:checked {
+    border: 1px solid @lineStrong;
+}

@@ -116,7 +116,7 @@ public:
 
     bool saveCDefines(const QString &fileName, bool wrapIfdef = false);
 
-    QStringList checkDifference(ConfigParams *config);
+    QStringList checkDifference(ConfigParams *config, bool editorSteps = false);
 
     quint32 getSignature();
 

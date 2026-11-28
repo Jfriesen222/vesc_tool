@@ -33,6 +33,8 @@ public:
     void setName(const QString &name);
     double range() const;
     void setRange(double range);
+    void setRangeNeg(double range);
+    void setBraking(bool braking);
     double val() const;
     void setVal(double val);
     QString unit() const;
@@ -50,7 +52,10 @@ protected:
 private:
     QString mName;
     double mRange;
+    double mRangeNeg;
     double mVal;
+    double mPeak;
+    bool mBraking;
     QString mUnit;
     int mDecimals;
 

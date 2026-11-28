@@ -63,19 +63,151 @@
 #ifndef USE_MOBILE
 
 #include <QProxyStyle>
+#include <QHeaderView>
 #include <QtConcurrent/QtConcurrent>
 
-// Disables focus drawing for all widgets
+// Draws what the style sheet (res/style.qss) cannot: group boxes are a blue title with a line over a card,
+// progress bars a slim line with the text after it and splitter handles a short bar. The focus frame is left out.
 class Style_tweaks : public QProxyStyle
 {
 public:
     using QProxyStyle::QProxyStyle;
+    using QProxyStyle::polish;
+
+    // The titles of table columns are small capitals
+    void polish(QWidget *widget)
+    {
+        if (qobject_cast<QHeaderView*>(widget)) {
+            QFont font = widget->font();
+            font.setCapitalization(QFont::AllUppercase);
+            font.setLetterSpacing(QFont::AbsoluteSpacing, 0.8);
+            widget->setFont(font);
+        } else if (widget->inherits("QComboBoxPrivateContainer")) {
+            // The list of a combo box has round corners, so its window has no frame, shadow or fill of its own
+            widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+            widget->setAttribute(Qt::WA_TranslucentBackground);
+        }
+        QProxyStyle::polish(widget);
+    }
+
     void drawPrimitive(PrimitiveElement element, const QStyleOption *option,
                        QPainter *painter, const QWidget *widget) const
     {
         if (element == QStyle::PE_FrameFocusRect) return;
 
         QProxyStyle::drawPrimitive(element, option, painter, widget);
+    }
+
+    QRect subControlRect(ComplexControl control, const QStyleOptionComplex *option,
+                         SubControl subControl, const QWidget *widget) const
+    {
+        const QStyleOptionGroupBox *box = qstyleoption_cast<const QStyleOptionGroupBox*>(option);
+        if (control != CC_GroupBox || !box) {
+            return QProxyStyle::subControlRect(control, option, subControl, widget);
+        }
+
+        bool checkable = box->subControls & SC_GroupBoxCheckBox;
+        int head = (box->text.isEmpty() && !checkable) ? 0 : 25;
+        int labelLeft = checkable ? 24 : 2;
+        QRect r = box->rect;
+
+        switch (subControl) {
+        case SC_GroupBoxFrame: return r.adjusted(0, head, 0, 0);
+        case SC_GroupBoxContents: return r.adjusted(2, head + 2, -2, -2);
+        case SC_GroupBoxCheckBox: return QRect(r.left() + 2, r.top() + 1, 14, 14);
+        case SC_GroupBoxLabel: return QRect(r.left() + labelLeft, r.top(), r.width() - labelLeft, 16);
+        default: return QRect();
+        }
+    }
+
+    void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
+                            QPainter *painter, const QWidget *widget) const
+    {
+        const QStyleOptionGroupBox *box = qstyleoption_cast<const QStyleOptionGroupBox*>(option);
+        if (control != CC_GroupBox || !box) {
+            QProxyStyle::drawComplexControl(control, option, painter, widget);
+            return;
+        }
+
+        if (!(box->features & QStyleOptionFrame::Flat)) {
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->setPen(Utility::getAppQColor("line"));
+            painter->setBrush(Utility::getAppQColor("cardBackground"));
+            painter->drawRoundedRect(QRectF(subControlRect(control, box, SC_GroupBoxFrame, widget)).
+                                     adjusted(0.5, 0.5, -0.5, -0.5), 10, 10);
+            painter->restore();
+        }
+
+        if (box->subControls & SC_GroupBoxCheckBox) {
+            // Drawn as the check boxes of the style sheet. A style rule for it would take the whole box from this style.
+            QRect check = subControlRect(control, box, SC_GroupBoxCheckBox, widget);
+            bool on = box->state & State_On;
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->setPen(on ? QPen(Qt::NoPen) : QPen(Utility::getAppQColor("lineStrong")));
+            painter->setBrush(on ? QBrush(Utility::getAppQColor("accentFill")) : QBrush(Qt::NoBrush));
+            painter->drawRoundedRect(QRectF(check).adjusted(0.5, 0.5, -0.5, -0.5), 4, 4);
+            if (on) {
+                painter->drawPixmap(check, Utility::getIcon("icons/check.png"));
+            }
+            painter->restore();
+        }
+
+        if (!box->text.isEmpty()) {
+            painter->save();
+            painter->setOpacity((box->state & State_Enabled) ? 1.0 : 0.45);
+            Utility::drawSectionHeader(painter, subControlRect(control, box, SC_GroupBoxLabel, widget), box->text);
+            painter->restore();
+        }
+    }
+
+    void drawControl(ControlElement element, const QStyleOption *option,
+                     QPainter *painter, const QWidget *widget) const
+    {
+        // The handle of a splitter is a short bar in its middle, brighter under the mouse
+        if (element == CE_Splitter) {
+            QRectF grip(0, 0, (option->state & State_Horizontal) ? 3 : 28, (option->state & State_Horizontal) ? 28 : 3);
+            grip.moveCenter(QRectF(option->rect).center());
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(Utility::getAppQColor((option->state & (State_MouseOver | State_Sunken)) ? "mutedText" : "lineStrong"));
+            painter->drawRoundedRect(grip, 1.5, 1.5);
+            painter->restore();
+            return;
+        }
+
+        // Under a style sheet a progress bar is drawn in parts. All of it is drawn with the contents here.
+        // A bar without a range is busy, which the base style animates.
+        const QStyleOptionProgressBar *bar = qstyleoption_cast<const QStyleOptionProgressBar*>(option);
+        bool part = element == CE_ProgressBarGroove || element == CE_ProgressBarContents || element == CE_ProgressBarLabel;
+        if (!part || !bar || !widget || bar->maximum <= bar->minimum) {
+            QProxyStyle::drawControl(element, option, painter, widget);
+            return;
+        }
+
+        if (element != CE_ProgressBarContents) {
+            return;
+        }
+
+        QRect rect = widget->rect();
+        QString text = bar->textVisible ? bar->text : QString();
+        int textWidth = text.isEmpty() ? 0 : qMax(bar->fontMetrics.horizontalAdvance("100 %"), bar->fontMetrics.horizontalAdvance(text)) + 8;
+        QRectF line(rect.left(), rect.center().y() - 2, rect.width() - textWidth, 5);
+        double done = double(bar->progress - bar->minimum) / double(bar->maximum - bar->minimum);
+
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(Utility::getAppQColor("lineStrong"));
+        painter->drawRoundedRect(line, 2.5, 2.5);
+        painter->setBrush(Utility::getAppQColor("infoText"));
+        line.setWidth(line.width() * done);
+        painter->drawRoundedRect(line, 2.5, 2.5);
+        painter->setPen(Utility::getAppQColor("mutedText"));
+        painter->drawText(rect, Qt::AlignRight | Qt::AlignVCenter, text);
+        painter->restore();
     }
 };
 
@@ -226,6 +358,19 @@ int main(int argc, char *argv[])
         Utility::setAppQColor("danger", QColor(224,72,72));
         Utility::setAppQColor("dangerText", QColor(255,122,122));
         Utility::setAppQColor("overlay", QColor(0,0,0,170));
+        Utility::setAppQColor("frameBackground", QColor(15,14,18));
+        Utility::setAppQColor("wellBackground", QColor(18,17,21));
+        Utility::setAppQColor("mutedText", QColor(140,139,147));
+        Utility::setAppQColor("line", QColor(255,255,255,18));
+        Utility::setAppQColor("lineStrong", QColor(255,255,255,40));
+        Utility::setAppQColor("accent", QColor(240,90,34));
+        Utility::setAppQColor("accentFill", QColor(210,68,15));
+        Utility::setAppQColor("accentDim", QColor(240,90,34,38));
+        Utility::setAppQColor("accentEdge", QColor(240,90,34,140));
+        Utility::setAppQColor("positiveDim", QColor(13,177,75,36));
+        Utility::setAppQColor("warningDim", QColor(224,160,48,26));
+        Utility::setAppQColor("warningEdge", QColor(224,160,48,64));
+        Utility::setAppQColor("stop", QColor(193,58,58));
     } else {
         qputenv("QT_QUICK_CONTROLS_CONF", ":/qtquickcontrols2.conf");
 
@@ -272,6 +417,19 @@ int main(int argc, char *argv[])
         Utility::setAppQColor("danger", QColor(200,52,52));
         Utility::setAppQColor("dangerText", QColor(185,35,35));
         Utility::setAppQColor("overlay", QColor(0,0,0,85));
+        Utility::setAppQColor("frameBackground", QColor(233,233,236));
+        Utility::setAppQColor("wellBackground", QColor(241,241,244));
+        Utility::setAppQColor("mutedText", QColor(107,107,116));
+        Utility::setAppQColor("line", QColor(0,0,0,24));
+        Utility::setAppQColor("lineStrong", QColor(0,0,0,50));
+        Utility::setAppQColor("accent", QColor(232,80,26));
+        Utility::setAppQColor("accentFill", QColor(194,65,12));
+        Utility::setAppQColor("accentDim", QColor(232,80,26,31));
+        Utility::setAppQColor("accentEdge", QColor(232,80,26,140));
+        Utility::setAppQColor("positiveDim", QColor(13,150,65,36));
+        Utility::setAppQColor("warningDim", QColor(205,135,20,26));
+        Utility::setAppQColor("warningEdge", QColor(205,135,20,64));
+        Utility::setAppQColor("stop", QColor(208,58,58));
     }
 
     // DPI settings
@@ -1057,7 +1215,8 @@ int main(int argc, char *argv[])
     }
 #endif
 
-#if defined(Q_OS_WIN) && QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // The 3D views are OpenGL widgets, and a window cannot mix them with QML drawn by another graphics API
+#if (defined(Q_OS_WIN) || defined(Q_OS_MACOS)) && QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 #endif
 
@@ -1636,58 +1795,59 @@ int main(int argc, char *argv[])
 
         addFonts();
 
+        // The desktop UI is one dark frame with the page as a panel in it, so its surfaces are a step
+        // darker than the ones of the mobile UI, which a loaded QML UI uses too
+        if (!useMobileUi && loadQml.isEmpty() && !loadQmlVesc) {
+            Utility::setAppQColor("darkBackground", isDark ? QColor(25,24,28) : QColor(250,250,251));
+            Utility::setAppQColor("normalBackground", isDark ? QColor(34,33,38) : QColor(255,255,255));
+            Utility::setAppQColor("cardBackground", Utility::getAppQColor("normalBackground"));
+            Utility::setAppQColor("lightBackground", isDark ? QColor(45,44,50) : QColor(239,239,242));
+            Utility::setAppQColor("raisedBackground", Utility::getAppQColor("lightBackground"));
+            Utility::setAppQColor("lightestBackground", isDark ? QColor(58,57,64) : QColor(226,226,231));
+            Utility::setAppQColor("plotBackground", Utility::getAppQColor("wellBackground"));
+            Utility::setAppQColor("titleText", isDark ? QColor(244,244,245) : QColor(17,17,20));
+            Utility::setAppQColor("lightText", isDark ? QColor(200,199,205) : QColor(51,51,58));
+            Utility::setAppQColor("disabledText", isDark ? QColor(104,103,111) : QColor(154,154,163));
+        }
+
         // Style
-        qApp->setStyleSheet("QListView::item::selected {background: qlineargradient(x1: 1.0, y1: 0.0, x2: 0, y2: 0, stop: 0 " +
-                            Utility::getAppHexColor("lightAccent") +
-                            ", stop: 0.4 " + Utility::getAppHexColor("darkAccent") + ");" +
-                            " border: none;} ");
         QStyle *myStyle = new Style_tweaks("Fusion");
         a->setStyle(myStyle);
         // Otherwise the standard palette and the window frame follow the system appearance
         a->styleHints()->setColorScheme(isDark ? Qt::ColorScheme::Dark : Qt::ColorScheme::Light);
 
-        if (isDark) {
-            QPalette darkPalette;
-            //QPalette::Inactive
-            darkPalette.setColor(QPalette::Window,Utility::getAppQColor("darkBackground"));
-            darkPalette.setColor(QPalette::WindowText,Utility::getAppQColor("lightText"));
-            darkPalette.setColor(QPalette::Disabled,QPalette::WindowText,Utility::getAppQColor("disabledText"));
-            darkPalette.setColor(QPalette::Base,Utility::getAppQColor("normalBackground"));
-            darkPalette.setColor(QPalette::AlternateBase,Utility::getAppQColor("lightBackground"));
-            darkPalette.setColor(QPalette::ToolTipBase,Utility::getAppQColor("lightestBackground"));
-            darkPalette.setColor(QPalette::ToolTipText,Utility::getAppQColor("lightText"));
-            darkPalette.setColor(QPalette::Text,Utility::getAppQColor("lightText"));
-            darkPalette.setColor(QPalette::Disabled,QPalette::Text,Utility::getAppQColor("disabledText"));
-            darkPalette.setColor(QPalette::Dark,QColor(35,35,35));
-            darkPalette.setColor(QPalette::Shadow,QColor(20,20,20));
-            darkPalette.setColor(QPalette::Button,Utility::getAppQColor("normalBackground"));
-            darkPalette.setColor(QPalette::ButtonText,Utility::getAppQColor("lightText"));
-            darkPalette.setColor(QPalette::Disabled,QPalette::ButtonText,Utility::getAppQColor("disabledText"));
-            darkPalette.setColor(QPalette::Disabled,QPalette::Highlight,Utility::getAppQColor("lightestBackground"));
-            darkPalette.setColor(QPalette::HighlightedText,Utility::getAppQColor("white"));
-            darkPalette.setColor(QPalette::Inactive,QPalette::Highlight,Utility::getAppQColor("midAccent"));
-            darkPalette.setColor(QPalette::Active,QPalette::Highlight,Utility::getAppQColor("darkAccent"));
-            darkPalette.setColor(QPalette::Disabled,QPalette::HighlightedText,Utility::getAppQColor("disabledText"));
-            darkPalette.setColor(QPalette::Link, QColor(150,150,255));
-            darkPalette.setColor(QPalette::LinkVisited, QColor(220,150,255));
-            qApp->setPalette(darkPalette);
-            qApp->setStyleSheet(
-                        "QTabBar::tab:selected, QTabBar::tab:hover {"
-                        "    background: #3d3d3d;"
-                        "    color: #eeeeee;"
-                        "}"
-                        "QTabBar::tab:!selected {"
-                        "    background: #272727;"
-                        "    color: #a5a5a5;"
-                        "}"
-                        );
-        } else {
-            QPalette lightPalette = qApp->style()->standardPalette();
-            lightPalette.setColor(QPalette::Inactive,QPalette::Highlight,Utility::getAppQColor("darkAccent"));
-            lightPalette.setColor(QPalette::Active,QPalette::Highlight,Utility::getAppQColor("midAccent"));
-            qApp->setPalette(lightPalette);
-            qApp->setStyleSheet("");
+        QPalette palette;
+        palette.setColor(QPalette::Window, Utility::getAppQColor("darkBackground"));
+        palette.setColor(QPalette::WindowText, Utility::getAppQColor("lightText"));
+        palette.setColor(QPalette::Base, Utility::getAppQColor("wellBackground"));
+        palette.setColor(QPalette::AlternateBase, Utility::getAppQColor("cardBackground"));
+        palette.setColor(QPalette::ToolTipBase, Utility::getAppQColor("raisedBackground"));
+        palette.setColor(QPalette::ToolTipText, Utility::getAppQColor("titleText"));
+        palette.setColor(QPalette::Text, Utility::getAppQColor("titleText"));
+        palette.setColor(QPalette::PlaceholderText, Utility::getAppQColor("mutedText"));
+        palette.setColor(QPalette::Dark, Utility::getAppQColor("frameBackground"));
+        palette.setColor(QPalette::Shadow, Utility::getAppQColor("frameBackground"));
+        palette.setColor(QPalette::Button, Utility::getAppQColor("raisedBackground"));
+        palette.setColor(QPalette::ButtonText, Utility::getAppQColor("titleText"));
+        palette.setColor(QPalette::Highlight, Utility::getAppQColor("midAccent"));
+        palette.setColor(QPalette::HighlightedText, Utility::getAppQColor("white"));
+        palette.setColor(QPalette::Link, Utility::getAppQColor("infoText"));
+        palette.setColor(QPalette::LinkVisited, Utility::getAppQColor("infoText"));
+        for (QPalette::ColorRole role: {QPalette::WindowText, QPalette::Text, QPalette::ButtonText, QPalette::HighlightedText}) {
+            palette.setColor(QPalette::Disabled, role, Utility::getAppQColor("disabledText"));
         }
+        qApp->setPalette(palette);
+
+        // The style sheet names the app colors and the theme icons with an at sign
+        QFile styleFile(":/res/style.qss");
+        styleFile.open(QIODevice::ReadOnly);
+        QString style = styleFile.readAll();
+        style.replace("@icons", Utility::getThemePath() + "desktop/icons");
+        QRegularExpression colorName("@(\\w+)");
+        for (auto m = colorName.match(style);m.hasMatch();m = colorName.match(style)) {
+            style.replace(m.capturedStart(), m.capturedLength(), Utility::getAppHexColor(m.captured(1)));
+        }
+        qApp->setStyleSheet(style);
 
         // Register this to not stop on the import statement when reusing components
         // from the mobile UI. In the mobile UI these are provided as singletons, whereas

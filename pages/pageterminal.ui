@@ -18,7 +18,7 @@
     <widget class="VTextBrowser" name="terminalBrowser">
      <property name="font">
       <font>
-       <family>DejaVu Sans Mono</family>
+       <family>Roboto Mono</family>
       </font>
      </property>
      <property name="lineWrapMode">
@@ -52,7 +52,13 @@
       </widget>
      </item>
      <item>
-      <widget class="HistoryLineEdit" name="terminalEdit"/>
+      <widget class="HistoryLineEdit" name="terminalEdit">
+       <property name="font">
+        <font>
+         <family>Roboto Mono</family>
+        </font>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="sendButton">
@@ -65,8 +71,11 @@
        <property name="toolTip">
         <string>Send command</string>
        </property>
+       <property name="primary" stdset="0">
+        <bool>true</bool>
+       </property>
        <property name="text">
-        <string/>
+        <string>Send</string>
        </property>
        <property name="icon">
         <iconset resource="../res.qrc">

@@ -34,7 +34,6 @@
 #include "pages/pageconnection.h"
 #include "widgets/ppmmap.h"
 #include "widgets/adcmap.h"
-#include "widgets/aspectimglabel.h"
 
 class SetupWizardApp : public QWizard
 {
@@ -65,11 +64,9 @@ public:
     SetupWizardApp(VescInterface *vesc, QWidget *parent = 0);
 
 private slots:
-    void idChanged(int id);
     void ended();
 
 private:
-    AspectImgLabel *mSideLabel;
     VescInterface *mVesc;
 
 };

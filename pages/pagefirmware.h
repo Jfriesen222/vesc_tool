@@ -73,6 +73,7 @@ private:
     void uploadFw(bool allOverCan);
     void reloadArchive(bool download);
     void reloadLatest(bool download);
+    void setDeviceRows(const QList<QPair<QString, QString>> &rows);
 
 };
 

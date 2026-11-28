@@ -21,6 +21,7 @@
 #define QMLEDITOR_H
 
 #include <QWidget>
+#include <QTabWidget>
 #include <QCodeEditor>
 #include <QFileSystemWatcher>
 
@@ -46,6 +47,14 @@ public:
 
     bool isDirty = false;
 
+    static QWidget *fileButtons(QTabWidget *tabs, QWidget *first);
+
+public slots:
+    void openFile();
+    void save();
+    void saveAs();
+    void reload();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
 
@@ -55,9 +64,6 @@ signals:
     void fileNameChanged(QString newName);
 
 private slots:
-    void on_openFileButton_clicked();
-    void on_saveButton_clicked();
-    void on_saveAsButton_clicked();
     void on_searchEdit_textChanged(const QString &arg1);
     void on_searchPrevButton_clicked();
     void on_searchNextButton_clicked();
@@ -65,7 +71,6 @@ private slots:
     void on_replaceAllButton_clicked();
     void on_searchHideButton_clicked();
     void on_searchCaseSensitiveBox_toggled(bool checked);
-    void on_refreshButton_clicked();
     void on_searchEdit_returnPressed();
     void on_fileChangeIgnoreButton_clicked();
     void on_fileChangedReloadButton_clicked();

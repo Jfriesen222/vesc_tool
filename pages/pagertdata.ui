@@ -14,454 +14,1208 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QTabWidget" name="tabWidget">
-       <property name="tabShape">
-        <enum>QTabWidget::TabShape::Triangular</enum>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Current</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>8</number>
        </property>
-       <property name="currentIndex">
-        <number>0</number>
+       <item>
+        <widget class="QFrame" name="currentWell">
+         <property name="well" stdset="0">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="currentWellLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QCustomPlot" name="currentPlot" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="valueWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QVBoxLayout" name="valueLayout">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="tileLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QFrame" name="powerTile">
+              <property name="card" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="tile" stdset="0">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="powerTileLayout">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>8</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="powerCaption">
+                 <property name="text">
+                  <string>POWER</string>
+                 </property>
+                 <property name="caption" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="powerRow">
+                 <item>
+                  <widget class="QLabel" name="powerValue">
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                   <property name="reading" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="Sparkline" name="powerSpark" native="true"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="dutyTile">
+              <property name="card" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="tile" stdset="0">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="dutyTileLayout">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>8</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="dutyCaption">
+                 <property name="text">
+                  <string>DUTY</string>
+                 </property>
+                 <property name="caption" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="dutyRow">
+                 <item>
+                  <widget class="QLabel" name="dutyValue">
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                   <property name="reading" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="Sparkline" name="dutySpark" native="true"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="erpmTile">
+              <property name="card" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="tile" stdset="0">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="erpmTileLayout">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>8</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="erpmCaption">
+                 <property name="text">
+                  <string>ERPM</string>
+                 </property>
+                 <property name="caption" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="erpmRow">
+                 <item>
+                  <widget class="QLabel" name="erpmValue">
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                   <property name="reading" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="Sparkline" name="erpmSpark" native="true"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="currentInTile">
+              <property name="card" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="tile" stdset="0">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="currentInTileLayout">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>8</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="currentInCaption">
+                 <property name="text">
+                  <string>BATTERY CURRENT</string>
+                 </property>
+                 <property name="caption" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="currentInRow">
+                 <item>
+                  <widget class="QLabel" name="currentInValue">
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                   <property name="reading" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="Sparkline" name="currentInSpark" native="true"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="currentMotorTile">
+              <property name="card" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="tile" stdset="0">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="currentMotorTileLayout">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>8</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="currentMotorCaption">
+                 <property name="text">
+                  <string>MOTOR CURRENT</string>
+                 </property>
+                 <property name="caption" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="currentMotorRow">
+                 <item>
+                  <widget class="QLabel" name="currentMotorValue">
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                   <property name="reading" stdset="0">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="Sparkline" name="currentMotorSpark" native="true"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QFrame" name="stripFrame">
+            <property name="card" stdset="0">
+             <bool>true</bool>
+            </property>
+            <layout class="QGridLayout" name="stripLayout" columnstretch="5,5,4,0,4,4,4,4,4,0,4,4">
+             <property name="leftMargin">
+              <number>12</number>
+             </property>
+             <property name="topMargin">
+              <number>8</number>
+             </property>
+             <property name="rightMargin">
+              <number>12</number>
+             </property>
+             <property name="bottomMargin">
+              <number>8</number>
+             </property>
+             <property name="horizontalSpacing">
+              <number>16</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>2</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="tempMosCaption">
+               <property name="text">
+                <string>MOSFET</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="tempMosValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="tempMotorCaption">
+               <property name="text">
+                <string>MOTOR</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="tempMotorValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="faultCaption">
+               <property name="text">
+                <string>FAULT</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="faultValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="4">
+              <widget class="QLabel" name="vinCaption">
+               <property name="text">
+                <string>VOLTS IN</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="4">
+              <widget class="QLabel" name="vinValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="5">
+              <widget class="QLabel" name="ahDrawnCaption">
+               <property name="text">
+                <string>AH DRAWN</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="5">
+              <widget class="QLabel" name="ahDrawnValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="6">
+              <widget class="QLabel" name="ahChargedCaption">
+               <property name="text">
+                <string>AH CHARGED</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="6">
+              <widget class="QLabel" name="ahChargedValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="7">
+              <widget class="QLabel" name="whDrawnCaption">
+               <property name="text">
+                <string>WH DRAWN</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="7">
+              <widget class="QLabel" name="whDrawnValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="8">
+              <widget class="QLabel" name="whChargedCaption">
+               <property name="text">
+                <string>WH CHARGED</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="8">
+              <widget class="QLabel" name="whChargedValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="10">
+              <widget class="QLabel" name="tachCaption">
+               <property name="text">
+                <string>TACH</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="10">
+              <widget class="QLabel" name="tachValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="11">
+              <widget class="QLabel" name="tachAbsCaption">
+               <property name="text">
+                <string>TACH ABS</string>
+               </property>
+               <property name="caption" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="11">
+              <widget class="QLabel" name="tachAbsValue">
+               <property name="text">
+                <string>-</string>
+               </property>
+               <property name="reading" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="LevelBar" name="tempMosBar" native="true"/>
+             </item>
+             <item row="2" column="1">
+              <widget class="LevelBar" name="tempMotorBar" native="true"/>
+             </item>
+             <item row="0" column="3" rowspan="3">
+              <widget class="QFrame" name="faultDivider">
+               <property name="minimumSize">
+                <size>
+                 <width>1</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>1</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="divider" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="9" rowspan="3">
+              <widget class="QFrame" name="whDivider">
+               <property name="minimumSize">
+                <size>
+                 <width>1</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>1</width>
+                 <height>28</height>
+                </size>
+               </property>
+               <property name="divider" stdset="0">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Temperature</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>8</number>
        </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string>Current</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QCustomPlot" name="currentPlot" native="true"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_2">
-        <attribute name="title">
-         <string>Temperature</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
-         <item>
-          <widget class="QCustomPlot" name="tempPlot" native="true"/>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QCheckBox" name="tempShowMosfetBox">
-             <property name="toolTip">
-              <string>Show MOSFET temperature</string>
-             </property>
-             <property name="text">
-              <string>MOSFET</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="tempShowMotorBox">
-             <property name="toolTip">
-              <string>Show motor temperature</string>
-             </property>
-             <property name="text">
-              <string>Motor</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_3">
-        <attribute name="title">
-         <string>RPM</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QCustomPlot" name="rpmPlot" native="true"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_4">
-        <attribute name="title">
-         <string>FOC</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <item>
-          <widget class="QCustomPlot" name="focPlot" native="true"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_5">
-        <attribute name="title">
-         <string>Rotor Position</string>
-        </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
-           <item>
-            <widget class="QProgressBar" name="posBar">
-             <property name="maximum">
-              <number>359</number>
-             </property>
-             <property name="value">
-              <number>120</number>
-             </property>
-             <property name="format">
-              <string>%v Degrees</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCustomPlot" name="posPlot" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_7">
-           <item>
-            <widget class="QPushButton" name="posInductanceButton">
-             <property name="toolTip">
-              <string>Start inductance based signal injection detection (BLDC only)</string>
-             </property>
-             <property name="text">
-              <string>Inductance</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="posEncoderButton">
-             <property name="toolTip">
-              <string>Plot the encoder position</string>
-             </property>
-             <property name="text">
-              <string>Encoder</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="posObserverButton">
-             <property name="toolTip">
-              <string>Plot the rotor position seen by the observer (FOC only)</string>
-             </property>
-             <property name="text">
-              <string>Observer</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="posPidButton">
-             <property name="toolTip">
-              <string>Plot the PID controller position</string>
-             </property>
-             <property name="text">
-              <string>PID Pos</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="posEncoderObserverErrorButton">
-             <property name="toolTip">
-              <string>Plot the difference between the observer and encoder position (FOC only)</string>
-             </property>
-             <property name="text">
-              <string>Obs vs Enc</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="posHallObserverErrorButton">
-             <property name="toolTip">
-              <string>Plot the difference between the observer and hall sensor position (FOC only)</string>
-             </property>
-             <property name="text">
-              <string>Obs vs Hall</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="posPidErrorButton">
-             <property name="toolTip">
-              <string>Plot the PID controller position error</string>
-             </property>
-             <property name="text">
-              <string>PID Error</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="posStopButton">
-             <property name="toolTip">
-              <string>Stop sending position samples</string>
-             </property>
-             <property name="text">
-              <string>Stop</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </widget>
-     </item>
-     <item>
-      <widget class="QFrame" name="buttonFrame">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+       <item>
+        <widget class="QFrame" name="tempWell">
+         <property name="well" stdset="0">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="tempWellLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>8</number>
+            </property>
+            <property name="topMargin">
+             <number>4</number>
+            </property>
+            <property name="rightMargin">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="tempShowMosfetBox">
+              <property name="toolTip">
+               <string>Show MOSFET temperature</string>
+              </property>
+              <property name="text">
+               <string>MOSFET</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="tempShowMotorBox">
+              <property name="toolTip">
+               <string>Show motor temperature</string>
+              </property>
+              <property name="text">
+               <string>Motor</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCustomPlot" name="tempPlot" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>RPM</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="spacing">
+        <number>8</number>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::Shape::StyledPanel</enum>
+       <item>
+        <widget class="QFrame" name="rpmWell">
+         <property name="well" stdset="0">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="rpmWellLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QCustomPlot" name="rpmPlot" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>FOC</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="spacing">
+        <number>8</number>
        </property>
-       <property name="frameShadow">
-        <enum>QFrame::Shadow::Plain</enum>
+       <item>
+        <widget class="QFrame" name="focWell">
+         <property name="well" stdset="0">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="focWellLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QCustomPlot" name="focPlot" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>Rotor Position</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <property name="spacing">
+        <number>8</number>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="spacing">
-         <number>3</number>
-        </property>
-        <property name="leftMargin">
-         <number>2</number>
-        </property>
-        <property name="topMargin">
-         <number>2</number>
-        </property>
-        <property name="rightMargin">
-         <number>2</number>
-        </property>
-        <property name="bottomMargin">
-         <number>2</number>
-        </property>
-        <item>
-         <widget class="QToolButton" name="autoscaleButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+       <item>
+        <widget class="QFrame" name="posWell">
+         <property name="well" stdset="0">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="posWellLayout">
+          <property name="spacing">
+           <number>6</number>
           </property>
-          <property name="font">
-           <font>
-            <pointsize>3</pointsize>
-           </font>
+          <property name="leftMargin">
+           <number>4</number>
           </property>
-          <property name="toolTip">
-           <string>Autoscale plots with incoming samples</string>
+          <property name="topMargin">
+           <number>4</number>
           </property>
-          <property name="text">
-           <string/>
+          <property name="rightMargin">
+           <number>4</number>
           </property>
-          <property name="icon">
-           <iconset resource="../res.qrc">
-            <normaloff>:/res/icons/size_off.png</normaloff>
-            <normalon>:/res/icons/size_on.png</normalon>:/res/icons/size_off.png</iconset>
+          <property name="bottomMargin">
+           <number>4</number>
           </property>
-          <property name="iconSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="zoomHButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>3</pointsize>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>Enable horizontal zoom</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../res.qrc">
-            <normaloff>:/res/icons/expand_off.png</normaloff>
-            <normalon>:/res/icons/expand_on.png</normalon>:/res/icons/expand_off.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="zoomVButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>3</pointsize>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>Enable vertical zoom</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../res.qrc">
-            <normaloff>:/res/icons/expand_v_off.png</normaloff>
-            <normalon>:/res/icons/expand_v_on.png</normalon>:/res/icons/expand_v_off.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="rescaleButton">
-          <property name="toolTip">
-           <string>Rescale plots to fit</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../res.qrc">
-            <normaloff>:/res/icons/size_off.png</normaloff>:/res/icons/size_off.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QToolButton" name="logRtButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Log Realtime Data to File.&lt;/p&gt;&lt;p&gt;Go to &lt;span style=&quot; font-weight:600;&quot;&gt;Settings -&amp;gt; Paths&lt;/span&gt; to choose the output directory.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../res.qrc">
-            <normaloff>:/res/icons/rt_off.png</normaloff>
-            <normalon>:/res/icons/rt_on.png</normalon>:/res/icons/rt_off.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>8</number>
+            </property>
+            <property name="topMargin">
+             <number>4</number>
+            </property>
+            <property name="rightMargin">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QProgressBar" name="posBar">
+              <property name="maximumWidth">
+               <number>340</number>
+              </property>
+              <property name="maximum">
+               <number>359</number>
+              </property>
+              <property name="value">
+               <number>120</number>
+              </property>
+              <property name="format">
+               <string>%v Degrees</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="posBarSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>8</number>
+            </property>
+            <property name="topMargin">
+             <number>4</number>
+            </property>
+            <property name="rightMargin">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="posInductanceButton">
+              <property name="toolTip">
+               <string>Start inductance based signal injection detection (BLDC only)</string>
+              </property>
+              <property name="text">
+               <string>Inductance</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="posEncoderButton">
+              <property name="toolTip">
+               <string>Plot the encoder position</string>
+              </property>
+              <property name="text">
+               <string>Encoder</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="posObserverButton">
+              <property name="toolTip">
+               <string>Plot the rotor position seen by the observer (FOC only)</string>
+              </property>
+              <property name="text">
+               <string>Observer</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="posPidButton">
+              <property name="toolTip">
+               <string>Plot the PID controller position</string>
+              </property>
+              <property name="text">
+               <string>PID Pos</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="posEncoderObserverErrorButton">
+              <property name="toolTip">
+               <string>Plot the difference between the observer and encoder position (FOC only)</string>
+              </property>
+              <property name="text">
+               <string>Obs vs Enc</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="posHallObserverErrorButton">
+              <property name="toolTip">
+               <string>Plot the difference between the observer and hall sensor position (FOC only)</string>
+              </property>
+              <property name="text">
+               <string>Obs vs Hall</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="posPidErrorButton">
+              <property name="toolTip">
+               <string>Plot the PID controller position error</string>
+              </property>
+              <property name="text">
+               <string>PID Error</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="posStopButton">
+              <property name="toolTip">
+               <string>Stop sending position samples</string>
+              </property>
+              <property name="text">
+               <string>Stop</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCustomPlot" name="posPlot" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
    <item>
-    <widget class="RtDataText" name="rtText" native="true"/>
+    <widget class="QFrame" name="buttonFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" name="buttonLayout">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="toolSeg">
+        <property name="seg" stdset="0">
+         <bool>true</bool>
+        </property>
+        <layout class="QHBoxLayout" name="toolSegLayout">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="autoscaleButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Autoscale plots with incoming samples</string>
+           </property>
+           <property name="text">
+            <string>Auto</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="zoomHButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Enable horizontal zoom</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../res.qrc"><normaloff>:/res/icons/expand_off.png</normaloff><normalon>:/res/icons/expand_on.png</normalon>:/res/icons/expand_off.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>14</width>
+             <height>14</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="zoomVButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Enable vertical zoom</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../res.qrc"><normaloff>:/res/icons/expand_v_off.png</normaloff><normalon>:/res/icons/expand_v_on.png</normalon>:/res/icons/expand_v_off.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>14</width>
+             <height>14</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="rescaleButton">
+           <property name="toolTip">
+            <string>Rescale plots to fit</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../res.qrc"><normaloff>:/res/icons/size_off.png</normaloff>:/res/icons/size_off.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>14</width>
+             <height>14</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="logSeg">
+        <property name="seg" stdset="0">
+         <bool>true</bool>
+        </property>
+        <layout class="QHBoxLayout" name="logSegLayout">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="logRtButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Log Realtime Data to File.&lt;/p&gt;&lt;p&gt;Go to &lt;span style=" font-weight:600;"&gt;Settings -&amp;gt; Paths&lt;/span&gt; to choose the output directory.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Log</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>Sparkline</class>
+   <extends>QWidget</extends>
+   <header>pages/pagertdata.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LevelBar</class>
+   <extends>QWidget</extends>
+   <header>pages/pagertdata.h</header>
+  </customwidget>
+  <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
    <header>widgets/qcustomplot.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>RtDataText</class>
-   <extends>QWidget</extends>
-   <header>widgets/rtdatatext.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

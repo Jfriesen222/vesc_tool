@@ -45,44 +45,117 @@
          <string>Start Pairing</string>
         </property>
         <property name="text">
-         <string/>
+         <string>Start Pairing</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="timeBox">
-        <property name="toolTip">
-         <string>Stay in pairing mode for this amount of time</string>
+       <widget class="QFrame" name="timeBoxFrame">
+        <property name="field" stdset="0">
+         <bool>true</bool>
         </property>
-        <property name="prefix">
-         <string>Time: </string>
-        </property>
-        <property name="suffix">
-         <string> s</string>
-        </property>
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <double>10.000000000000000</double>
-        </property>
+        <layout class="QHBoxLayout" name="timeBoxFrameLayout">
+         <property name="leftMargin">
+          <number>10</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="timeBoxCaption">
+           <property name="text">
+            <string>TIME</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="timeBox">
+           <property name="toolTip">
+            <string>Stay in pairing mode for this amount of time</string>
+           </property>
+           <property name="suffix">
+            <string> s</string>
+           </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <double>10.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="countLabel">
-        <property name="font">
-         <font>
-          <bold>true</bold>
-         </font>
+       <widget class="QFrame" name="countLabelFrame">
+        <property name="field" stdset="0">
+         <bool>true</bool>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::Box</enum>
-        </property>
-        <property name="text">
-         <string>0</string>
+        <layout class="QHBoxLayout" name="countLabelFrameLayout">
+         <property name="leftMargin">
+          <number>10</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="countLabelCaption">
+           <property name="text">
+            <string>TIME LEFT</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="countBox">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="suffix">
+            <string> s</string>
+           </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <double>999.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="hintLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignRight|Qt::AlignVCenter</set>
+        </property>
+        <property name="hint" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Put the device in pairing mode before the time runs out.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -32,6 +32,9 @@
 #include <QDir>
 #include <QPixmap>
 #include <QCursor>
+#include <QPainter>
+#include <QStyleOptionSlider>
+#include "utility.h"
 #include <QDebug>
 
 class SliderProxy : public QProxyStyle
@@ -54,20 +57,8 @@ SuperSlider::SuperSlider(QWidget *parent)
     SliderProxy *aSliderProxy = new SliderProxy();
     aSliderProxy->setParent(this);
 
-    setStyleSheet("QSlider::handle { image: url(://res/images/slider1.png); }"
-
-                  "QSlider::groove:horizontal {"
-                  "border: 0px solid #999999;"
-                  "height: 20px;"
-                  "background: #b4b4b4;"
-                  "margin: 2px 0;}"
-
-                  "QSlider::handle:horizontal {"
-                  "background: #b4b4b4;"
-                  "border: 0px solid #5c5c5c;"
-                  "width: 14px;"
-                  "margin: 0px 0;"
-                  "border-radius: 0px;}");
+    // Only the sizes: it is drawn in paintEvent
+    setStyleSheet("QSlider::groove:horizontal { height: 20px; } QSlider::handle:horizontal { width: 14px; }");
 
     setStyle(aSliderProxy);
     alt_handle = new SuperSliderHandle(this);
@@ -81,9 +72,29 @@ SuperSliderHandle::SuperSliderHandle(SuperSlider *_parent) : QLabel(_parent)
     filter = new SliderEventFilter(parent);
     valueNow = 0;
 
-    QPixmap pix = QPixmap("://res/images/slider1.png");
-    pix =  pix.scaled(14, 20, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    setPixmap(pix);
+    setFixedSize(14, 20);
+}
+
+// A thin track, a brighter line over the range between the two handles and the handles as small bars
+void SuperSlider::paintEvent(QPaintEvent *event)
+{
+    (void)event;
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
+    QRect handle = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
+    double x1 = alt_handle->geometry().center().x() + 0.5, x2 = handle.center().x() + 0.5, y = height() / 2.0;
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Utility::getAppQColor("lineStrong"));
+    painter.drawRoundedRect(QRectF(0, y - 1.5, width(), 3), 1.5, 1.5);
+    painter.setBrush(Utility::getAppQColor("mutedText"));
+    painter.drawRect(QRectF(qMin(x1, x2), y - 1.5, qAbs(x2 - x1), 3));
+    painter.setBrush(Utility::getAppQColor("lightText"));
+    for (double x: {x1, x2}) {
+        painter.drawRoundedRect(QRectF(x - 4, y - 9, 8, 18), 3, 3);
+    }
 }
 
 int SuperSlider::alt_value()
@@ -159,6 +170,7 @@ void SuperSliderHandle::setValue(int value)
     double range = double(parent->maximum() - parent->minimum());
     int location = int(double((parent->width() - 14) * (value - parent->minimum())) / range);
     move(location, y());
+    parent->update();
 }
 
 int SuperSliderHandle::value()
@@ -169,6 +181,7 @@ int SuperSliderHandle::value()
 void SuperSliderHandle::moveAndUptade(QPoint p)
 {
     move(p);
+    parent->update();
     double width = parent->width() - 14;
     double value = pos().x() / width;
     double range = parent->maximum() - parent->minimum();

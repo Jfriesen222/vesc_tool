@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include "utility.h"
+#include "startupwizard.h"
 #include "setupwizardapp.h"
 
 SetupWizardApp::SetupWizardApp(VescInterface *vesc, QWidget *parent)
@@ -43,33 +44,11 @@ SetupWizardApp::SetupWizardApp(VescInterface *vesc, QWidget *parent)
     setPage(Page_Conclusion, new AppConclusionPage(vesc));
 
     setStartId(Page_Intro);
-    setWizardStyle(ModernStyle);
-    QPixmap icon_logo = QIcon(Utility::getIcon(":/res/icon.svg")).pixmap(QSize(this->devicePixelRatioF() * 48, this->devicePixelRatioF() * 48));
-    icon_logo.setDevicePixelRatio(this->devicePixelRatioF());
-    setPixmap(QWizard::LogoPixmap, icon_logo);
-    resize(800, 450);
-
+    setUpWizardFrame(this);
     setWindowTitle(tr("App Setup Wizard"));
 
-    mSideLabel = new AspectImgLabel(Qt::Vertical);
-    mSideLabel->setPixmap(Utility::getIcon("logo_vertical.png"));
-    mSideLabel->setScaledContents(true);
-    setSideWidget(mSideLabel);
-
-    connect(this, SIGNAL(currentIdChanged(int)),
-            this, SLOT(idChanged(int)));
     connect(this, SIGNAL(rejected()), this, SLOT(ended()));
     connect(this, SIGNAL(accepted()), this, SLOT(ended()));
-}
-
-void SetupWizardApp::idChanged(int id)
-{
-    if (id == Page_Intro || id == Page_Conclusion) {
-        setSideWidget(mSideLabel);
-        mSideLabel->setVisible(true);
-    } else {
-        setSideWidget(nullptr);
-    }
 }
 
 void SetupWizardApp::ended()
@@ -226,6 +205,7 @@ AppMultiPage::AppMultiPage(VescInterface *vesc, QWidget *parent)
     mCanFwdList->setIconSize(QSize(50, 50));
     mCanFwdList->setWordWrap(true);
     mCanFwdList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    mCanFwdList->setProperty("choices", true);
 
     registerField("CanFwd", this, "canFwd", SIGNAL(canFwdChanged));
     connect(mCanFwdList, SIGNAL(currentRowChanged(int)),
@@ -344,7 +324,8 @@ AppGeneralPage::AppGeneralPage(VescInterface *vesc, QWidget *parent)
     item->setData(Qt::UserRole, SetupWizardApp::Input_Nunchuk);
     mInputList->addItem(item);
 
-    mInputList->setIconSize(QSize(60, 60));
+    mInputList->setIconSize(QSize(48, 48));
+    mInputList->setProperty("choices", true);
     mInputList->setCurrentItem(nullptr);
 
     registerField("Input", this, "inputType", SIGNAL(inputTypeChanged));
@@ -412,7 +393,8 @@ AppNunchukPage::AppNunchukPage(VescInterface *vesc, QWidget *parent)
     mNrfPair->setVesc(mVesc);
 
     mDisplay = new DisplayPercentage;
-    mDisplay->setMinimumHeight(30);
+    mDisplay->setProperty("tape", true);
+    mDisplay->setMinimumHeight(34);
     mDisplay->setDual(true);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -442,7 +424,7 @@ bool AppNunchukPage::validatePage()
 
 void AppNunchukPage::initializePage()
 {
-    mParamTab->setRowCount(0);
+    mParamTab->clearParams();
 
     mParamTab->addParamRow(mVesc->appConfig(), "app_chuk_conf.ctrl_type");
     mParamTab->addParamRow(mVesc->appConfig(), "app_chuk_conf.ramp_time_pos");
@@ -548,7 +530,7 @@ bool AppPpmMapPage::validatePage()
 
 void AppPpmMapPage::initializePage()
 {
-    mParamTab->setRowCount(0);
+    mParamTab->clearParams();
 
     mParamTab->addParamRow(mVesc->appConfig(), "app_ppm_conf.pulse_start");
     mParamTab->addParamRow(mVesc->appConfig(), "app_ppm_conf.pulse_end");
@@ -618,7 +600,7 @@ bool AppPpmPage::validatePage()
 
 void AppPpmPage::initializePage()
 {
-    mParamTab->setRowCount(0);
+    mParamTab->clearParams();
 
     mParamTab->addRowSeparator(tr("General"));
     mParamTab->addParamRow(mVesc->appConfig(), "app_ppm_conf.ctrl_type");
@@ -679,7 +661,7 @@ bool AppAdcMapPage::validatePage()
 
 void AppAdcMapPage::initializePage()
 {
-    mParamTab->setRowCount(0);
+    mParamTab->clearParams();
 
     mParamTab->addParamRow(mVesc->appConfig(), "app_adc_conf.voltage_start");
     mParamTab->addParamRow(mVesc->appConfig(), "app_adc_conf.voltage_end");
@@ -766,7 +748,7 @@ bool AppAdcPage::validatePage()
 
 void AppAdcPage::initializePage()
 {
-    mParamTab->setRowCount(0);
+    mParamTab->clearParams();
 
     mParamTab->addRowSeparator(tr("General"));
     mParamTab->addParamRow(mVesc->appConfig(), "app_adc_conf.ctrl_type");

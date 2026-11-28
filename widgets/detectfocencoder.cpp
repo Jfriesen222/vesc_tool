@@ -72,6 +72,9 @@ void DetectFocEncoder::on_applyButton_clicked()
         mVesc->mcConfig()->updateParamDouble("foc_encoder_ratio", ui->ratioBox->value());
         mVesc->mcConfig()->updateParamBool("foc_encoder_inverted", ui->invertedBox->currentIndex() != 0);
         mVesc->emitStatusMessage(tr("Encoder Parameters Applied"), true);
+        Utility::setStyleProperty(ui->applyStep, "ok", true);
+        Utility::setStyleProperty(ui->applyButton, "primary", false);
+        Utility::setStyleProperty(ui->applyStep, "next", false);
     }
 }
 
@@ -92,6 +95,18 @@ void DetectFocEncoder::setVesc(VescInterface *vesc)
 
 void DetectFocEncoder::encoderParamReceived(ENCODER_DETECT_RES res)
 {
+    // The tiles show whether the last detection worked, and Apply is the next step after a good one
+    bool ok = res.offset <= 1000.0;
+    for (auto *t: {ui->offsetTile, ui->ratioTile}) {
+        Utility::setStyleProperty(t, "ok", ok);
+        Utility::setStyleProperty(t, "failed", !ok);
+    }
+    Utility::setStyleProperty(ui->detectStep, "ok", ok);
+    Utility::setStyleProperty(ui->detectStep, "failed", !ok);
+    Utility::setStyleProperty(ui->applyStep, "ok", false);
+    Utility::setStyleProperty(ui->applyButton, "primary", ok);
+    Utility::setStyleProperty(ui->applyStep, "next", ok);
+
     if (res.offset > 1000.0) {
         mVesc->emitStatusMessage(tr("Encoder not enabled in firmware"), false);
         QMessageBox::critical(this, "Error", "Encoder support is not enabled. Enable it in the general settings.");

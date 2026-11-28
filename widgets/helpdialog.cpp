@@ -21,6 +21,7 @@
 #include "ui_helpdialog.h"
 #include <QDebug>
 #include <QMessageBox>
+#include <QTextBlock>
 #include "utility.h"
 
 HelpDialog::HelpDialog(QString title, QString text, QWidget *parent) :
@@ -30,10 +31,11 @@ HelpDialog::HelpDialog(QString title, QString text, QWidget *parent) :
     ui->setupUi(this);
 
     this->setWindowIcon(Utility::getIcon("icons/Help-96.png"));
-    ui->label->setPixmap(Utility::getIcon("icons/About-96.png"));
+    ui->label->setPixmap(Utility::getIcon("icons/Help-96.png"));
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(title);
+    ui->titleLabel->setText(title);
 
     if (text.trimmed().startsWith('#')) {
         ui->textEdit->setMarkdown(text);
@@ -42,6 +44,8 @@ HelpDialog::HelpDialog(QString title, QString text, QWidget *parent) :
     }
 
     ui->textEdit->viewport()->setAutoFillBackground(false);
+    ui->textEdit->document()->setDocumentMargin(0);
+    setReadingSpacing(ui->textEdit);
 }
 
 HelpDialog::~HelpDialog()
@@ -57,6 +61,8 @@ void HelpDialog::showHelp(QWidget *parent, ConfigParams *params, QString name, b
         HelpDialog *h = new HelpDialog(param->longName,
                                        param->description,
                                        parent);
+        h->ui->titleLabel->setText(QString("%1&nbsp;&nbsp;<span style=\"font-family:'Roboto Mono'; font-size:9pt; font-weight:400; color:%2\">%3</span>").
+                                   arg(param->longName.toHtmlEscaped(), Utility::getAppHexColor("mutedText"), name.toHtmlEscaped()));
         if (modal) {
             h->exec();
         } else {
@@ -81,6 +87,24 @@ void HelpDialog::showHelpMonospace(QWidget *parent, QString title, QString text)
     QFont font = QFont("DejaVu Sans Mono");
     h->setFont(font);
     h->exec();
+}
+
+// Spaces long rich text for reading: taller lines of text and list items close together
+void HelpDialog::setReadingSpacing(QTextEdit *edit)
+{
+    QTextCursor cursor(edit->document());
+    for (QTextBlock b = edit->document()->begin();b.isValid();b = b.next()) {
+        QTextBlockFormat f = b.blockFormat();
+        if (!b.text().isEmpty()) {
+            f.setLineHeight(150, QTextBlockFormat::ProportionalHeight);
+        }
+        if (b.textList()) {
+            f.setTopMargin(2);
+            f.setBottomMargin(2);
+        }
+        cursor.setPosition(b.position());
+        cursor.setBlockFormat(f);
+    }
 }
 
 void HelpDialog::showEvent(QShowEvent *event)

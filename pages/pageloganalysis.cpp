@@ -31,25 +31,35 @@
 #include <QHBoxLayout>
 #include <QPainter>
 #include <QPixmap>
-#include <QLabel>
 #include <QToolButton>
 #include <QDoubleSpinBox>
-#include <QItemSelectionModel>
 #include <QSignalBlocker>
+#include <QShortcut>
 
 static const int dataTableColName = 0;
 static const int dataTableColValue = 1;
 static const int dataTableColY1 = 2;
 static const int dataTableColY2 = 3;
 static const int dataTableColScale = 4;
-static const int dataTableColAddButton = 5;
 
-static const int selectedTableColColor = 0;
-static const int selectedTableColSeries = 1;
-static const int selectedTableColValue = 2;
-static const int selectedTableColScale = 3;
-static const int selectedTableColAxis = 4;
-static const int selectedTableColRemove = 5;
+static const int selectedTableColSeries = 0;
+static const int selectedTableColValue = 1;
+static const int selectedTableColScale = 2;
+static const int selectedTableColAxis = 3;
+static const int selectedTableColRemove = 4;
+
+// A rounded square in the colour of a trace; a transparent one keeps the names of unplotted series in line
+static QIcon swatchIcon(const QColor &color)
+{
+    QPixmap px(24, 24);
+    px.fill(Qt::transparent);
+    QPainter p(&px);
+    p.setRenderHint(QPainter::Antialiasing, true);
+    p.setPen(Qt::NoPen);
+    p.setBrush(color);
+    p.drawRoundedRect(QRectF(4, 4, 16, 16), 4, 4);
+    return QIcon(px);
+}
 
 PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
     QWidget(parent),
@@ -57,6 +67,7 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
 {
     ui->setupUi(this);
     mVesc = nullptr;
+    mVescLogListed = false;
 
     resetInds();
 
@@ -83,14 +94,16 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
     ui->spanSlider->setMaximum(10000);
     ui->spanSlider->setValue(10000);
 
-    ui->mapSplitter->setStretchFactor(0, 2);
-    ui->mapSplitter->setStretchFactor(1, 1);
+    // The map stays closed until a log with positions is opened
+    ui->mapSplitter->setSizes({0, 1});
 
-    ui->statSplitter->setStretchFactor(0, 6);
-    ui->statSplitter->setStretchFactor(1, 1);
+    ui->statSplitter->setStretchFactor(0, 1);
+    ui->statSplitter->setStretchFactor(1, 0);
+    ui->statSplitter->setSizes({560, 420});
 
-    ui->dataSplitter->setStretchFactor(0, 1);
-    ui->dataSplitter->setStretchFactor(1, 6);
+    ui->dataSplitter->setStretchFactor(0, 0);
+    ui->dataSplitter->setStretchFactor(1, 1);
+    ui->dataSplitter->setSizes({200, 360});
 
     Utility::setPlotColors(ui->plot);
     ui->plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
@@ -98,54 +111,54 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
     ui->plot->axisRect()->setRangeDrag(Qt::Orientations());
 
     ui->statTable->setColumnWidth(0, 140);
-    ui->logTable->setColumnWidth(0, 250);
-    ui->vescLogTable->setColumnWidth(0, 250);
+    for (auto t: {ui->logTable, ui->vescLogTable, ui->logLocalTable}) {
+        t->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+        t->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    }
 
     ui->dataTable->horizontalHeader()->setSectionResizeMode(dataTableColName, QHeaderView::Stretch);
     ui->dataTable->horizontalHeader()->setSectionResizeMode(dataTableColValue, QHeaderView::Fixed);
-    ui->dataTable->horizontalHeader()->setSectionResizeMode(dataTableColY1, QHeaderView::Fixed);
-    ui->dataTable->horizontalHeader()->setSectionResizeMode(dataTableColY2, QHeaderView::Fixed);
-    ui->dataTable->horizontalHeader()->setSectionResizeMode(dataTableColScale, QHeaderView::Fixed);
-
-    ui->dataTable->setColumnWidth(dataTableColValue, 170);
-    ui->dataTable->setColumnWidth(dataTableColY1, 30);
-    ui->dataTable->setColumnWidth(dataTableColY2, 30);
-    ui->dataTable->setColumnWidth(dataTableColScale, 60);
-    ui->dataTable->setColumnWidth(dataTableColAddButton, 50);
+    ui->dataTable->setColumnWidth(dataTableColValue, 130);
     ui->dataTable->setColumnHidden(dataTableColY1, true);
     ui->dataTable->setColumnHidden(dataTableColY2, true);
     ui->dataTable->setColumnHidden(dataTableColScale, true);
     ui->dataTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->dataTable->setIconSize(QSize(12, 12));
+    ui->dataTable->setMouseTracking(true);
 
-    ui->selectedDataItems->horizontalHeader()->setSectionResizeMode(selectedTableColColor, QHeaderView::Fixed);
     ui->selectedDataItems->horizontalHeader()->setSectionResizeMode(selectedTableColSeries, QHeaderView::Stretch);
     ui->selectedDataItems->horizontalHeader()->setSectionResizeMode(selectedTableColValue, QHeaderView::Fixed);
     ui->selectedDataItems->horizontalHeader()->setSectionResizeMode(selectedTableColScale, QHeaderView::Fixed);
     ui->selectedDataItems->horizontalHeader()->setSectionResizeMode(selectedTableColAxis, QHeaderView::Fixed);
     ui->selectedDataItems->horizontalHeader()->setSectionResizeMode(selectedTableColRemove, QHeaderView::Fixed);
-    ui->selectedDataItems->setColumnWidth(selectedTableColColor, 24);
-    ui->selectedDataItems->setColumnWidth(selectedTableColValue, 136);
-    ui->selectedDataItems->setColumnWidth(selectedTableColScale, 70);
-    ui->selectedDataItems->setColumnWidth(selectedTableColAxis, 48);
+    ui->selectedDataItems->setColumnWidth(selectedTableColValue, 100);
+    ui->selectedDataItems->setColumnWidth(selectedTableColScale, 64);
+    ui->selectedDataItems->setColumnWidth(selectedTableColAxis, 96);
     ui->selectedDataItems->setColumnWidth(selectedTableColRemove, 32);
-    ui->selectedDataItems->verticalHeader()->setVisible(false);
-    ui->selectedDataItems->verticalHeader()->setDefaultSectionSize(24);
+    ui->selectedDataItems->verticalHeader()->setDefaultSectionSize(34);
+    ui->selectedDataItems->setIconSize(QSize(12, 12));
     ui->selectedDataItems->setShowGrid(false);
     ui->selectedDataItems->setFocusPolicy(Qt::NoFocus);
+    ui->selectedDataItems->setVisible(false);
 
-    connect(ui->dataTable, &QTableWidget::itemChanged, [this](QTableWidgetItem *item) {
-        if (item->checkState() == Qt::Checked) {
-            if (item->column() == dataTableColY1){
-                ui->dataTable->item(item->row(), dataTableColY2)->setCheckState(Qt::Unchecked);
-            }
-            if (item->column() == dataTableColY2) {
-                ui->dataTable->item(item->row(), dataTableColY1)->setCheckState(Qt::Unchecked);
-            }
-        }
-        if (item->column() > dataTableColValue) {
-            updateGraphs();
-            updateSelectedDataItemValues();
-        }
+    // A left click on a series plots it, or removes it when it is plotted. The second click of a double
+    // click reports no click, so a double click toggles the series once. Space or Return toggles the
+    // current series.
+    connect(ui->dataTable, &QTableWidget::cellClicked, this, [this](int row) {
+        toggleSeries(row);
+    });
+
+    auto toggleShortcut = new QShortcut(ui->dataTable);
+    toggleShortcut->setKeys({QKeySequence(Qt::Key_Space), QKeySequence(Qt::Key_Return)});
+    toggleShortcut->setContext(Qt::WidgetShortcut);
+    connect(toggleShortcut, &QShortcut::activated, this, [this]() {
+        toggleSeries(ui->dataTable->currentRow());
+    });
+
+    // Time stamps cannot be plotted, so they do not show the hand
+    connect(ui->dataTable, &QTableWidget::cellEntered, this, [this](int row) {
+        ui->dataTable->viewport()->setCursor(ui->dataTable->item(row, dataTableColY1) ?
+                                                 Qt::PointingHandCursor : Qt::ArrowCursor);
     });
 
     m3dView = new Vesc3DView(this);
@@ -183,9 +196,14 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
         if (mVesc) {
             if (!mVesc->isPortConnected()) {
                 mVescLastPath.clear();
+                mVescLogListed = false;
                 if (ui->vescLogTable->rowCount() > 0) {
                     ui->vescLogTable->setRowCount(0);
                 }
+            } else if (!mVescLogListed && mVesc->fwRx() && ui->vescLogTable->isVisible()) {
+                // The logs on the device are listed once without a click on Refresh
+                mVescLogListed = true;
+                on_vescLogListRefreshButton_clicked();
             }
         }
     });
@@ -204,16 +222,29 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
         }
     });
 
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
-
-    ui->plot->legend->setVisible(false);
-    ui->plot->legend->setFont(legendFont);
-    ui->plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
+    Utility::setPlotLegendRow(ui->plot);
+    ui->plot->legend->setWrap(3);
+    on_showLegendBox_toggled(false);
     ui->plot->xAxis->setLabel("Seconds (s)");
+
+    mPlotHint = new QCPItemText(ui->plot);
+    mPlotHint->position->setType(QCPItemPosition::ptAxisRectRatio);
+    mPlotHint->position->setCoords(0.5, 0.5);
+    mPlotHint->setColor(Utility::getAppQColor("mutedText"));
+    mPlotHint->setText(tr("Open a log on the Source tab"));
+
+    // The range slider runs under the time axis: the ends of its handles sit under the start and end of the axis
+    connect(ui->plot, &QCustomPlot::afterLayout, this, [this]() {
+        QRect axis = ui->plot->axisRect()->rect();
+        int left = ui->plot->mapTo(ui->plotPane, axis.topLeft()).x() - 7;
+        int right = ui->plotPane->width() - ui->plot->mapTo(ui->plotPane, axis.topRight()).x() - 7;
+        left -= ui->playButton->width() + ui->rangeLayout->spacing();
+        ui->rangeLayout->setContentsMargins(qMax(0, left), 0, qMax(0, right), 0);
+    });
 
     mVerticalLine = new QCPCurve(ui->plot->xAxis, ui->plot->yAxis);
     mVerticalLine->removeFromLegend();
+    mVerticalLine->setVisible(false);
     mVerticalLine->setPen(QPen(Utility::getAppQColor("normalText")));
 
     auto updateMouse = [this](QMouseEvent *event) {
@@ -278,42 +309,8 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
         truncateDataAndPlot(ui->autoZoomBox->isChecked());
     });
 
-    connect(ui->dataTable, &QTableWidget::itemSelectionChanged, [this]() {
-        updateGraphs();
-        updateSelectedDataItems();
-    });
-
-    auto activateDataSeriesRows = [this](const QList<int> &rows) {
-        if (!ui->dataTable->selectionModel() || !ui->dataTable->model()) {
-            return;
-        }
-
-        foreach (int row, rows) {
-            if (row < 0 || row >= ui->dataTable->rowCount()) {
-                continue;
-            }
-
-            QTableWidgetItem *y1 = ui->dataTable->item(row, dataTableColY1);
-            QTableWidgetItem *y2 = ui->dataTable->item(row, dataTableColY2);
-
-            if (y1 && y2) {
-                if (y1->checkState() != Qt::Checked && y2->checkState() != Qt::Checked) {
-                    y1->setCheckState(Qt::Checked);
-                }
-            }
-
-            QModelIndex rowIndex = ui->dataTable->model()->index(row, dataTableColName);
-            ui->dataTable->selectionModel()->select(rowIndex,
-                                                    QItemSelectionModel::Select | QItemSelectionModel::Rows);
-        }
-    };
-
-    connect(ui->dataTable, &QTableWidget::cellDoubleClicked, [this](int row, int column) {
-        (void)column;
-
-        if (QToolButton *btn = qobject_cast<QToolButton*>(ui->dataTable->cellWidget(row, dataTableColAddButton))) {
-            btn->click();
-        }
+    connect(ui->playButton, &QPushButton::toggled, this, [this](bool checked) {
+        ui->playButton->setIcon(Utility::getIcon(checked ? "icons/pause.png" : "icons/Circled Play-96.png"));
     });
 
     connect(ui->filterOutlierBox, &QGroupBox::toggled, [this]() {
@@ -324,6 +321,7 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
         if (ui->pollGnssBox->isChecked()) {
             ui->map->setInfoTraceNow(2);
             ui->map->clearInfoTrace();
+            showMap(true);
         }
     });
 
@@ -349,6 +347,7 @@ PageLogAnalysis::PageLogAnalysis(QWidget *parent) :
     });
 
     on_gridBox_toggled(ui->gridBox->isChecked());
+    setFileButtonsEnabled(true);
     logListRefresh();
     on_logLocalRefreshButton_clicked();
 
@@ -412,6 +411,7 @@ void PageLogAnalysis::setVesc(VescInterface *vesc)
             restoreSelection();
 
             truncateDataAndPlot(ui->autoZoomBox->isChecked());
+            showMap(ui->map->getInfoPointsInTrace(0) > 0 || ui->pollGnssBox->isChecked());
 
             if (mInd_t_day >= 0 && !mLog.isEmpty()) {
                 updateDataAndPlot(mLog.last().at(mInd_t_day));
@@ -773,8 +773,7 @@ void PageLogAnalysis::loadVescLog(QVector<LOG_DATA> log)
     }
 
     restoreSelection();
-
-    truncateDataAndPlot();
+    showOpenedLog();
 }
 
 void PageLogAnalysis::on_openCsvButton_clicked()
@@ -917,35 +916,48 @@ void PageLogAnalysis::truncateDataAndPlot(bool zoomGraph)
 
 void PageLogAnalysis::updateGraphs()
 {
-    QSet<QModelIndex> uniqueRows;
-
-    auto selectedRows = ui->dataTable->selectionModel()->selectedRows();
-    foreach (const QModelIndex &index, selectedRows) {
-        uniqueRows.insert(index);
-    }
-
-    for (int row = 0; row < ui->dataTable->rowCount(); ++row) {
-        QTableWidgetItem *item;
-        item = ui->dataTable->item(row, dataTableColY1);
-        if (item && item->checkState() == Qt::Checked) {
-            uniqueRows.insert(ui->dataTable->model()->index(row, dataTableColName));
-        }
-        item = ui->dataTable->item(row, dataTableColY2);
-        if (item && item->checkState() == Qt::Checked) {
-            uniqueRows.insert(ui->dataTable->model()->index(row, dataTableColName));
+    // The plotted series in list order. Each keeps the colour it got when it was plotted.
+    QList<int> rows;
+    for (int row = 0;row < ui->dataTable->rowCount();row++) {
+        if (isPlotted(row)) {
+            rows.append(row);
         }
     }
 
-    auto rows = uniqueRows.values();
+    const QList<QColor> colors = {
+        Utility::getAppQColor("plot_graph1"), QColor(Qt::magenta), Utility::getAppQColor("plot_graph2"),
+        Utility::getAppQColor("plot_graph3"), QColor(Qt::cyan), Utility::getAppQColor("plot_graph4")
+    };
+
+    foreach (int row, mGraphRowColors.keys()) {
+        if (!rows.contains(row)) {
+            mGraphRowColors.remove(row);
+        }
+    }
+
+    foreach (int row, rows) {
+        if (!mGraphRowColors.contains(row)) {
+            QColor color = colors.at(mGraphRowColors.size() % colors.size());
+            foreach (auto c, colors) {
+                if (!mGraphRowColors.values().contains(c)) {
+                    color = c;
+                    break;
+                }
+            }
+            mGraphRowColors[row] = color;
+        }
+    }
+
+    QVector<double> scales;
+    foreach (int row, rows) {
+        auto sb = qobject_cast<QDoubleSpinBox*>(ui->dataTable->cellWidget(row, dataTableColScale));
+        scales.append(sb ? sb->value() : 1.0);
+    }
 
     QVector<double> xAxis;
-    QVector<QVector<double> > yAxes;
-    QVector<QString> names;
+    QVector<QVector<double> > yAxes(rows.size());
 
     double startTime = -1.0;
-    double verticalTime = -1.0;
-    LocPoint p, p2;
-
     double time = 0;
     foreach (const auto &d, mLogTruncated) {
         if (mInd_t_day >= 0) {
@@ -962,133 +974,91 @@ void PageLogAnalysis::updateGraphs()
         }
 
         xAxis.append(time);
-        int rowInd = 0;
 
-        for (int r = 0;r < rows.size();r++) {
-            int row = rows.at(r).row();
-            double rowScale = 1.0;
-            if(QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox*>
-                    (ui->dataTable->cellWidget(row, dataTableColScale))) {
-                rowScale = sb->value();
-            }
-
-            auto entry = d[row];
-            const auto &header = mLogHeader[row];
-
-            if (!header.isTimeStamp) {
-                if (yAxes.size() <= rowInd) yAxes.append(QVector<double>());
-                yAxes[rowInd].append(entry * rowScale);
-                names.append(QString("%1 (%2 * %3)").arg(header.name).
-                             arg(header.unit).arg(rowScale));
-                rowInd++;
-            }
+        for (int i = 0;i < rows.size();i++) {
+            yAxes[i].append(d[rows.at(i)] * scales.at(i));
         }
     }
 
     ui->plot->clearGraphs();
     ui->plot->yAxis2->setVisible(false);
-    mGraphRowColors.clear();
 
-    for (int i = 0;i < yAxes.size();i++) {
-        QPen pen = QPen(Utility::getAppQColor("plot_graph1"));
+    for (int i = 0;i < rows.size();i++) {
+        int row = rows.at(i);
+        const auto &header = mLogHeader[row];
 
-        if (i == 1) {
-            pen = QPen(Qt::magenta);
-        } else if (i == 2) {
-            pen = QPen(Utility::getAppQColor("plot_graph2"));
-        } else if (i == 3) {
-            pen = QPen(Utility::getAppQColor("plot_graph3"));
-        } else if (i == 4) {
-            pen = QPen(Qt::cyan);
-        } else if (i == 5) {
-            pen = QPen(Utility::getAppQColor("plot_graph4"));
-        }
-
-        auto row = rows.at(i).row();
-
-        bool y2Axis = false;
-        
-        if(QTableWidgetItem *y2Widget = ui->dataTable->item(row, dataTableColY2)) {
-            y2Axis = (y2Widget->checkState() == Qt::Checked);
-        }
-
-        if(y2Axis){
+        if (ui->dataTable->item(row, dataTableColY2)->checkState() == Qt::Checked) {
             ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis2);
             ui->plot->yAxis2->setVisible(true);
-        } else{
+        } else {
             ui->plot->addGraph();
         }
 
-        ui->plot->graph(i)->setPen(pen);
-        ui->plot->graph(i)->setName(names.at(i));
+        // The legend names the unit, the scale when it is not 1 and the right axis
+        QString unit = header.unit;
+        if (scales.at(i) != 1.0) {
+            unit += QString(" * %1").arg(scales.at(i));
+        }
+        if (ui->plot->graph(i)->valueAxis() == ui->plot->yAxis2) {
+            unit += unit.isEmpty() ? tr("right") : tr(", right");
+        }
+
+        ui->plot->graph(i)->setPen(QPen(mGraphRowColors.value(row)));
+        ui->plot->graph(i)->setName(unit.isEmpty() ? header.name : QString("%1 (%2)").arg(header.name, unit));
         ui->plot->graph(i)->setData(xAxis, yAxes.at(i));
-        mGraphRowColors[row] = pen.color();
     }
 
+    // A plotted series has a swatch in the colour of its trace and a row tinted with it
+    {
+        QSignalBlocker block(ui->dataTable);
+        for (int row = 0;row < ui->dataTable->rowCount();row++) {
+            QColor color = mGraphRowColors.value(row, Qt::transparent);
+            // Saturated colours get a lighter tint, so that all tints read about as strong
+            QColor tint = color;
+            tint.setAlphaF(0.16 - 0.06 * color.hslSaturationF());
+            QBrush background = mGraphRowColors.contains(row) ? QBrush(tint) : QBrush();
+            ui->dataTable->item(row, dataTableColName)->setIcon(swatchIcon(color));
+            ui->dataTable->item(row, dataTableColName)->setBackground(background);
+            ui->dataTable->item(row, dataTableColValue)->setBackground(background);
+        }
+    }
+
+    // The cursor line is left out of the rescale and drawn again over the new range
+    bool cursorShown = mVerticalLine->visible();
     mVerticalLine->setVisible(false);
 
-    if (yAxes.size() > 0) {
+    if (rows.size() > 0) {
         ui->plot->rescaleAxes(true);
     } else if (xAxis.size() >= 2) {
         ui->plot->xAxis->setRangeLower(xAxis.first());
         ui->plot->xAxis->setRangeUpper(xAxis.last());
     }
 
-    if (verticalTime >= 0) {
-        QVector<double> x(2) , y(2);
-        x[0] = verticalTime; y[0] = ui->plot->yAxis->range().lower;
-        x[1] = verticalTime; y[1] = ui->plot->yAxis->range().upper;
-        mVerticalLine->setData(x, y);
-        mVerticalLine->setVisible(true);
-    }
+    mPlotHint->setVisible(rows.isEmpty());
+    mPlotHint->setText(tr("Click a series on the Data tab to plot it"));
+    ui->playButton->setEnabled(!mLogTruncated.isEmpty());
+    ui->showLegendBox->setEnabled(!mLogTruncated.isEmpty());
 
     ui->plot->replotWhenVisible();
+    updateSelectedDataItemValues();
+
+    if (cursorShown) {
+        updateDataAndPlot(mPlayPosNow);
+    }
 }
 
 void PageLogAnalysis::updateSelectedDataItems()
 {
-    QSet<int> rowsToShow;
-    for (int row = 0; row < ui->dataTable->rowCount(); ++row) {
-        QTableWidgetItem *y1Item = ui->dataTable->item(row, dataTableColY1);
-        QTableWidgetItem *y2Item = ui->dataTable->item(row, dataTableColY2);
-
-        if ((y1Item && y1Item->checkState() == Qt::Checked) ||
-            (y2Item && y2Item->checkState() == Qt::Checked)) {
-            rowsToShow.insert(row);
-        }
-    }
-
-    QList<int> rows = rowsToShow.values();
-    std::sort(rows.begin(), rows.end());
-
     ui->selectedDataItems->setUpdatesEnabled(false);
     ui->selectedDataItems->setRowCount(0);
 
-    foreach (int sourceRow, rows) {
-        auto nameItem = ui->dataTable->item(sourceRow, dataTableColName);
-        auto scaleSource = qobject_cast<QDoubleSpinBox*>(ui->dataTable->cellWidget(sourceRow, dataTableColScale));
-
-        if (!nameItem) {
+    for (int sourceRow = 0;sourceRow < ui->dataTable->rowCount();sourceRow++) {
+        if (!isPlotted(sourceRow)) {
             continue;
         }
 
         int row = ui->selectedDataItems->rowCount();
         ui->selectedDataItems->insertRow(row);
-
-        auto colorWidget = new QWidget(ui->selectedDataItems);
-        auto colorLayout = new QHBoxLayout(colorWidget);
-        colorLayout->setContentsMargins(4, 0, 4, 0);
-        colorLayout->setSpacing(0);
-
-        auto colorSwatch = new QLabel(colorWidget);
-        colorSwatch->setObjectName("graphColorSwatch");
-        colorSwatch->setFixedSize(12, 7);
-
-        colorLayout->addStretch(1);
-        colorLayout->addWidget(colorSwatch);
-        colorLayout->addStretch(1);
-
-        ui->selectedDataItems->setCellWidget(row, selectedTableColColor, colorWidget);
 
         auto seriesItem = new QTableWidgetItem();
         seriesItem->setFlags(Qt::ItemIsEnabled);
@@ -1101,265 +1071,164 @@ void PageLogAnalysis::updateSelectedDataItems()
         valueCellItem->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
         ui->selectedDataItems->setItem(row, selectedTableColValue, valueCellItem);
 
-        if (scaleSource) {
-            auto scaleWidget = new QWidget(ui->selectedDataItems);
-            auto scaleLayout = new QHBoxLayout(scaleWidget);
-            scaleLayout->setContentsMargins(2, 0, 2, 0);
-            scaleLayout->setSpacing(4);
+        auto scaleBox = new QDoubleSpinBox();
+        scaleBox->setObjectName("selectedScaleControl");
+        scaleBox->setToolTip(tr("Scale"));
+        connect(scaleBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this, sourceRow](double value) {
+            if (QDoubleSpinBox *source = qobject_cast<QDoubleSpinBox*>(ui->dataTable->cellWidget(sourceRow, dataTableColScale))) {
+                source->setValue(value);
+            }
+        });
+        ui->selectedDataItems->setCellWidget(row, selectedTableColScale, scaleBox);
 
-            auto scaleLabel = new QLabel(QString::fromUtf8("×"), scaleWidget);
-            scaleLabel->setAlignment(Qt::AlignCenter);
-            scaleLabel->setFixedWidth(10);
-
-            auto scaleBox = new QDoubleSpinBox(scaleWidget);
-            scaleBox->setObjectName("selectedScaleControl");
-            scaleBox->setDecimals(scaleSource->decimals());
-            scaleBox->setMinimum(scaleSource->minimum());
-            scaleBox->setMaximum(scaleSource->maximum());
-            scaleBox->setSingleStep(scaleSource->singleStep());
-            scaleBox->setValue(scaleSource->value());
-            scaleBox->setAlignment(Qt::AlignRight);
-            scaleBox->setButtonSymbols(QAbstractSpinBox::NoButtons);
-
-            connect(scaleBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this, sourceRow](double value) {
-                if (QDoubleSpinBox *source = qobject_cast<QDoubleSpinBox*>(ui->dataTable->cellWidget(sourceRow, dataTableColScale))) {
-                    source->setValue(value);
-                }
-            });
-
-            scaleLayout->addWidget(scaleBox, 1);
-            scaleLayout->addWidget(scaleLabel);
-            ui->selectedDataItems->setCellWidget(row, selectedTableColScale, scaleWidget);
-        } else {
-            auto scaleItem = new QTableWidgetItem("-");
-            scaleItem->setTextAlignment(Qt::AlignCenter);
-            scaleItem->setFlags(Qt::ItemIsEnabled);
-            ui->selectedDataItems->setItem(row, selectedTableColScale, scaleItem);
-        }
-
-        auto createAxisIcon = [](bool rightSide) {
-            QPixmap px(32, 32);
-            int width = 32;
-            int height = 32;
-            px.fill(Qt::transparent);
-
-            QPainter p(&px);
-            p.setRenderHint(QPainter::Antialiasing, true);
-            QColor c = Utility::getAppQColor("normalText");
-            p.setPen(QPen(c, 2.0));
-
-            // Draw Y axis
-            int margin = 5;
-            int yAxisX = rightSide ? width - margin: margin;
-            p.drawLine(yAxisX, margin, yAxisX, height - margin);
-
-            // Draw X axis
-            p.drawLine(margin,  height - margin, width - margin, height-margin);
-
-            p.setPen(QPen(c, 1.0));
-            // Draw ticks
-            int tick1 = 1 * height/4;
-            int tick2 = 2 * height/4;
-            int tick3 = 3 * height/4;
-            int tickWidth = 4;
-            int tickStartX = yAxisX - tickWidth;
-            int tickEndX = yAxisX + tickWidth;
-            
-            p.drawLine(tickStartX, tick1, tickEndX, tick1);
-            p.drawLine(tickStartX, tick2, tickEndX, tick2);
-            p.drawLine(tickStartX, tick3, tickEndX, tick3);
-
-            return QIcon(px);
-        };
-
-        auto axisWidget = new QWidget(ui->selectedDataItems);
-        axisWidget->setObjectName("axisPill");
+        // Left or right Y axis, one of them always checked
+        auto axisWidget = new QWidget();
         auto axisLayout = new QHBoxLayout(axisWidget);
-        axisLayout->setContentsMargins(1, 0, 1, 0);
-        axisLayout->setSpacing(0);
+        axisLayout->setContentsMargins(0, 0, 0, 0);
+        auto axisFrame = new QFrame();
+        axisFrame->setProperty("seg", true);
+        auto segLayout = new QHBoxLayout(axisFrame);
+        segLayout->setContentsMargins(2, 2, 2, 2);
+        segLayout->setSpacing(2);
+        axisLayout->addWidget(axisFrame, 0, Qt::AlignCenter);
 
-        auto axisLeft = new QToolButton(axisWidget);
+        auto axisLeft = new QToolButton();
         axisLeft->setObjectName("axisLeftButton");
-        axisLeft->setToolTip("Plot on left Y axis");
+        axisLeft->setText(tr("Left"));
+        axisLeft->setToolTip(tr("Plot on left Y axis"));
         axisLeft->setCheckable(true);
-        axisLeft->setAutoRaise(true);
-        axisLeft->setIcon(createAxisIcon(false));
-        axisLeft->setIconSize(QSize(32, 32));
-        axisLeft->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        // axisLeft->setMinimumWidth(42);
-        axisLeft->setFixedHeight(16);
+        axisLeft->setAutoExclusive(true);
+        segLayout->addWidget(axisLeft);
 
-        auto axisRight = new QToolButton(axisWidget);
+        auto axisRight = new QToolButton();
         axisRight->setObjectName("axisRightButton");
-        axisRight->setToolTip("Plot on right Y axis");
+        axisRight->setText(tr("Right"));
+        axisRight->setToolTip(tr("Plot on right Y axis"));
         axisRight->setCheckable(true);
-        axisRight->setAutoRaise(true);
-        axisRight->setIcon(createAxisIcon(true));
-        axisRight->setIconSize(QSize(32, 32));
-        axisRight->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        // axisRight->setMinimumWidth(42);
-        axisRight->setFixedHeight(16);
+        axisRight->setAutoExclusive(true);
+        segLayout->addWidget(axisRight);
 
-        axisWidget->setFixedHeight(18);
-
-        QColor axisBorder = Utility::getAppQColor("normalText");
-        axisWidget->setStyleSheet(QString(
-            "QWidget#axisPill { border: 2px; border-radius: 5px; }"
-            "QToolButton { border: none; padding: 0px 0px; }"
-            "QToolButton#axisLeftButton  { border-top-left-radius:  5px; border-bottom-left-radius:  5px; }"
-            "QToolButton#axisRightButton { border-top-right-radius: 5px; border-bottom-right-radius: 5px; }"
-            "QToolButton:checked { background: palette(highlight); color: palette(highlighted-text); }"));
-
-        connect(axisLeft, &QToolButton::toggled, this, [this, sourceRow, axisLeft, axisRight](bool checked) {
-            if (!checked) {
-                axisLeft->setChecked(true);
-                return;
+        connect(axisRight, &QToolButton::toggled, this, [this, sourceRow](bool right) {
+            {
+                QSignalBlocker block(ui->dataTable);
+                ui->dataTable->item(sourceRow, dataTableColY1)->setCheckState(right ? Qt::Unchecked : Qt::Checked);
+                ui->dataTable->item(sourceRow, dataTableColY2)->setCheckState(right ? Qt::Checked : Qt::Unchecked);
             }
-
-            QSignalBlocker block(axisRight);
-            axisRight->setChecked(false);
-
-            QTableWidgetItem *y1 = ui->dataTable->item(sourceRow, dataTableColY1);
-            QTableWidgetItem *y2 = ui->dataTable->item(sourceRow, dataTableColY2);
-            if (!y1 || !y2) {
-                return;
-            }
-
-            y1->setCheckState(Qt::Checked);
-            y2->setCheckState(Qt::Unchecked);
+            updateGraphs();
         });
 
-        connect(axisRight, &QToolButton::toggled, this, [this, sourceRow, axisLeft, axisRight](bool checked) {
-            if (!checked) {
-                axisRight->setChecked(true);
-                return;
-            }
-
-            QSignalBlocker block(axisLeft);
-            axisLeft->setChecked(false);
-
-            QTableWidgetItem *y1 = ui->dataTable->item(sourceRow, dataTableColY1);
-            QTableWidgetItem *y2 = ui->dataTable->item(sourceRow, dataTableColY2);
-            if (!y1 || !y2) {
-                return;
-            }
-
-            y2->setCheckState(Qt::Checked);
-            y1->setCheckState(Qt::Unchecked);
-        });
-
-        axisLayout->addWidget(axisLeft);
-        axisLayout->addWidget(axisRight);
         ui->selectedDataItems->setCellWidget(row, selectedTableColAxis, axisWidget);
 
-        auto removeButton = new QToolButton(ui->selectedDataItems);
+        auto removeButton = new QToolButton();
         removeButton->setObjectName("removeSeriesButton");
-        removeButton->setText("×");
-        removeButton->setAutoRaise(true);
-        removeButton->setToolTip("Remove this data series");
+        removeButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
+        removeButton->setToolTip(tr("Remove this data series"));
 
         connect(removeButton, &QToolButton::clicked, this, [this, sourceRow]() {
-            if (QToolButton *btn = qobject_cast<QToolButton*>(ui->dataTable->cellWidget(sourceRow, dataTableColAddButton))) {
-                btn->click();
-            }
+            toggleSeries(sourceRow);
         });
 
         ui->selectedDataItems->setCellWidget(row, selectedTableColRemove, removeButton);
     }
 
+    bool empty = ui->selectedDataItems->rowCount() == 0;
+    ui->selectedDataItems->setVisible(!empty);
+    ui->plotHint->setVisible(empty);
+
     updateSelectedDataItemValues();
     ui->selectedDataItems->setUpdatesEnabled(true);
-    ui->selectedDataItems->viewport()->update();
 }
 
 void PageLogAnalysis::updateSelectedDataItemValues()
 {
-    if (ui->selectedDataItems->rowCount() == 0) {
+    for (int row = 0; row < ui->selectedDataItems->rowCount(); ++row) {
+        auto seriesItem = ui->selectedDataItems->item(row, selectedTableColSeries);
+        int sourceRow = seriesItem->data(Qt::UserRole).toInt();
+
+        seriesItem->setText(ui->dataTable->item(sourceRow, dataTableColName)->text());
+        seriesItem->setIcon(swatchIcon(mGraphRowColors.value(sourceRow, Qt::transparent)));
+        ui->selectedDataItems->item(row, selectedTableColValue)->setText(
+                    ui->dataTable->item(sourceRow, dataTableColValue)->text());
+
+        if (QWidget *axisWidget = ui->selectedDataItems->cellWidget(row, selectedTableColAxis)) {
+            QSignalBlocker blockLeft(axisWidget->findChild<QToolButton*>("axisLeftButton"));
+            QSignalBlocker blockRight(axisWidget->findChild<QToolButton*>("axisRightButton"));
+            bool right = ui->dataTable->item(sourceRow, dataTableColY2)->checkState() == Qt::Checked;
+            axisWidget->findChild<QToolButton*>(right ? "axisRightButton" : "axisLeftButton")->setChecked(true);
+        }
+
+        auto scaleBox = qobject_cast<QDoubleSpinBox*>(ui->selectedDataItems->cellWidget(row, selectedTableColScale));
+        auto source = qobject_cast<QDoubleSpinBox*>(ui->dataTable->cellWidget(sourceRow, dataTableColScale));
+        if (scaleBox && source) {
+            QSignalBlocker blockScale(scaleBox);
+            scaleBox->setDecimals(source->decimals());
+            scaleBox->setMinimum(source->minimum());
+            scaleBox->setMaximum(source->maximum());
+            scaleBox->setSingleStep(source->singleStep());
+            scaleBox->setValue(source->value());
+        }
+    }
+}
+
+void PageLogAnalysis::toggleSeries(int row)
+{
+    QTableWidgetItem *y1 = ui->dataTable->item(row, dataTableColY1);
+    QTableWidgetItem *y2 = ui->dataTable->item(row, dataTableColY2);
+
+    // Time stamps are not plotted
+    if (!y1 || !y2) {
         return;
     }
 
-    ui->selectedDataItems->setUpdatesEnabled(false);
+    bool plot = !isPlotted(row);
 
-    for (int row = 0; row < ui->selectedDataItems->rowCount(); ++row) {
-        auto seriesItem = ui->selectedDataItems->item(row, selectedTableColSeries);
-        if (!seriesItem) {
-            continue;
-        }
-
-        int sourceRow = seriesItem->data(Qt::UserRole).toInt();
-        if (sourceRow < 0 || sourceRow >= ui->dataTable->rowCount()) {
-            continue;
-        }
-
-        auto nameItem = ui->dataTable->item(sourceRow, dataTableColName);
-        auto valueItem = ui->dataTable->item(sourceRow, dataTableColValue);
-
-        if (nameItem) {
-            seriesItem->setText(nameItem->text());
-        } else {
-            seriesItem->setText(QString());
-        }
-
-        auto selectedValueItem = ui->selectedDataItems->item(row, selectedTableColValue);
-        if (selectedValueItem) {
-            QString valueText = valueItem ? valueItem->text() : QString();
-            if (!valueText.isEmpty()) {
-                valueText = QString::fromUtf8("\u2009") + valueText + QString::fromUtf8("\u2009");
-            }
-            selectedValueItem->setText(valueText);
-        }
-
-        if (QWidget *colorWidget = ui->selectedDataItems->cellWidget(row, selectedTableColColor)) {
-            if (QLabel *swatch = colorWidget->findChild<QLabel*>("graphColorSwatch")) {
-                QColor graphColor = mGraphRowColors.value(sourceRow, Utility::getAppQColor("normalText"));
-                QColor swatchBorder = Utility::getAppQColor("normalText");
-                swatch->setStyleSheet(QString("background: %1; border: 1px solid rgba(%2, %3, %4, 85); border-radius: 4px;")
-                                      .arg(graphColor.name(QColor::HexRgb))
-                                      .arg(swatchBorder.red())
-                                      .arg(swatchBorder.green())
-                                      .arg(swatchBorder.blue()));
-                swatch->setToolTip(graphColor.name(QColor::HexRgb));
-            }
-        }
-
-        QTableWidgetItem *y1Item = ui->dataTable->item(sourceRow, dataTableColY1);
-        QTableWidgetItem *y2Item = ui->dataTable->item(sourceRow, dataTableColY2);
-        bool hasAxisToggle = (y1Item != nullptr && y2Item != nullptr);
-
-        if (QWidget *axisWidget = ui->selectedDataItems->cellWidget(row, selectedTableColAxis)) {
-            auto axisLeft = axisWidget->findChild<QToolButton*>("axisLeftButton");
-            auto axisRight = axisWidget->findChild<QToolButton*>("axisRightButton");
-
-            if (axisLeft && axisRight) {
-                axisLeft->setEnabled(hasAxisToggle);
-                axisRight->setEnabled(hasAxisToggle);
-
-                QSignalBlocker blockLeft(axisLeft);
-                QSignalBlocker blockRight(axisRight);
-                bool y2Checked = hasAxisToggle && y2Item->checkState() == Qt::Checked;
-                axisRight->setChecked(y2Checked);
-                axisLeft->setChecked(!y2Checked);
-            }
-        }
-
-        if (QWidget *scaleWidget = ui->selectedDataItems->cellWidget(row, selectedTableColScale)) {
-            if (QDoubleSpinBox *scaleBox = scaleWidget->findChild<QDoubleSpinBox*>("selectedScaleControl")) {
-                if (QDoubleSpinBox *source = qobject_cast<QDoubleSpinBox*>(ui->dataTable->cellWidget(sourceRow, dataTableColScale))) {
-                    QSignalBlocker blockScale(scaleBox);
-                    scaleBox->setDecimals(source->decimals());
-                    scaleBox->setMinimum(source->minimum());
-                    scaleBox->setMaximum(source->maximum());
-                    scaleBox->setSingleStep(source->singleStep());
-                    scaleBox->setValue(source->value());
-                    scaleBox->setEnabled(true);
-                } else {
-                    scaleBox->setEnabled(false);
-                }
-            }
-        }
+    {
+        QSignalBlocker block(ui->dataTable);
+        y1->setCheckState(plot ? Qt::Checked : Qt::Unchecked);
+        y2->setCheckState(Qt::Unchecked);
     }
 
-    ui->selectedDataItems->setUpdatesEnabled(true);
+    updateGraphs();
+    updateSelectedDataItems();
+}
+
+bool PageLogAnalysis::isPlotted(int row)
+{
+    QTableWidgetItem *y1 = ui->dataTable->item(row, dataTableColY1);
+    QTableWidgetItem *y2 = ui->dataTable->item(row, dataTableColY2);
+    return (y1 && y1->checkState() == Qt::Checked) || (y2 && y2->checkState() == Qt::Checked);
+}
+
+// Shows a newly opened log over its whole range, with the Data tab in front when nothing is plotted yet
+void PageLogAnalysis::showOpenedLog()
+{
+    {
+        QSignalBlocker block(ui->spanSlider);
+        ui->spanSlider->alt_setValue(0);
+        ui->spanSlider->setValue(10000);
+    }
+
+    mVerticalLine->setVisible(false);
+    truncateDataAndPlot();
+    showMap(ui->map->getInfoPointsInTrace(0) > 0);
+
+    if (ui->selectedDataItems->rowCount() == 0) {
+        ui->tabWidget->setCurrentWidget(ui->tab);
+    }
+}
+
+// The map gives its room to the plot when the log has no positions
+void PageLogAnalysis::showMap(bool show)
+{
+    auto sizes = ui->mapSplitter->sizes();
+    if (show != (sizes.first() > 0)) {
+        int total = qMax(20, sizes.first() + sizes.last());
+        ui->mapSplitter->setSizes(show ? QList<int>({total * 9 / 20, total - total * 9 / 20}) : QList<int>({0, total}));
+
+        if (show) {
+            ui->map->zoomInOnInfoTrace(-1, 0.1);
+        }
+    }
 }
 
 void PageLogAnalysis::updateStats()
@@ -1457,8 +1326,8 @@ void PageLogAnalysis::updateStats()
     ui->statTable->item(8, 1)->setText(QString::number(ahCharge, 'f', 2) + " Ah");
     ui->statTable->item(9, 1)->setText(QString::number(3.6 * metersAbs / (double(timeTotMs) / 1000.0), 'f', 2) + " km/h");
     ui->statTable->item(10, 1)->setText(QString::number(3.6 * metersGnss / (double(timeTotMs) / 1000.0), 'f', 2) + " km/h");
-    ui->statTable->item(11, 1)->setText(QString::number((wh - whCharge) / (metersAbs / 1000.0), 'f', 2) + " wh/km");
-    ui->statTable->item(12, 1)->setText(QString::number((wh - whCharge) / (metersGnss / 1000.0), 'f', 2) + " wh/km");
+    ui->statTable->item(11, 1)->setText(QString::number((wh - whCharge) / (metersAbs / 1000.0), 'f', 2) + " Wh/km");
+    ui->statTable->item(12, 1)->setText(QString::number((wh - whCharge) / (metersGnss / 1000.0), 'f', 2) + " Wh/km");
     ui->statTable->item(13, 1)->setText(QString::number(double(samples) / (double(timeTotMs) / 1000.0), 'f', 2) + " Hz");
 }
 
@@ -1695,7 +1564,6 @@ void PageLogAnalysis::addDataItem(QString name, bool hasScale, double scaleStep,
                 [this](double value) {
                     (void)value;
                     updateGraphs();
-                    updateSelectedDataItemValues();
                 });
 
         // Y1
@@ -1707,31 +1575,12 @@ void PageLogAnalysis::addDataItem(QString name, bool hasScale, double scaleStep,
         QTableWidgetItem *y2Item = new QTableWidgetItem("");
         y2Item->setCheckState(Qt::Unchecked);
         ui->dataTable->setItem(currentRow, dataTableColY2, y2Item);
-
-        QToolButton *addButton = new QToolButton();
-        addButton->setText("+");
-        connect(addButton, &QToolButton::clicked, [this, y1Item, y2Item, currentRow, addButton]() {
-            auto selection = QItemSelectionModel::Select | QItemSelectionModel::Rows;
-
-            if (y1Item->checkState() == Qt::Unchecked && y2Item->checkState() == Qt::Unchecked) {
-                y1Item->setCheckState(Qt::Checked);
-                addButton->setText("-");
-            } else {
-                y1Item->setCheckState(Qt::Unchecked);
-                y2Item->setCheckState(Qt::Unchecked);
-                selection = QItemSelectionModel::Deselect | QItemSelectionModel::Rows;
-                addButton->setText("+");
-            }
-
-            QModelIndex rowIndex = ui->dataTable->model()->index(currentRow, dataTableColName);
-            ui->dataTable->selectionModel()->select(rowIndex, selection);
-            updateSelectedDataItems();
-        });
-
-        ui->dataTable->setCellWidget(currentRow, dataTableColAddButton, addButton);
-
     } else {
         ui->dataTable->setItem(currentRow, dataTableColScale, new QTableWidgetItem("N/A"));
+
+        // Time stamps cannot be plotted, so they do not light up under the mouse
+        nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEnabled);
+        valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEnabled);
     }
 }
 
@@ -1817,8 +1666,7 @@ void PageLogAnalysis::openLog(QString name, QByteArray data)
         }
 
         restoreSelection();
-
-        truncateDataAndPlot();
+        showOpenedLog();
     }
 }
 
@@ -1909,8 +1757,11 @@ void PageLogAnalysis::generateMissingEntries()
                 i_llh[2] = alt;
             }
 
-            // Use first point when hacc is not available
-            if (mInd_gnss_h_acc < 0) {
+            // Use first point with a position when hacc is not available
+            if (mInd_gnss_h_acc < 0 && (lat != 0.0 || lon != 0.0)) {
+                i_llh[0] = lat;
+                i_llh[1] = lon;
+                i_llh[2] = alt;
                 break;
             }
         }
@@ -1966,7 +1817,10 @@ void PageLogAnalysis::generateMissingEntries()
                     hacc = mLog.at(i).at(mInd_gnss_h_acc);
                 }
 
-                if (hacc > 0.0 && (!ui->filterOutlierBox->isChecked() ||
+                // Without hacc every point with a position counts
+                bool valid = mInd_gnss_h_acc >= 0 ? hacc > 0.0 : (lat != 0.0 || lon != 0.0);
+
+                if (valid && (!ui->filterOutlierBox->isChecked() ||
                                    (
                                        hacc < ui->filterhAccBox->value()) &&
                                        Utility::distLlhToLlh(lat, lon, alt, i_llh[0], i_llh[1], i_llh[2]) <
@@ -2014,14 +1868,8 @@ void PageLogAnalysis::generateMissingEntries()
 
 void PageLogAnalysis::storeSelection()
 {
-    mSelection.dataLabels.clear();
     mSelection.checkedY1Boxes.clear();
     mSelection.checkedY2Boxes.clear();
-
-    // Selected rows
-    foreach (auto i, ui->dataTable->selectionModel()->selectedRows()) {
-        mSelection.dataLabels.append(ui->dataTable->item(i.row(), dataTableColName)->text());
-    }
 
     // Selected y1 and y2 boxes
     for (int row = 0; row < ui->dataTable->rowCount(); row++) {
@@ -2043,21 +1891,13 @@ void PageLogAnalysis::storeSelection()
 
 void PageLogAnalysis::restoreSelection()
 {
-    ui->dataTable->clearSelection();
-    auto modeOld = ui->dataTable->selectionMode();
-    ui->dataTable->setSelectionMode(QAbstractItemView::MultiSelection);
+    QSignalBlocker block(ui->dataTable);
+    mGraphRowColors.clear();
+
     for (int row = 0;row < ui->dataTable->rowCount();row++) {
         auto rowText = ui->dataTable->item(row, dataTableColName)->text();
-        bool selected = false;
         bool checkedY1 = false;
         bool checkedY2 = false;
-
-        foreach (auto i, mSelection.dataLabels) {
-            if (rowText == i) {
-                selected = true;
-                break;
-            }
-        }
 
         foreach (auto i, mSelection.checkedY1Boxes) {
             if (rowText == i) {
@@ -2073,10 +1913,6 @@ void PageLogAnalysis::restoreSelection()
             }
         }
 
-        if (selected) {
-            ui->dataTable->selectRow(row);
-        }
-
         if (checkedY1) {
             ui->dataTable->item(row, dataTableColY1)->setCheckState(Qt::Checked);
         }
@@ -2085,7 +1921,6 @@ void PageLogAnalysis::restoreSelection()
             ui->dataTable->item(row, dataTableColY2)->setCheckState(Qt::Checked);
         }
     }
-    ui->dataTable->setSelectionMode(modeOld);
     ui->dataTable->verticalScrollBar()->setValue(mSelection.scrollPos);
     updateSelectedDataItems();
 }
@@ -2097,6 +1932,10 @@ void PageLogAnalysis::setFileButtonsEnabled(bool en)
     ui->vescLogListRefreshButton->setEnabled(en);
     ui->vescLogDeleteButton->setEnabled(en);
     ui->vescUpButton->setEnabled(en);
+
+    // The transfer progress shows while the buttons wait for it
+    ui->vescDisplay->setVisible(!en);
+    ui->vescLogCancelButton->setVisible(!en);
 }
 
 void PageLogAnalysis::on_saveMapPdfButton_clicked()
@@ -2524,7 +2363,15 @@ void PageLogAnalysis::on_logLocalDeleteButton_clicked()
 
 void PageLogAnalysis::on_showLegendBox_toggled(bool checked)
 {
+    // The legend leaves its row above the plot while it is hidden, so that the row takes no room
+    auto legendRow = qobject_cast<QCPLayoutGrid*>(ui->plot->plotLayout()->element(0, 0));
+    if (checked) {
+        legendRow->addElement(0, 0, ui->plot->legend);
+    } else {
+        legendRow->take(ui->plot->legend);
+    }
+
     ui->plot->legend->setVisible(checked);
-    updateGraphs();
+    ui->plot->replotWhenVisible();
 }
 

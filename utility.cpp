@@ -18,10 +18,12 @@
     */
 
 #include "utility.h"
+#include "widgets/vtextbrowser.h"
 #ifdef Q_OS_IOS
 #include "ios/src/setIosParameters.h"
 #endif
 #include <cmath>
+#include <QScrollBar>
 #include <QtMath>
 #include <QProgressDialog>
 #include <QEventLoop>
@@ -39,6 +41,10 @@
 #include <QDirIterator>
 #include <QPixmapCache>
 #include <QPainter>
+#include <QAbstractSpinBox>
+#include <QLineEdit>
+#include <QLabel>
+#include <QHBoxLayout>
 
 #include "maddy/parser.h"
 #include "heatshrink/heatshrinkif.h"
@@ -48,6 +54,95 @@
 #include <QJniObject>
 #include <QJniEnvironment>
 #endif
+
+namespace {
+// A dot at the newest point of each line of a plot
+class EndDots : public QCPLayerable
+{
+public:
+    EndDots(QCustomPlot *plot) : QCPLayerable(plot, "axes")
+    {
+        setObjectName("endDots");
+    }
+
+protected:
+    void applyDefaultAntialiasingHint(QCPPainter *painter) const override
+    {
+        painter->setAntialiasing(true);
+    }
+
+    void draw(QCPPainter *painter) override
+    {
+        painter->setPen(Qt::NoPen);
+        for (int i = 0;i < mParentPlot->graphCount();i++) {
+            QCPGraph *graph = mParentPlot->graph(i);
+            if (graph->realVisibility() && graph->lineStyle() != QCPGraph::lsNone && !graph->data()->isEmpty()) {
+                auto last = graph->data()->constEnd() - 1;
+                QPointF end = graph->coordsToPixels(last->key, last->value);
+                if (QRectF(graph->keyAxis()->axisRect()->rect()).adjusted(-1, -1, 1, 1).contains(end)) {
+                    painter->setBrush(graph->pen().color());
+                    painter->drawEllipse(end, 3, 3);
+                }
+            }
+        }
+    }
+};
+
+// Entry of a plot legend: a swatch in the color of the trace, which glows in the dark theme, and the name. What
+// follows three spaces in the name is a value and is brighter.
+class LegendEntry : public QCPPlottableLegendItem
+{
+public:
+    using QCPPlottableLegendItem::QCPPlottableLegendItem;
+
+protected:
+    void draw(QCPPainter *painter) override
+    {
+        bool shown = mPlottable->realVisibility();
+        QColor color = shown ? mPlottable->pen().color() : Utility::getAppQColor("disabledText");
+        QStringList text = mPlottable->name().split("   ");
+        QLineF swatch(mRect.left() + 9, mRect.center().y() + 0.5, mRect.left() + 18, mRect.center().y() + 0.5);
+
+        painter->setAntialiasing(true);
+        if (shown && Utility::isDarkMode()) {
+            // The halo is thin rings on top of each other, so that it fades out like a blur
+            for (double r = 7.0;r > 0.0;r -= 0.5) {
+                QColor glow = color;
+                glow.setAlphaF(0.55 * (exp(-r * r / 16.0) - exp(-(r + 0.5) * (r + 0.5) / 16.0)));
+                painter->setPen(QPen(glow, 3.0 + 2.0 * r, Qt::SolidLine, Qt::RoundCap));
+                painter->drawLine(swatch);
+            }
+        }
+        painter->setPen(QPen(color, 3, Qt::SolidLine, Qt::RoundCap));
+        painter->drawLine(swatch);
+
+        QFont font = getFont();
+        QRectF rect = mRect.adjusted(28, 0, 0, 0);
+        painter->setFont(font);
+        painter->setPen(Utility::getAppQColor(shown ? "lightText" : "disabledText"));
+        painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, text.first());
+        if (text.size() > 1) {
+            rect.setLeft(rect.left() + QFontMetrics(font).horizontalAdvance(text.first()) + 8);
+            font.setWeight(QFont::Medium);
+            painter->setFont(font);
+            painter->setPen(Utility::getAppQColor(shown ? "titleText" : "disabledText"));
+            painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, text.last());
+        }
+    }
+
+    QSize minimumOuterSizeHint() const override
+    {
+        QStringList text = mPlottable->name().split("   ");
+        QFont font = getFont();
+        int width = 28 + QFontMetrics(font).horizontalAdvance(text.first());
+        if (text.size() > 1) {
+            font.setWeight(QFont::Medium);
+            width += 8 + QFontMetrics(font).horizontalAdvance(text.last());
+        }
+        return QSize(width + mMargins.left() + mMargins.right(), 22);
+    }
+};
+}
 
 QMap<QString, QColor> Utility::mAppColors = {
     {"lightestBackground", QColor(80,80,80)},
@@ -2357,39 +2452,184 @@ QString Utility::getAppHexColor(QString colorName)
 
 void Utility::setPlotColors(QCustomPlot* plot)
 {
-    plot->setBackground(QBrush(Utility::getAppQColor("plotBackground")));
+    QColor text = getAppQColor("mutedText");
+    QPen axisPen(getAppQColor("lineStrong"));
+    QPen gridPen(getAppQColor("lineStrong"), 1, Qt::DotLine);
 
-    plot->xAxis->setLabelColor(Utility::getAppQColor("lightText"));
-    plot->xAxis->setBasePen(QPen(Utility::getAppQColor("lightText")));
-    plot->xAxis->setTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->xAxis->setSubTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->xAxis->setTickLabelColor(Utility::getAppQColor("lightText"));
+    plot->setBackground(QBrush(getAppQColor("plotBackground")));
 
-    plot->xAxis->setBasePen(QPen(Utility::getAppQColor("lightText")));
-    plot->yAxis->setLabelColor(Utility::getAppQColor("lightText"));
-    plot->yAxis->setBasePen(QPen(Utility::getAppQColor("lightText")));
-    plot->yAxis->setTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->yAxis->setSubTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->yAxis->setTickLabelColor(Utility::getAppQColor("lightText"));
-    plot->yAxis->setBasePen(QPen(Utility::getAppQColor("lightText")));
+    for (QCPAxis *axis: {plot->xAxis, plot->yAxis, plot->xAxis2, plot->yAxis2}) {
+        axis->setLabelColor(text);
+        axis->setTickLabelColor(text);
+        axis->setBasePen(axisPen);
+        axis->setTickPen(axisPen);
+        axis->setSubTickPen(axisPen);
+        axis->grid()->setPen(gridPen);
+        axis->grid()->setZeroLinePen(axisPen);
+    }
 
-    plot->xAxis2->setLabelColor(Utility::getAppQColor("lightText"));
-    plot->xAxis2->setBasePen(QPen(Utility::getAppQColor("lightText")));
-    plot->xAxis2->setTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->xAxis2->setSubTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->xAxis2->setTickLabelColor(Utility::getAppQColor("lightText"));
-    plot->xAxis2->setBasePen(QPen(Utility::getAppQColor("lightText")));
+    plot->legend->setBrush(getAppQColor("cardBackground"));
+    plot->legend->setTextColor(getAppQColor("lightText"));
+    plot->legend->setBorderPen(QPen(getAppQColor("lineStrong")));
 
-    plot->yAxis2->setLabelColor(Utility::getAppQColor("lightText"));
-    plot->yAxis2->setBasePen(QPen(Utility::getAppQColor("lightText")));
-    plot->yAxis2->setTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->yAxis2->setSubTickPen(QPen(Utility::getAppQColor("lightText")));
-    plot->yAxis2->setTickLabelColor(Utility::getAppQColor("lightText"));
-    plot->yAxis2->setBasePen(QPen(Utility::getAppQColor("lightText")));
+    if (!plot->findChild<QObject*>("endDots", Qt::FindDirectChildrenOnly)) {
+        new EndDots(plot);
+    }
+}
 
-    plot->legend->setBrush(Utility::getAppQColor("normalBackground"));
-    plot->legend->setTextColor(Utility::getAppQColor("lightText"));
-    plot->legend->setBorderPen(QPen(Utility::getAppQColor("darkBackground")));
+// Puts the legend of a plot in a row above it, packed to the left
+void Utility::setPlotLegendRow(QCustomPlot *plot)
+{
+    QCPLegend *legend = plot->legend;
+    legend->setFont(plot->font());
+    legend->setFillOrder(QCPLayoutGrid::foColumnsFirst);
+    legend->setColumnSpacing(18);
+    legend->setBrush(Qt::NoBrush);
+    legend->setBorderPen(Qt::NoPen);
+    QCPLayoutGrid *legendRow = new QCPLayoutGrid;
+    plot->plotLayout()->insertRow(0);
+    plot->plotLayout()->addElement(0, 0, legendRow);
+    plot->plotLayout()->setRowStretchFactor(0, 0.001);
+    legendRow->addElement(0, 0, legend);
+    legendRow->addElement(0, 1, new QCPLayoutElement(plot));
+    legendRow->setColumnStretchFactor(0, 0.001);
+
+    // The plot adds plain entries with its traces, which are swapped for the ones above
+    QObject::connect(plot, &QCustomPlot::beforeReplot, legend, [legend]() {
+        for (int i = 0;i < legend->elementCount();i++) {
+            QCPPlottableLegendItem *item = qobject_cast<QCPPlottableLegendItem*>(legend->elementAt(i));
+            if (item && !dynamic_cast<LegendEntry*>(item)) {
+                int row, column;
+                legend->indexToRowCol(i, row, column);
+                QCPAbstractPlottable *plottable = item->plottable();
+                legend->take(item);
+                delete item;
+                legend->addElement(row, column, new LegendEntry(legend, plottable));
+            }
+        }
+    });
+}
+
+// Sets a property that the style sheet selects on, for the widget and the widgets in it
+void Utility::setStyleProperty(QWidget *widget, const char *name, bool value)
+{
+    if (widget && widget->property(name).toBool() != value) {
+        widget->setProperty(name, value);
+        for (QWidget *w: QList<QWidget*>({widget}) + widget->findChildren<QWidget*>()) {
+            w->style()->unpolish(w);
+            w->style()->polish(w);
+        }
+    }
+}
+
+// Moves the suffix of a spin box to a dimmed unit label at the right end of its field
+void Utility::setSpinUnit(QAbstractSpinBox *box)
+{
+    QString unit = box->property("suffix").toString().trimmed();
+    // A degree sign alone only reads as one right after the number, at its size
+    box->setProperty("suffix", unit == "°" ? unit : QString());
+    if (unit == "°") {
+        return;
+    }
+    QLineEdit *edit = box->findChild<QLineEdit*>();
+    QLabel *label = edit->findChild<QLabel*>("unit");
+    if (!label) {
+        label = new QLabel(edit);
+        label->setObjectName("unit");
+        label->setAttribute(Qt::WA_TransparentForMouseEvents);
+        QHBoxLayout *layout = new QHBoxLayout(edit);
+        layout->setContentsMargins(0, 0, 3, 0);
+        layout->addStretch();
+        layout->addWidget(label);
+    }
+    label->setText(unit);
+    label->ensurePolished();
+    edit->setTextMargins(0, 0, unit.isEmpty() ? 0 : label->sizeHint().width() + 7, 0);
+}
+
+// Shows a text about the tool from the info.xml of the newest config bundled with the tool. A downloaded config
+// is not used, so these texts always match the tool. Icons are written as
+// <img src="theme:icons/NAME.png" width="16" height="16"> and show the line icons of the theme.
+void Utility::setToolDescription(VTextBrowser *edit, const QString &name)
+{
+    static QHash<QString, QString> texts;
+    if (texts.isEmpty()) {
+        ConfigParams info;
+        auto fw = configLatestSupported();
+        info.loadParamsXml(QString("://res/config/%1.%2/info.xml").arg(fw.first).arg(fw.second, 2, 10, QChar('0')));
+        for (const auto &n: info.getParamOrder()) {
+            texts.insert(n, info.getParam(n)->description);
+        }
+    }
+
+    // The icon and name columns line up over all tables of a text. A table without icons starts with the name, and
+    // its text column lines up with the others.
+    QString html = texts.value(name, name + " not found.");
+    html.replace("<tr><td class=\"name\">", "<tr><td class=\"name\" width=\"152\">")
+            .replace("<td></td>", "<td width=\"30\"></td>")
+            .replace("<td class=\"name\">", "<td class=\"name\" width=\"120\">");
+    QTextDocument *doc = edit->document();
+    edit->ensurePolished();
+    int px = QFontInfo(edit->font()).pixelSize();
+    doc->setDocumentMargin(24);
+    doc->setDefaultStyleSheet(QString(
+                "h3 { color: %1; font-family: Exan; font-size: medium; font-weight: normal; letter-spacing: 2px;"
+                " text-transform: uppercase; margin-top: 13px; margin-bottom: 8px; }"
+                "p { margin-top: 0px; margin-bottom: 8px; line-height: 135%; }"
+                "p.lead { color: %2; font-size: %5px; }"
+                "a { color: %1; text-decoration: none; }"
+                ".warn { color: %3; }"
+                ".muted { color: %4; }"
+                "table { margin-bottom: 8px; }"
+                "td { padding: 2px 14px 2px 0px; vertical-align: top; line-height: 125%; }"
+                "td.name { color: %2; font-weight: bold; }")
+            .arg(getAppHexColor("lightAccent"), getAppHexColor("titleText"),
+                 getAppHexColor("warningText"), getAppHexColor("mutedText"))
+            .arg(qRound(px * 1.15)));
+    edit->setMaxTextWidth(680);
+    edit->setHtml(html);
+    // The view has no size yet and has scrolled to show the cursor
+    edit->verticalScrollBar()->setValue(0);
+
+    // Icons are drawn at their size in device pixels, so that they stay sharp
+    const int size = 16;
+    qreal dpr = edit->devicePixelRatioF();
+    QRegularExpression rx("theme:(icons/[^\"]+)");
+    for (auto it = rx.globalMatch(html);it.hasNext();) {
+        auto m = it.next();
+        QPixmap pm = getIcon(m.captured(1)).scaled(qRound(size * dpr), qRound(size * dpr),
+                                                   Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        pm.setDevicePixelRatio(dpr);
+        doc->addResource(QTextDocument::ImageResource, QUrl(m.captured(0)), pm);
+    }
+}
+
+// Title of a block in the desktop UI: blue capitals with a line that fades out to the right edge
+void Utility::drawSectionHeader(QPainter *painter, const QRect &rect, const QString &text)
+{
+    QFont font("Exan");
+    font.setPointSizeF(qApp->font().pointSizeF() * 0.9);
+    font.setLetterSpacing(QFont::AbsoluteSpacing, 2.0);
+
+    // The capital K and X of the font read as H, and it has no hyphen
+    QString title = text.toUpper().replace('K', 'k').replace('X', 'x').replace('-', ' ').remove('&');
+    QColor color = getAppQColor("lightAccent");
+    int lineY = rect.center().y();
+
+    painter->save();
+    painter->setFont(font);
+    painter->setPen(color);
+    title = painter->fontMetrics().elidedText(title, Qt::ElideRight, rect.width());
+    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, title);
+    int lineX = rect.left() + painter->fontMetrics().horizontalAdvance(title) + 10;
+    QLinearGradient fade(lineX, 0, rect.right(), 0);
+    color.setAlphaF(0.4);
+    fade.setColorAt(0.0, color);
+    color.setAlphaF(0.08);
+    fade.setColorAt(1.0, color);
+    painter->setPen(QPen(QBrush(fade), 1));
+    painter->drawLine(lineX, lineY, rect.right(), lineY);
+    painter->restore();
 }
 
 void Utility::plotSavePdf(QCustomPlot *plot, int width, int height, QString title)
@@ -2494,20 +2734,6 @@ QString Utility::waitForLine(QTcpSocket *socket, int timeoutMs)
     return res;
 }
 
-// Icon with an accent dot in the top right corner, e.g. for unwritten changes
-QPixmap Utility::getIconWithDot(QString path)
-{
-    QPixmap pm = getIcon(path);
-    QPainter p(&pm);
-    p.setRenderHint(QPainter::Antialiasing);
-    qreal r = pm.width() * 0.17;
-    QPointF c(pm.width() - r - 1, r + 1);
-    p.setPen(QPen(getAppQColor("darkBackground"), r * 0.5));
-    p.setBrush(getAppQColor("accentText"));
-    p.drawEllipse(c, r, r);
-    return pm;
-}
-
 // Small accent dot that marks pages and tabs with unwritten changes
 QPixmap Utility::getChangedDot()
 {
@@ -2529,7 +2755,10 @@ QPixmap Utility::getIcon(QString path)
 
     QPixmap pm;
     if (!QPixmapCache::find(path, &pm)) {
-        pm.load(getThemePath() + path);
+        // The widgets of the desktop UI have their own drawings of some icons
+        if (!pm.load(getThemePath() + "desktop/" + path)) {
+            pm.load(getThemePath() + path);
+        }
         QPixmapCache::insert(path, pm);
     }
 

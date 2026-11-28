@@ -38,8 +38,6 @@ public:
     VescInterface *vesc() const;
     void setVesc(VescInterface *vesc);
 
-    void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
-
 private slots:
     void bldcDetectReceived(bldc_detect param);
 

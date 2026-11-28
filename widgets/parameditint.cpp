@@ -41,14 +41,15 @@ ParamEditInt::ParamEditInt(QWidget *parent) :
     mPercentageBox = new QSpinBox(this);
 
     mPercentageBox->setSuffix(" %");
+    Utility::setSpinUnit(mPercentageBox);
 
-    ui->mainLayout->insertWidget(0, mDisplay);
-    ui->mainLayout->insertWidget(0, mIntBox);
-    ui->mainLayout->insertWidget(0, mPercentageBox);
-
-    ui->mainLayout->setStretchFactor(mIntBox, 1);
-    ui->mainLayout->setStretchFactor(mPercentageBox, 1);
-    ui->mainLayout->setStretchFactor(mDisplay, 10);
+    QVBoxLayout *boxLayout = new QVBoxLayout;
+    boxLayout->setSpacing(0);
+    boxLayout->addWidget(mPercentageBox);
+    boxLayout->addWidget(mIntBox);
+    mDisplay->setFixedHeight(2);
+    mDisplay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    ui->mainLayout->insertLayout(0, boxLayout, 1);
 
     mPercentageBox->setVisible(false);
     mDisplay->setVisible(false);
@@ -113,6 +114,7 @@ void ParamEditInt::setName(const QString &name)
 void ParamEditInt::setSuffix(const QString &suffix)
 {
     mIntBox->setSuffix(suffix);
+    Utility::setSpinUnit(mIntBox);
 }
 
 void ParamEditInt::setShowAsPercentage(bool showAsPercentage)
@@ -121,8 +123,16 @@ void ParamEditInt::setShowAsPercentage(bool showAsPercentage)
     mPercentageBox->setVisible(showAsPercentage);
 }
 
+// The level is a line along the bottom edge inside the box that is shown
 void ParamEditInt::showDisplay(bool show)
 {
+    QWidget *box = mIntBox->isHidden() ? mPercentageBox : mIntBox;
+    if (!box->layout()) {
+        QVBoxLayout *layout = new QVBoxLayout(box);
+        layout->setContentsMargins(4, 0, 4, 1);
+        layout->addStretch();
+        layout->addWidget(mDisplay);
+    }
     mDisplay->setVisible(show);
 }
 

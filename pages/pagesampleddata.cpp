@@ -30,7 +30,7 @@ PageSampledData::PageSampledData(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->rescaleButton->setIcon(Utility::getIcon("icons/expand_off.png"));
+    ui->rescaleButton->setIcon(Utility::getIcon("icons/size_off.png"));
     ui->saveDataButton->setIcon(Utility::getIcon("icons/Save as-96.png"));
     ui->loadDataButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->sampleNowButton->setIcon(Utility::getIcon("icons/3ph_sine.png"));
@@ -42,23 +42,23 @@ PageSampledData::PageSampledData(QWidget *parent) :
     ui->sampleTriggerStartNosendButton->setIcon(Utility::getIcon("icons/sample_trigger_start_nosend.png"));
     ui->sampleLastButton->setIcon(Utility::getIcon("icons/Upload-96.png"));
 
-    QIcon mycon = QIcon(Utility::getIcon("icons/expand_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_off.png"), QIcon::Normal, QIcon::Off);
-    ui->zoomHButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/expand_v_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_off.png"), QIcon::Normal, QIcon::Off);
-    ui->zoomVButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/size_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/size_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/size_off.png"), QIcon::Normal, QIcon::Off);
-
+    // The checked state shows as a raised button, so the icons stay the same
+    ui->zoomHButton->setIcon(Utility::getIcon("icons/expand_off.png"));
+    ui->zoomVButton->setIcon(Utility::getIcon("icons/expand_v_off.png"));
 
     layout()->setContentsMargins(0, 0, 0, 0);
     mVesc = 0;
+
+    // The sampling controls sit under the plot of every tab and the plot tools over the top right of its well.
+    auto placeOnTab = [this]() {
+        QWidget *tab = ui->tabWidget->currentWidget();
+        tab->layout()->addWidget(ui->sampleWidget);
+        QFrame *well = tab->findChild<QFrame*>(QString(), Qt::FindDirectChildrenOnly);
+        static_cast<QGridLayout*>(well->layout())->addWidget(ui->toolFrame, 0, 0, Qt::AlignTop | Qt::AlignRight);
+        ui->toolFrame->raise();
+    };
+    connect(ui->tabWidget, &QTabWidget::currentChanged, placeOnTab);
+    placeOnTab();
 
     mDoReplot = false;
     mDoFilterReplot = false;
@@ -76,7 +76,16 @@ PageSampledData::PageSampledData(QWidget *parent) :
     {
         Utility::setPlotColors(plots[i]);
         plots[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
+        Utility::setPlotLegendRow(plots[i]);
+        plots[i]->legend->setVisible(true);
     }
+
+    // Axis names of the time plots, shown before samples arrive
+    ui->currentPlot->xAxis->setLabel("Seconds (s)");
+    ui->currentPlot->yAxis->setLabel("Amperes (A)");
+    ui->voltagePlot->xAxis->setLabel("Seconds (s)");
+    ui->voltagePlot->yAxis->setLabel("Volts (V)");
 
     connect(mTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
     connect(mSampleGetTimer, SIGNAL(timeout()), this, SLOT(sampleGetTimerSlot()));
@@ -134,9 +143,6 @@ void PageSampledData::setVesc(VescInterface *vesc)
 void PageSampledData::timerSlot()
 {
     static QVector<double> filter;
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
-
     // Plot filters
     if (mDoFilterReplot) {
         if (ui->filterBox->currentIndex() == 2) {
@@ -188,15 +194,9 @@ void PageSampledData::timerSlot()
         ui->filterResponsePlot->graph(0)->setName("Filter Response");
         ui->filterResponsePlot->graph(0)->setPen(QPen(Utility::getAppQColor("plot_graph1")));
 
-        ui->filterPlot->legend->setVisible(true);
-        ui->filterPlot->legend->setFont(legendFont);
-        ui->filterPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
         ui->filterPlot->xAxis->setLabel("Index");
         ui->filterPlot->yAxis->setLabel("Value");
 
-        ui->filterResponsePlot->legend->setVisible(true);
-        ui->filterResponsePlot->legend->setFont(legendFont);
-        ui->filterResponsePlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
         ui->filterResponsePlot->xAxis->setLabel("Frequency (Hz)");
         ui->filterResponsePlot->yAxis->setLabel("Gain");
 
@@ -450,9 +450,6 @@ void PageSampledData::timerSlot()
             }
 
             // Plot settings
-            ui->currentPlot->legend->setVisible(true);
-            ui->currentPlot->legend->setFont(legendFont);
-            ui->currentPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
             if (showFft) {
                 ui->currentPlot->xAxis->setLabel("Frequency (Hz)");
                 ui->currentPlot->yAxis->setLabel("Amplitude");
@@ -468,9 +465,6 @@ void PageSampledData::timerSlot()
                 }
             }
 
-            ui->voltagePlot->legend->setVisible(true);
-            ui->voltagePlot->legend->setFont(legendFont);
-            ui->voltagePlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
             ui->voltagePlot->xAxis->setLabel("Seconds (s)");
             ui->voltagePlot->yAxis->setLabel("Volts (V)");
 

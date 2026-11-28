@@ -26,11 +26,19 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
+#include <QRegularExpression>
 #include <cmath>
 
 #ifdef HAS_SERIALPORT
 #include <QSerialPortInfo>
 #endif
+
+// A value watched on the EXT Monitor, with its unit dimmed
+static QString readoutText(double value, QString unit)
+{
+    return QString("%1 <span style=\"color:%2;font-size:11pt\">%3</span>")
+            .arg(value).arg(Utility::getAppQColor("mutedText").name(), unit);
+}
 
 PageExperiments::PageExperiments(QWidget *parent) :
     QWidget(parent),
@@ -52,6 +60,8 @@ PageExperiments::PageExperiments(QWidget *parent) :
     ui->saveCsvButton->setIcon(Utility::getIcon("icons/Save-96.png"));
     ui->savePngButton->setIcon(Utility::getIcon("icons/Save-96.png"));
     ui->savePdfButton->setIcon(Utility::getIcon("icons/Save-96.png"));
+    ui->compCloseButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
+    ui->extNoteIcon->setPixmap(Utility::getIcon("icons/About-96.png"));
 
     QIcon mycon = QIcon(Utility::getIcon("icons/expand_off.png"));
     mycon.addPixmap(Utility::getIcon("icons/expand_on.png"), QIcon::Normal, QIcon::On);
@@ -78,16 +88,29 @@ PageExperiments::PageExperiments(QWidget *parent) :
 
     ui->plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
-
     Utility::setPlotColors(ui->plot);
+    Utility::setPlotLegendRow(ui->plot);
+    ui->plot->legend->setWrap(4);
     ui->plot->legend->setVisible(true);
-    ui->plot->legend->setFont(legendFont);
-    ui->plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignLeft);
     ui->plot->xAxis->setLabel("Seconds (s)");
     ui->plot->yAxis2->setLabel("ERPM");
     ui->plot->yAxis2->setVisible(true);
+
+    // The show list is the legend on screen: each name gets the colour of its line and a dimmed unit
+    QList<QPair<QLabel*, QString> > showLabels = {
+        {ui->showPowerLabel, "plot_graph1"}, {ui->showCurrentLabel, "plot_graph2"},
+        {ui->showCurrentInLabel, "plot_graph3"}, {ui->showVoltageLabel, "plot_graph4"},
+        {ui->showTempFetLabel, "plot_graph5"}, {ui->showTempFetIndLabel, "plot_graph6"},
+        {ui->showTempMotorLabel, "plot_graph9"}, {ui->showDutyLabel, "plot_graph10"},
+        {ui->showErpmLabel, "plot_graph11"}};
+    QString muted = Utility::getAppQColor("mutedText").name();
+    for (auto &l: showLabels) {
+        QString text = l.first->text().toHtmlEscaped();
+        text.replace(QRegularExpression(" \\((.*)\\)$"), QString(" <span style=\"color:%1\">\\1</span>").arg(muted));
+        text.replace(" right axis", QString(" <span style=\"color:%1\">right axis</span>").arg(muted));
+        l.first->setText(QString("<span style=\"color:%1\">\u2501</span>&nbsp;&nbsp;%2")
+                         .arg(Utility::getAppQColor(l.second).name(), text));
+    }
 
 #ifdef HAS_SERIALPORT
     mVictronPort = new QSerialPort(this);
@@ -876,12 +899,12 @@ void PageExperiments::victronDataAvailable()
                         switch (cmd) {
                         case 60813: {
                             mVictronVoltage = val / 100.0;
-                            ui->extVoltageLabel->setText(QString("Voltage: %1 V").arg(mVictronVoltage));
+                            ui->extVoltageLabel->setText(readoutText(mVictronVoltage, "V"));
                         } break;
 
                         case 60815: {
                             mVictronCurrent = -val / 10.0;
-                            ui->extCurrentLabel->setText(QString("Current: %1 A").arg(mVictronCurrent));
+                            ui->extCurrentLabel->setText(readoutText(mVictronCurrent, "A"));
                         } break;
 
                         default:
@@ -943,6 +966,7 @@ void PageExperiments::on_openCompButton_clicked()
         }
 
         ui->compareButtons->setEnabled(true);
+        ui->compCloseButton->setEnabled(true);
         plotSamples(false);
         file.close();
     }
@@ -951,6 +975,7 @@ void PageExperiments::on_openCompButton_clicked()
 void PageExperiments::on_compCloseButton_clicked()
 {
     ui->compareButtons->setEnabled(false);
+    ui->compCloseButton->setEnabled(false);
     resetCompareSamples();
     plotSamples(false);
 }

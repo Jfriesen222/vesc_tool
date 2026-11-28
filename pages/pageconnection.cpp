@@ -59,7 +59,6 @@ PageConnection::PageConnection(QWidget *parent) :
     ui->unpairButton->setIcon(Utility::getIcon("icons/Restart-96.png"));
     ui->deletePairedButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
     ui->clearPairedButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
-    ui->canDefaultButton->setIcon(Utility::getIcon("icons/Bug-96.png"));
     ui->helpButton->setIcon(Utility::getIcon("icons/Help-96.png"));
     ui->autoConnectButton->setIcon(Utility::getIcon("icons/Wizard-96.png"));
     ui->bleSetNameButton->setIcon(Utility::getIcon("icons/Ok-96.png"));
@@ -70,9 +69,17 @@ PageConnection::PageConnection(QWidget *parent) :
     ui->tcpDetectConnectButton->setIcon(Utility::getIcon("icons/Connected-96.png"));
     ui->tcpDetectDisconnectButton->setIcon(Utility::getIcon("icons/Disconnected-96.png"));
 
-    QIcon mycon = QIcon(Utility::getIcon("icons/can_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/can_on.png"), QIcon::Normal, QIcon::On);
-    ui->canFwdButton->setIcon(mycon);
+    ui->canFwdBox->setPlaceholderText(tr("No CAN device selected"));
+
+    QFont mono = ui->tcpServerAddressesEdit->font();
+    mono.setFamily("Roboto Mono");
+    for (auto e: {ui->tcpServerAddressesEdit, ui->tcpServerClientsEdit, ui->udpServerAddressesEdit, ui->udpServerClientsEdit}) {
+        e->setFont(mono);
+    }
+    ui->tcpServerAddressesEdit->setPlaceholderText(tr("Server not enabled"));
+    ui->udpServerAddressesEdit->setPlaceholderText(tr("Server not enabled"));
+    ui->tcpServerClientsEdit->setPlaceholderText(tr("None"));
+    ui->udpServerClientsEdit->setPlaceholderText(tr("None"));
 
     mUdpListen = new UdpServerSimple(this);
     mUdpListen->startServerBroadcast(65109);
@@ -80,6 +87,17 @@ PageConnection::PageConnection(QWidget *parent) :
 #ifndef HAS_CANBUS
     ui->tabWidget->setTabVisible(1, false);
 #endif
+
+    // The tab widget is as high as the content of the open tab, so that the CAN forward block follows it
+    auto fitTab = [this]() {
+        for (int i = 0;i < ui->tabWidget->count();i++) {
+            ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Preferred, i == ui->tabWidget->currentIndex() ?
+                                                        QSizePolicy::Preferred : QSizePolicy::Ignored);
+        }
+        ui->tabWidget->setMaximumHeight(ui->tabWidget->minimumSizeHint().height());
+    };
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, fitTab);
+    QTimer::singleShot(0, this, fitTab);
 
     connect(mUdpListen, &UdpServerSimple::dataRx, [this](const QByteArray &data) {
         QString str(data);
@@ -195,9 +213,35 @@ void PageConnection::timerSlot()
     }
 
     if (mVesc) {
-        QString str = mVesc->getConnectedPortName();
-        if (str != ui->statusLabel->text()) {
-            ui->statusLabel->setText(mVesc->getConnectedPortName());
+        // Status card
+        bool connected = mVesc->isPortConnected();
+        ui->statusLabel->setText(connected ? mVesc->getConnectedPortName() :
+                                             tr("Connect on a tab, or let AutoConnect try the USB connection."));
+        FW_RX_PARAMS fw = mVesc->getLastFwRxParams();
+        bool fwKnown = connected && fw.major >= 0;
+        Utility::setStyleProperty(ui->statusStateLabel, "connected", connected);
+        Utility::setStyleProperty(ui->statusNameLabel, "muted", !connected);
+        ui->statusStateLabel->setText(QString("<img src=\"%1desktop/icons/%2\" width=\"14\" height=\"14\" style=\"vertical-align: middle\">&nbsp;%3")
+                                          .arg(Utility::getThemePath(), connected ? "led_ok.png" : "led_off.png",
+                                               (connected ? tr("Connected") : tr("Not connected")).toUpper()));
+        ui->statusNameLabel->setText(fwKnown ? fw.hw : (connected ? "" : tr("No device")));
+        ui->statusFwLabel->setText(fwKnown ? QString("%1.%2").arg(fw.major).arg(fw.minor, 2, 10, QLatin1Char('0')) : "-");
+        ui->statusHwLabel->setText(fwKnown ? fw.hw : "-");
+        ui->statusFwdLabel->setText(!connected ? "-" : mVesc->commands()->getSendCan() ?
+                                        tr("CAN ID %1").arg(mVesc->commands()->getCanSendId()) : tr("Off"));
+        ui->statusPairedLabel->setText(!fwKnown ? "-" : fw.isPaired ? tr("Yes") : tr("No"));
+
+        // Connect is the action to take while nothing is connected, Disconnect while something is
+        for (auto b: {ui->serialConnectButton, ui->CANbusConnectButton, ui->tcpConnectButton, ui->udpConnectButton,
+                      ui->bleConnectButton, ui->tcpHubConnectButton, ui->virtualConnectButton}) {
+            Utility::setStyleProperty(b, "primary", !connected);
+            Utility::setStyleProperty(b, "muted", connected);
+        }
+        Utility::setStyleProperty(ui->tcpDetectConnectButton, "muted", connected);
+        for (auto b: {ui->serialDisconnectButton, ui->CANbusDisconnectButton, ui->tcpDisconnectButton,
+                      ui->tcpDetectDisconnectButton, ui->udpDisconnectButton, ui->bleDisconnectButton,
+                      ui->tcpHubDisconnectButton, ui->virtualDisconnectButton}) {
+            Utility::setStyleProperty(b, "muted", !connected);
         }
 
         // CAN fwd
@@ -218,8 +262,8 @@ void PageConnection::timerSlot()
         }
     }
 
-    QString tcpIpTxt = "Server IPs\n";
-    QString tcpClientTxt = "Connected Clients\n";
+    QString tcpIpTxt;
+    QString tcpClientTxt;
     if (mVesc->tcpServerIsRunning()) {
         for (auto adr: Utility::getNetworkAddresses()) {
             tcpIpTxt += adr.toString() + "\n";
@@ -241,8 +285,8 @@ void PageConnection::timerSlot()
         ui->tcpServerClientsEdit->setPlainText(tcpClientTxt);
     }
 
-    QString udpIpTxt = "Server IPs\n";
-    QString udpClientTxt = "Connected Clients\n";
+    QString udpIpTxt;
+    QString udpClientTxt;
     if(mVesc->udpServerIsRunning()) {
         for (auto adr: Utility::getNetworkAddresses()) {
             udpIpTxt += adr.toString() + "\n";

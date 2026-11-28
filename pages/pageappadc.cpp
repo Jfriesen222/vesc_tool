@@ -35,8 +35,13 @@ PageAppAdc::PageAppAdc(QWidget *parent) :
     ui->throttlePlot->graph()->setPen(QPen(Utility::getAppQColor("plot_graph1")));
     ui->throttlePlot->xAxis->setLabel("Throttle Value");
     ui->throttlePlot->yAxis->setLabel("Output Value");
+    for (QCPAxis *axis: {ui->throttlePlot->xAxis, ui->throttlePlot->yAxis}) {
+        axis->setRange(-1.0, 1.0);
+        axis->setNumberFormat("f");
+        axis->setNumberPrecision(1);
+    }
+    Utility::setPlotLegendRow(ui->throttlePlot);
     ui->throttlePlot->legend->setVisible(true);
-    ui->throttlePlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
 }
 
 PageAppAdc::~PageAppAdc()
@@ -98,7 +103,6 @@ void PageAppAdc::paramChangedDouble(QObject *src, QString name, double newParam)
             y.append(val);
         }
         ui->throttlePlot->graph()->setData(x, y);
-        ui->throttlePlot->rescaleAxes();
         ui->throttlePlot->replot();
     }
 }

@@ -20,17 +20,19 @@
 #include "pagelistitem.h"
 #include "utility.h"
 #include <QHBoxLayout>
+#include <QPainter>
 
 PageListItem::PageListItem(QString name,
                            QString icon,
-                           QString groupIcon,
                            QWidget *parent) : QWidget(parent)
 {
     mIconLabel = new QLabel;
     mNameLabel = new QLabel;
-    mGroupLabel = new QLabel;
     mChangedDot = new QLabel;
-    mSpaceStart = new QSpacerItem(6, 0);
+    mSpaceStart = new QSpacerItem(8, 0);
+    mSelected = false;
+    mIndented = false;
+    mBold = false;
 
     // Marks pages with parameters that are not written to the VESC
     mChangedDot->setPixmap(Utility::getChangedDot());
@@ -38,22 +40,19 @@ PageListItem::PageListItem(QString name,
     mChangedDot->hide();
 
     mIconLabel->setScaledContents(true);
-    mGroupLabel->setScaledContents(true);
 
     setName(name);
     setIcon(icon);
-    setGroupIcon(groupIcon);
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 0, 8, 0);
+    layout->setSpacing(9);
 
     layout->addSpacerItem(mSpaceStart);
     layout->addWidget(mIconLabel);
     layout->addWidget(mNameLabel);
-    layout->addWidget(mChangedDot);
     layout->addStretch();
-    layout->addWidget(mGroupLabel);
-    layout->addSpacing(2);
+    layout->addWidget(mChangedDot);
 
     this->setLayout(layout);
 }
@@ -65,32 +64,9 @@ void PageListItem::setName(const QString &name)
 
 void PageListItem::setIcon(const QString &path)
 {
-    if (!path.isEmpty()) {
-        mIconLabel->setPixmap(QPixmap(path));
-
-        QFontMetrics fm(this->font());
-        int height = fm.height() * 1.1;
-
-        mIconLabel->setFixedSize(height, height);
-    } else {
-        mIconLabel->setPixmap(QPixmap());
-    }
-}
-
-void PageListItem::setGroupIcon(const QString &path)
-{
-    if (!path.isEmpty()) {
-        QPixmap pix(path);
-        mGroupLabel->setPixmap(pix);
-
-        QFontMetrics fm(this->font());
-        int height = fm.height();
-
-        mGroupLabel->setFixedSize((height * pix.width()) / pix.height(), height);
-    } else {
-        mSpaceStart->changeSize(2, 0);
-        mGroupLabel->setPixmap(QPixmap());
-    }
+    mIcon = QPixmap(path);
+    mIconLabel->setFixedSize(fontMetrics().height(), fontMetrics().height());
+    updateColors();
 }
 
 QString PageListItem::name()
@@ -101,13 +77,61 @@ QString PageListItem::name()
 void PageListItem::setBold(bool bold)
 {
     QFont f = mNameLabel->font();
-    f.setBold(bold);
+    f.setWeight(bold ? QFont::Medium : QFont::Normal);
     mNameLabel->setFont(f);
+    mBold = bold;
+    updateColors();
 }
 
 void PageListItem::setIndented(bool indented)
 {
-    mSpaceStart->changeSize(indented ? 15 : 2, 0);
+    mSpaceStart->changeSize(indented ? 30 : 8, 0);
+    mIndented = indented;
+    update();
+}
+
+void PageListItem::setSelected(bool selected)
+{
+    mSelected = selected;
+    updateColors();
+    update();
+}
+
+// The page that is open is tinted and has a mark on the left edge. The pages of a group are under a line.
+void PageListItem::paintEvent(QPaintEvent *event)
+{
+    (void)event;
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+
+    if (mSelected) {
+        painter.setBrush(Utility::getAppQColor("accentDim"));
+        painter.drawRoundedRect(QRectF(rect()).adjusted(8, 0, 0, 0), 7, 7);
+        painter.setBrush(Utility::getAppQColor("accent"));
+        painter.drawRoundedRect(QRectF(0, 5, 3, height() - 10), 1.5, 1.5);
+    }
+
+    if (mIndented) {
+        painter.fillRect(QRectF(24, 0, 1, height()), Utility::getAppQColor("line"));
+    }
+}
+
+// The icon is drawn in the color of the text, or in the accent color for the page that is open
+void PageListItem::updateColors()
+{
+    bool top = mBold;
+    QPalette p = mNameLabel->palette();
+    p.setColor(QPalette::WindowText, Utility::getAppQColor(mSelected || top ? "titleText" : "lightText"));
+    mNameLabel->setPalette(p);
+
+    QPixmap pm = mIcon;
+    if (!pm.isNull()) {
+        QPainter painter(&pm);
+        painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        painter.fillRect(pm.rect(), Utility::getAppQColor(mSelected ? "accentText" : top ? "lightText" : "mutedText"));
+    }
+    mIconLabel->setPixmap(pm);
 }
 
 void PageListItem::setChanged(bool changed)

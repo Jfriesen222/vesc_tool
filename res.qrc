@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/bg.png</file>
         <file>res/images/rc_rx.jpg</file>
         <file>res/images/ebike_throttle.jpg</file>
         <file>res/images/nunchuk.jpg</file>
@@ -42,7 +41,6 @@
         <file>res/other_fw/nrf52832_vesc_ble_rx7_tx6_led8.bin</file>
         <file>res/other_fw/nrf52840_vesc_ble_rx26_tx25_led27.bin</file>
         <file>res/other_fw/nrf52840_stick_remote.bin</file>
-        <file>res/images/slider1.png</file>
         <file>res/bootloaders/60_o_75_300_o_HD60_o_UAVC_OMEGA_o_75_300_R2_o_60_MK3_o_100_250_o_75_300_R3_o_60_MK4_o_60_MK5_o_HD75.bin</file>
         <file>res/fonts/Roboto/Roboto-Black.ttf</file>
         <file>res/fonts/Roboto/Roboto-BlackItalic.ttf</file>
@@ -58,7 +56,6 @@
         <file>res/fonts/Roboto/Roboto-ThinItalic.ttf</file>
         <file>res/images/esk8.jpg</file>
         <file>res/images/propeller.jpg</file>
-        <file>res/+theme_light/logo_vertical.png</file>
         <file>res/icons/bluetooth.png</file>
         <file>res/icons/minimize.png</file>
         <file>res/icons/icons8-battery-100.png</file>
@@ -77,13 +74,11 @@
         <file>res/icons/rt_off.png</file>
         <file>res/icons/rt_app_on.png</file>
         <file>res/icons/rt_app_off.png</file>
-        <file>res/icons/rl.png</file>
         <file>res/icons/motor_up.png</file>
         <file>res/icons/motor_down.png</file>
         <file>res/icons/motor_default.png</file>
         <file>res/icons/motor.png</file>
         <file>res/icons/mcconf.png</file>
-        <file>res/icons/lambda.png</file>
         <file>res/icons/keys_on.png</file>
         <file>res/icons/keys_off.png</file>
         <file>res/icons/imu_on.png</file>
@@ -209,7 +204,6 @@
         <file>res/icons_textedit/Align Justify-96.png</file>
         <file>res/icons_textedit/Align Center-96.png</file>
         <file>res/icons_textedit/Add Image-96.png</file>
-        <file>res/logo_vertical.png</file>
         <file>res/+theme_light/icons/Wizard-96.png</file>
         <file>res/+theme_light/icons/Wii-96.png</file>
         <file>res/+theme_light/icons/Waypoint Map-96.png</file>
@@ -257,7 +251,6 @@
         <file>res/+theme_light/icons/rt_app_on.png</file>
         <file>res/+theme_light/icons/rt_app_off.png</file>
         <file>res/+theme_light/icons/Rs 232 Male-96.png</file>
-        <file>res/+theme_light/icons/rl.png</file>
         <file>res/+theme_light/icons/Restart-96.png</file>
         <file>res/+theme_light/icons/Refresh-96.png</file>
         <file>res/+theme_light/icons/Process-96.png</file>
@@ -274,7 +267,6 @@
         <file>res/+theme_light/icons/motor_default.png</file>
         <file>res/+theme_light/icons/mcconf.png</file>
         <file>res/+theme_light/icons/Line Chart-96.png</file>
-        <file>res/+theme_light/icons/lambda.png</file>
         <file>res/+theme_light/icons/keys_on.png</file>
         <file>res/+theme_light/icons/keys_off.png</file>
         <file>res/+theme_light/icons/imu_on.png</file>
@@ -373,12 +365,179 @@
         <file>res/+theme_light/icons/Package-96.png</file>
         <file>res/icons/Connected-hl-96.png</file>
         <file>res/+theme_light/icons/Connected-hl-96.png</file>
-        <file>res/icons/glow.png</file>
-        <file>res/+theme_light/icons/glow.png</file>
         <file>res/symbol_v_wide.png</file>
         <file>res/+theme_light/symbol_v_wide.png</file>
         <file>res/+theme_light/icons/Globe-96.png</file>
         <file>res/+theme_light/icons/LAN-96.png</file>
         <file>res/+theme_light/icons/USB-96.png</file>
+        <file>res/style.qss</file>
+        <file>res/desktop/icons/About-96.png</file>
+        <file>res/desktop/icons/Anchor-96.png</file>
+        <file>res/desktop/icons/Brake Warning-96.png</file>
+        <file>res/desktop/icons/Calculator-96.png</file>
+        <file>res/desktop/icons/Cancel-96.png</file>
+        <file>res/desktop/icons/Circled Play-96.png</file>
+        <file>res/desktop/icons/Connected-96.png</file>
+        <file>res/desktop/icons/Connected-hl-96.png</file>
+        <file>res/desktop/icons/Console-96.png</file>
+        <file>res/desktop/icons/Data Backup-96.png</file>
+        <file>res/desktop/icons/Delete-96.png</file>
+        <file>res/desktop/icons/Disconnected-96.png</file>
+        <file>res/desktop/icons/Down-96.png</file>
+        <file>res/desktop/icons/Download-96.png</file>
+        <file>res/desktop/icons/Help-96.png</file>
+        <file>res/desktop/icons/Horizontal Settings Mixer-96.png</file>
+        <file>res/desktop/icons/Line Chart-96.png</file>
+        <file>res/desktop/icons/Ok-96.png</file>
+        <file>res/desktop/icons/Open Folder-96.png</file>
+        <file>res/desktop/icons/Plus Math-96.png</file>
+        <file>res/desktop/icons/Refresh-96.png</file>
+        <file>res/desktop/icons/Restart-96.png</file>
+        <file>res/desktop/icons/Save as-96.png</file>
+        <file>res/desktop/icons/Save-96.png</file>
+        <file>res/desktop/icons/Send File-96.png</file>
+        <file>res/desktop/icons/Shutdown-96.png</file>
+        <file>res/desktop/icons/Stop Sign-96.png</file>
+        <file>res/desktop/icons/Up-96.png</file>
+        <file>res/desktop/icons/Upload-96.png</file>
+        <file>res/desktop/icons/Wizard-96.png</file>
+        <file>res/desktop/icons/alive_off.png</file>
+        <file>res/desktop/icons/alive_on.png</file>
+        <file>res/desktop/icons/app_default.png</file>
+        <file>res/desktop/icons/app_down.png</file>
+        <file>res/desktop/icons/app_up.png</file>
+        <file>res/desktop/icons/apply.png</file>
+        <file>res/desktop/icons/arrow_r.png</file>
+        <file>res/desktop/icons/bms_off.png</file>
+        <file>res/desktop/icons/bms_on.png</file>
+        <file>res/desktop/icons/can_off.png</file>
+        <file>res/desktop/icons/can_on.png</file>
+        <file>res/desktop/icons/check.png</file>
+        <file>res/desktop/icons/chevron.png</file>
+        <file>res/desktop/icons/expand_off.png</file>
+        <file>res/desktop/icons/expand_on.png</file>
+        <file>res/desktop/icons/expand_v_off.png</file>
+        <file>res/desktop/icons/expand_v_on.png</file>
+        <file>res/desktop/icons/icons8-edit-96.png</file>
+        <file>res/desktop/icons/imu_off.png</file>
+        <file>res/desktop/icons/imu_on.png</file>
+        <file>res/desktop/icons/keys_off.png</file>
+        <file>res/desktop/icons/keys_on.png</file>
+        <file>res/desktop/icons/motor_default.png</file>
+        <file>res/desktop/icons/motor_down.png</file>
+        <file>res/desktop/icons/motor_up.png</file>
+        <file>res/desktop/icons/radio.png</file>
+        <file>res/desktop/icons/rt_app_off.png</file>
+        <file>res/desktop/icons/rt_app_on.png</file>
+        <file>res/desktop/icons/rt_off.png</file>
+        <file>res/desktop/icons/rt_on.png</file>
+        <file>res/desktop/icons/size_off.png</file>
+        <file>res/desktop/icons/size_on.png</file>
+        <file>res/desktop/icons/spin_down.png</file>
+        <file>res/desktop/icons/spin_up.png</file>
+        <file>res/+theme_light/desktop/icons/About-96.png</file>
+        <file>res/+theme_light/desktop/icons/Anchor-96.png</file>
+        <file>res/+theme_light/desktop/icons/Brake Warning-96.png</file>
+        <file>res/+theme_light/desktop/icons/Calculator-96.png</file>
+        <file>res/+theme_light/desktop/icons/Cancel-96.png</file>
+        <file>res/+theme_light/desktop/icons/Circled Play-96.png</file>
+        <file>res/+theme_light/desktop/icons/Connected-96.png</file>
+        <file>res/+theme_light/desktop/icons/Connected-hl-96.png</file>
+        <file>res/+theme_light/desktop/icons/Console-96.png</file>
+        <file>res/+theme_light/desktop/icons/Data Backup-96.png</file>
+        <file>res/+theme_light/desktop/icons/Delete-96.png</file>
+        <file>res/+theme_light/desktop/icons/Disconnected-96.png</file>
+        <file>res/+theme_light/desktop/icons/Down-96.png</file>
+        <file>res/+theme_light/desktop/icons/Download-96.png</file>
+        <file>res/+theme_light/desktop/icons/Help-96.png</file>
+        <file>res/+theme_light/desktop/icons/Horizontal Settings Mixer-96.png</file>
+        <file>res/+theme_light/desktop/icons/Line Chart-96.png</file>
+        <file>res/+theme_light/desktop/icons/Ok-96.png</file>
+        <file>res/+theme_light/desktop/icons/Open Folder-96.png</file>
+        <file>res/+theme_light/desktop/icons/Plus Math-96.png</file>
+        <file>res/+theme_light/desktop/icons/Refresh-96.png</file>
+        <file>res/+theme_light/desktop/icons/Restart-96.png</file>
+        <file>res/+theme_light/desktop/icons/Save as-96.png</file>
+        <file>res/+theme_light/desktop/icons/Save-96.png</file>
+        <file>res/+theme_light/desktop/icons/Send File-96.png</file>
+        <file>res/+theme_light/desktop/icons/Shutdown-96.png</file>
+        <file>res/+theme_light/desktop/icons/Stop Sign-96.png</file>
+        <file>res/+theme_light/desktop/icons/Up-96.png</file>
+        <file>res/+theme_light/desktop/icons/Upload-96.png</file>
+        <file>res/+theme_light/desktop/icons/Wizard-96.png</file>
+        <file>res/+theme_light/desktop/icons/alive_off.png</file>
+        <file>res/+theme_light/desktop/icons/alive_on.png</file>
+        <file>res/+theme_light/desktop/icons/app_default.png</file>
+        <file>res/+theme_light/desktop/icons/app_down.png</file>
+        <file>res/+theme_light/desktop/icons/app_up.png</file>
+        <file>res/+theme_light/desktop/icons/apply.png</file>
+        <file>res/+theme_light/desktop/icons/arrow_r.png</file>
+        <file>res/+theme_light/desktop/icons/bms_off.png</file>
+        <file>res/+theme_light/desktop/icons/bms_on.png</file>
+        <file>res/+theme_light/desktop/icons/can_off.png</file>
+        <file>res/+theme_light/desktop/icons/can_on.png</file>
+        <file>res/+theme_light/desktop/icons/check.png</file>
+        <file>res/+theme_light/desktop/icons/chevron.png</file>
+        <file>res/+theme_light/desktop/icons/expand_off.png</file>
+        <file>res/+theme_light/desktop/icons/expand_on.png</file>
+        <file>res/+theme_light/desktop/icons/expand_v_off.png</file>
+        <file>res/+theme_light/desktop/icons/expand_v_on.png</file>
+        <file>res/+theme_light/desktop/icons/icons8-edit-96.png</file>
+        <file>res/+theme_light/desktop/icons/imu_off.png</file>
+        <file>res/+theme_light/desktop/icons/imu_on.png</file>
+        <file>res/+theme_light/desktop/icons/keys_off.png</file>
+        <file>res/+theme_light/desktop/icons/keys_on.png</file>
+        <file>res/+theme_light/desktop/icons/motor_default.png</file>
+        <file>res/+theme_light/desktop/icons/motor_down.png</file>
+        <file>res/+theme_light/desktop/icons/motor_up.png</file>
+        <file>res/+theme_light/desktop/icons/radio.png</file>
+        <file>res/+theme_light/desktop/icons/rt_app_off.png</file>
+        <file>res/+theme_light/desktop/icons/rt_app_on.png</file>
+        <file>res/+theme_light/desktop/icons/rt_off.png</file>
+        <file>res/+theme_light/desktop/icons/rt_on.png</file>
+        <file>res/+theme_light/desktop/icons/size_off.png</file>
+        <file>res/+theme_light/desktop/icons/size_on.png</file>
+        <file>res/+theme_light/desktop/icons/spin_down.png</file>
+        <file>res/+theme_light/desktop/icons/spin_up.png</file>
+        <file>res/desktop/icons/Controller-96.png</file>
+        <file>res/desktop/icons/Gyroscope-96.png</file>
+        <file>res/desktop/icons/Lock-96.png</file>
+        <file>res/desktop/icons/Process-96.png</file>
+        <file>res/desktop/icons/Settings-96.png</file>
+        <file>res/desktop/icons/bluetooth.png</file>
+        <file>res/desktop/icons/USB-96.png</file>
+        <file>res/desktop/icons/LAN-96.png</file>
+        <file>res/desktop/icons/Globe-96.png</file>
+        <file>res/desktop/icons/cross.png</file>
+        <file>res/desktop/icons/icons8-fantasy-96.png</file>
+        <file>res/desktop/icons/motor.png</file>
+        <file>res/+theme_light/desktop/icons/Controller-96.png</file>
+        <file>res/+theme_light/desktop/icons/Gyroscope-96.png</file>
+        <file>res/+theme_light/desktop/icons/Lock-96.png</file>
+        <file>res/+theme_light/desktop/icons/Process-96.png</file>
+        <file>res/+theme_light/desktop/icons/Settings-96.png</file>
+        <file>res/+theme_light/desktop/icons/bluetooth.png</file>
+        <file>res/+theme_light/desktop/icons/USB-96.png</file>
+        <file>res/+theme_light/desktop/icons/LAN-96.png</file>
+        <file>res/+theme_light/desktop/icons/Globe-96.png</file>
+        <file>res/+theme_light/desktop/icons/cross.png</file>
+        <file>res/+theme_light/desktop/icons/icons8-fantasy-96.png</file>
+        <file>res/+theme_light/desktop/icons/motor.png</file>
+        <file>res/desktop/icons/led_bad.png</file>
+        <file>res/desktop/icons/led_off.png</file>
+        <file>res/desktop/icons/led_ok.png</file>
+        <file>res/+theme_light/desktop/icons/led_bad.png</file>
+        <file>res/+theme_light/desktop/icons/led_off.png</file>
+        <file>res/+theme_light/desktop/icons/led_ok.png</file>
+        <file>res/desktop/icons/chevron_l.png</file>
+        <file>res/desktop/icons/chevron_r.png</file>
+        <file>res/desktop/icons/pause.png</file>
+        <file>res/desktop/icons/search.png</file>
+        <file>res/desktop/icons/warning.png</file>
+        <file>res/+theme_light/desktop/icons/chevron_l.png</file>
+        <file>res/+theme_light/desktop/icons/chevron_r.png</file>
+        <file>res/+theme_light/desktop/icons/pause.png</file>
+        <file>res/+theme_light/desktop/icons/search.png</file>
+        <file>res/+theme_light/desktop/icons/warning.png</file>
     </qresource>
 </RCC>

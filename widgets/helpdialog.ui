@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>613</width>
+    <width>560</width>
     <height>236</height>
    </rect>
   </property>
@@ -18,20 +18,26 @@
     <normaloff>:/res/icons/Help-96.png</normaloff>:/res/icons/Help-96.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>10</number>
+     </property>
      <item>
       <widget class="QLabel" name="label">
        <property name="minimumSize">
         <size>
-         <width>40</width>
-         <height>40</height>
+         <width>16</width>
+         <height>16</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>40</width>
-         <height>40</height>
+         <width>16</width>
+         <height>16</height>
         </size>
        </property>
        <property name="text">
@@ -43,13 +49,26 @@
       </widget>
      </item>
      <item>
-      <widget class="VTextBrowser" name="textEdit">
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+      <widget class="QLabel" name="titleLabel">
+       <property name="dialogTitle" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="VTextBrowser" name="textEdit">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -68,8 +87,17 @@
      </item>
      <item>
       <widget class="QPushButton" name="okButton">
+       <property name="minimumSize">
+        <size>
+         <width>84</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Ok</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

@@ -34,6 +34,7 @@ public:
     SuperSlider(QWidget *parent = nullptr);
 
     virtual void resizeEvent(QResizeEvent *event);
+    void paintEvent(QPaintEvent *event) override;
 
     int alt_value();
     void alt_setValue(int value);

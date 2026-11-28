@@ -36,7 +36,6 @@
 #include "pages/pageconnection.h"
 #include "widgets/ppmmap.h"
 #include "widgets/adcmap.h"
-#include "widgets/aspectimglabel.h"
 
 #include "vescinterface.h"
 
@@ -93,6 +92,7 @@ private:
     bool mLastIsDark;
 
     void saveSettingsChanged();
+    void fitToTab();
 
 };
 

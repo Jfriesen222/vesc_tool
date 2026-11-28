@@ -38,7 +38,7 @@ PageScripting::PageScripting(QWidget *parent) :
     ui->setupUi(this);
     mVesc = nullptr;
     ui->qmlWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    ui->qmlWidget->setClearColor(Utility::getAppQColor("normalBackground"));
+    ui->qmlWidget->setClearColor(Utility::getAppQColor("wellBackground"));
 
     ui->mainEdit->setModeQml();
     makeEditorConnections(ui->mainEdit);
@@ -68,7 +68,8 @@ PageScripting::PageScripting(QWidget *parent) :
 
     plusButton->setFlat(true);
     plusButton->setText("New Tab");
-    ui->fileTabs->setCornerWidget(plusButton);
+    ui->fileTabs->setCornerWidget(ScriptEditor::fileButtons(ui->fileTabs, plusButton));
+    ui->tabWidget->setCornerWidget(ui->clearConsoleButton);
     connect(plusButton, &QPushButton::clicked, [this]() {
         createEditorTab("", "");
     });
@@ -241,12 +242,12 @@ void PageScripting::debugMsgRx(QtMsgType type, const QString msg)
     QString str;
 
     if (type == QtWarningMsg || type == QtCriticalMsg || type == QtFatalMsg) {
-        str = "<font color=\"red\">" + msg + "</font><br>";
+        str = "<font color=\"" + Utility::getAppHexColor("warningText") + "\">" + msg + "</font><br>";
     } else {
         str = msg + "<br>";
     }
 
-    ui->debugEdit->queueConsoleText("<font color=\"#4d7fc4\">" +
+    ui->debugEdit->queueConsoleText("<font color=\"" + Utility::getAppHexColor("mutedText") + "\">" +
                                    QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss: ") +
                                    "</font>" + str, true);
 }
@@ -263,9 +264,9 @@ void PageScripting::on_stopButton_clicked()
     if (mVesc) {
         ui->qmlWidget->deleteLater();
         ui->qmlWidget = new QQuickWidget(this);
-        ui->splitter->addWidget(ui->qmlWidget);
+        ui->qmlFrameLayout->addWidget(ui->qmlWidget, 1);
         ui->qmlWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-        ui->qmlWidget->setClearColor(Utility::getAppQColor("normalBackground"));
+        ui->qmlWidget->setClearColor(Utility::getAppQColor("wellBackground"));
         ui->qmlWidget->engine()->rootContext()->setContextProperty("VescIf", mVesc);
         ui->qmlWidget->engine()->rootContext()->setContextProperty("QmlUi", this);
         ui->qmlWidget->engine()->rootContext()->setContextProperty("Utility", &mUtil);

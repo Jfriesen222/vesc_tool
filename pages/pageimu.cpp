@@ -45,6 +45,9 @@ PageImu::PageImu(QWidget *parent) :
     {
         Utility::setPlotColors(plots[i]);
         plots[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
+        Utility::setPlotLegendRow(plots[i]);
+        plots[i]->legend->setVisible(true);
     }
 
     int graphIndex = 0;
@@ -115,30 +118,15 @@ PageImu::PageImu(QWidget *parent) :
     ui->magPlot->graph(graphIndex)->setName("Mag Z");
     graphIndex++;
 
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
-
-    ui->rpyPlot->legend->setVisible(true);
-    ui->rpyPlot->legend->setFont(legendFont);
-    ui->rpyPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->rpyPlot->xAxis->setLabel("Seconds (s)");
     ui->rpyPlot->yAxis->setLabel("Angle (Deg)");
 
-    ui->accelPlot->legend->setVisible(true);
-    ui->accelPlot->legend->setFont(legendFont);
-    ui->accelPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->accelPlot->xAxis->setLabel("Seconds (s)");
     ui->accelPlot->yAxis->setLabel("Acceleration (G)");
 
-    ui->gyroPlot->legend->setVisible(true);
-    ui->gyroPlot->legend->setFont(legendFont);
-    ui->gyroPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->gyroPlot->xAxis->setLabel("Seconds (s)");
     ui->gyroPlot->yAxis->setLabel("Angular Velocity (Deg/s)");
 
-    ui->magPlot->legend->setVisible(true);
-    ui->magPlot->legend->setFont(legendFont);
-    ui->magPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->magPlot->xAxis->setLabel("Seconds (s)");
     ui->magPlot->yAxis->setLabel("Magnetic Field (µT)");
 
@@ -146,7 +134,7 @@ PageImu::PageImu(QWidget *parent) :
     m3dView->setMinimumWidth(200);
     m3dView->setRollPitchYaw(20, 20, 0);
     m3dView->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    ui->tab_3->layout()->addWidget(m3dView);
+    ui->viewWell->layout()->addWidget(m3dView);
 }
 
 PageImu::~PageImu()
@@ -201,6 +189,19 @@ void PageImu::timerSlot()
         ui->magPlot->graph(graphIndex++)->setData(xAxis, mMagYVec);
         ui->magPlot->graph(graphIndex++)->setData(xAxis, mMagZVec);
 
+        // The legend shows the latest value of each trace
+        QCustomPlot *plots[4] = {ui->rpyPlot, ui->accelPlot, ui->gyroPlot, ui->magPlot};
+        QStringList names = {"Roll", "Pitch", "Yaw", "Acc X", "Acc Y", "Acc Z",
+                             "Gyro X", "Gyro Y", "Gyro Z", "Mag X", "Mag Y", "Mag Z"};
+        QVector<double> *values[12] = {&mRollVec, &mPitchVec, &mYawVec, &mAccXVec, &mAccYVec, &mAccZVec,
+                                       &mGyroXVec, &mGyroYVec, &mGyroZVec, &mMagXVec, &mMagYVec, &mMagZVec};
+        QStringList units = {"\u00B0", " g", " \u00B0/s", " \u00B5T"};
+        for (int i = 0;i < 12;i++) {
+            plots[i / 3]->graph(i % 3)->setName(QString("%1   %2%3").arg(names.at(i)).
+                                                arg(values[i]->last(), 0, 'f', i / 3 == 1 ? 2 : 1).
+                                                arg(units.at(i / 3)));
+        }
+
         ui->rpyPlot->rescaleAxes();
         ui->accelPlot->rescaleAxes();
         ui->gyroPlot->rescaleAxes();
@@ -221,6 +222,16 @@ void PageImu::valuesReceived(IMU_VALUES values, unsigned int mask)
 
     m3dView->setRollPitchYaw(values.roll * 180.0 / M_PI, values.pitch * 180.0 / M_PI,
                              ui->useYawBox->isChecked() ? values.yaw * 180.0 / M_PI : 0.0);
+
+    // The angles of the 3D view, with yaw dimmed while the view does not use it
+    QString angle = "%1 <font color=\"%2\">%3\u00B0</font>";
+    ui->anglesLabel->setText(
+                angle.arg(tr("Roll"), Utility::getAppHexColor("titleText")).arg(values.roll * 180.0 / M_PI, 0, 'f', 1) +
+                "&nbsp;&nbsp;&nbsp;" +
+                angle.arg(tr("Pitch"), Utility::getAppHexColor("titleText")).arg(values.pitch * 180.0 / M_PI, 0, 'f', 1) +
+                "&nbsp;&nbsp;&nbsp;" +
+                angle.arg(tr("Yaw"), Utility::getAppHexColor(ui->useYawBox->isChecked() ? "titleText" : "disabledText")).
+                arg(values.yaw * 180.0 / M_PI, 0, 'f', 1));
 
     appendDoubleAndTrunc(&mRollVec, values.roll * 180.0 / M_PI, maxS);
     appendDoubleAndTrunc(&mPitchVec, values.pitch * 180.0 / M_PI, maxS);

@@ -32,7 +32,8 @@ PageCanAnalyzer::PageCanAnalyzer(QWidget *parent) :
     ui->sendButton->setIcon(Utility::getIcon("icons/Send File-96.png"));
 
     layout()->setContentsMargins(0, 0, 0, 0);
-    ui->msgTable->setColumnWidth(1, 120);
+    ui->msgTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->canBaudNoteIcon->setPixmap(QIcon(Utility::getIcon("icons/About-96.png")).pixmap(16, 16));
     mVesc = nullptr;
 }
 

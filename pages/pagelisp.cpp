@@ -38,7 +38,7 @@ PageLisp::PageLisp(QWidget *parent) :
     plusButton->setIcon(Utility::getIcon("icons/Plus Math-96.png"));
     ui->runButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
     ui->stopButton->setIcon(Utility::getIcon("icons/Shutdown-96.png"));
-    ui->infoButton->setIcon(Utility::getIcon("icons/Help-96.png"));
+    ui->infoButton->setIcon(Utility::getIcon("icons/About-96.png"));
     ui->helpButton->setIcon(Utility::getIcon("icons/Help-96.png"));
     ui->clearConsoleButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
     ui->openRecentButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
@@ -70,7 +70,8 @@ PageLisp::PageLisp(QWidget *parent) :
 
     plusButton->setFlat(true);
     plusButton->setText("New Tab");
-    ui->fileTabs->setCornerWidget(plusButton);
+    ui->fileTabs->setCornerWidget(ScriptEditor::fileButtons(ui->fileTabs, plusButton));
+    ui->tabWidget->setCornerWidget(ui->clearConsoleButton);
     connect(plusButton, &QPushButton::clicked, [this]() {
         createEditorTab("", "");
     });
@@ -119,8 +120,9 @@ PageLisp::PageLisp(QWidget *parent) :
         ui->exampleList->addItem(item);
     }
 
-    ui->splitter->setSizes(QList<int>({1000, 100}));
-    ui->splitter_2->setSizes(QList<int>({1000, 600}));
+    ui->splitter->setSizes(QList<int>({1000, 400}));
+    ui->splitter_2->setSizes(QList<int>({1000, 300}));
+    ui->bindingTable->horizontalHeaderItem(1)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
     mPollTimer.start(1000 / ui->pollRateBox->value());
     connect(&mPollTimer, &QTimer::timeout, [this]() {
@@ -148,12 +150,9 @@ PageLisp::PageLisp(QWidget *parent) :
     connect(ui->zoomVButton, &QPushButton::clicked, updateZoom);
     updateZoom();
 
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
     ui->bindingPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    Utility::setPlotLegendRow(ui->bindingPlot);
     ui->bindingPlot->legend->setVisible(true);
-    ui->bindingPlot->legend->setFont(legendFont);
-    ui->bindingPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->bindingPlot->xAxis->setLabel("Age (s)");
     ui->bindingPlot->yAxis->setLabel("Value");
     ui->bindingPlot->xAxis->setRangeReversed(true);
@@ -215,7 +214,7 @@ void PageLisp::setVesc(VescInterface *vesc)
 
     connect(mVesc->commands(), &Commands::lispStatsRx, [this](LISP_STATS stats) {
         ui->cpuBar->setValue(stats.cpu_use * 10);
-        ui->cpuBar->setFormat(QString("%1%").arg(stats.cpu_use, 0, 'f', 1));
+        ui->cpuBar->setFormat(QString("%1 %").arg(stats.cpu_use, 0, 'f', 1));
         ui->heapBar->setValue(stats.heap_use);
         ui->memBar->setValue(stats.mem_use);
 
@@ -228,9 +227,13 @@ void PageLisp::setVesc(VescInterface *vesc)
 
         int ind = 0;
         for (auto b: stats.number_bindings) {
-            ui->bindingTable->setItem(ind, 0, new QTableWidgetItem(b.first));
+            auto name = new QTableWidgetItem(b.first);
+            name->setFont(ui->debugEdit->font());
+            ui->bindingTable->setItem(ind, 0, name);
             auto data = new QTableWidgetItem(QString::number(b.second, 'f'));
             data->setData(Qt::UserRole, b.second);
+            data->setFont(ui->debugEdit->font());
+            data->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
             ui->bindingTable->setItem(ind, 1, data);
 
             if (ui->bindingTable->item(ind, 1)->isSelected()) {

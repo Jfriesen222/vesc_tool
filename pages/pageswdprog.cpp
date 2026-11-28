@@ -48,6 +48,8 @@ PageSwdProg::PageSwdProg(QWidget *parent) :
     ui->resetButton->setIcon(Utility::getIcon("icons/Restart-96.png"));
     ui->eraseFlashButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
     ui->uploadButton->setIcon(Utility::getIcon("icons/Download-96.png"));
+    ui->targetLamp->setPixmap(QIcon(Utility::getIcon("icons/led_ok.png")).pixmap(14, 14));
+    ui->targetLamp->setVisible(false);
     ui->cancelButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
 
     mTimer = new QTimer(this);
@@ -443,6 +445,8 @@ void PageSwdProg::timerSlot()
         ui->targetLabel->clear();
         ui->fwList->clear();
     }
+
+    ui->targetLamp->setVisible(!ui->targetLabel->text().isEmpty());
 }
 
 void PageSwdProg::fwUploadStatus(const QString &status, double progress, bool isOngoing)

@@ -45,15 +45,13 @@ public slots:
     void startSetupWizardFocQml();
     void startSetupWizardMotor();
     void startSetupWizardApp();
+    void autoConnect();
+    void triggerWindowAction(const QString &name);
+    void showDirSetup();
+    void showNrfPair();
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
-
-private slots:
-    void on_autoConnectButton_clicked();
-    void on_nrfPairButton_clicked();
-    void on_setupBluetoothButton_clicked();
-    void on_wizardIMUButton_clicked();
 
 private:
     Ui::PageWelcome *ui;

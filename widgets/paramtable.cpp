@@ -19,26 +19,34 @@
 
 #include "paramtable.h"
 #include "utility.h"
+#include <QBoxLayout>
 #include <QDebug>
 #include <QHeaderView>
-#include <QLabel>
+#include <QPainter>
+#include <QTimer>
 #include <QMenu>
 #include <QTabWidget>
+#include <QPushButton>
 
 ParamTable::ParamTable(QWidget *parent) : QTableWidget(parent)
 {
-    setColumnCount(2);
-
-    QStringList headers;
-    headers.append("Name");
-    headers.append("Edit");
-
-    setHorizontalHeaderLabels(headers);
-    setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::NoSelection);
-    horizontalHeader()->setStretchLastSection(true);
+    setFocusPolicy(Qt::NoFocus);
+    setShowGrid(false);
+    setWordWrap(false);
+    setTextElideMode(Qt::ElideRight);
+    viewport()->setMouseTracking(true);
+    setFrameShape(QFrame::NoFrame);
+    setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
     horizontalHeader()->setVisible(false);
+    horizontalHeader()->setMinimumSectionSize(0);
     verticalHeader()->setVisible(false);
+    verticalHeader()->setMinimumSectionSize(0);
+    mLayoutPending = false;
+    mMarkedRow = -1;
+    mHoverRow = -1;
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &QWidget::customContextMenuRequested, this, &ParamTable::showContextMenu);
@@ -46,75 +54,48 @@ ParamTable::ParamTable(QWidget *parent) : QTableWidget(parent)
 
 bool ParamTable::addParamRow(ConfigParams *params, QString paramName)
 {
-    bool res = false;
-    QWidget *editor = params->getEditor(paramName);
-    QString name = params->getLongName(paramName);
-
-    if (editor) {
-        int row = rowCount();
-        setRowCount(row + 1);
-        QTableWidgetItem *item = new QTableWidgetItem(name);
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-        setItem(row, 0, item);
-        setCellWidget(row, 1, editor);
-        res = true;
-
-        mRows.resize(row + 1);
-        mRows[row] = {params, paramName};
-        connect(params, &ConfigParams::changedParamsChanged, this, &ParamTable::updateChanged, Qt::UniqueConnection);
-        updateChanged();
-
-        resizeColumnToContents(0);
-        resizeRowsToContents();
+    if (!params->hasParam(paramName) || params->getParam(paramName)->type == CFG_T_UNDEFINED) {
+        return false;
     }
 
-    return res;
+    mRows.append({params, paramName});
+    connect(params, &ConfigParams::changedParamsChanged, this, &ParamTable::updateChanged, Qt::UniqueConnection);
+    scheduleLayout();
+    return true;
 }
 
 void ParamTable::addRowSeparator(QString text)
 {
-    int row = rowCount();
-    setRowCount(row + 1);
-
-    QLabel *label = new QLabel(text);
-    label->setAlignment(Qt::AlignCenter);
-    QFont font;
-    font.setBold(true);
-
-    label->setStyleSheet("QLabel { background: qlineargradient(x1: 0, y1: 0, x2: 1.0, y2: 0, stop: 0.0" + Utility::getAppHexColor("lightAccent") +
-                         ", stop: 0.2 " + Utility::getAppHexColor("darkAccent") +
-                         ", stop: 0.8 " + Utility::getAppHexColor("darkAccent") +
-                         ", stop: 1.0 " + Utility::getAppHexColor("lightAccent") +");" +
-                         " color : white; border: none;}");
-    label->setFont(font);
-    label->setMargin(3);
-
-    setCellWidget(row, 0, label);
-    setSpan(row, 0, 1, 2);
-
-    resizeColumnToContents(0);
-    resizeRowsToContents();
+    mRows.append({nullptr, "::sep::" + text});
+    scheduleLayout();
 }
 
 void ParamTable::addParamSubgroup(ConfigParams *params, QString groupName, QString subgroupName)
 {
-    setUpdatesEnabled(false);
-    foreach (auto p, params->getParamsFromSubgroup(groupName, subgroupName)) {
+    // Parameters before the first separator of the XML are under the name of their subgroup
+    QStringList names = params->getParamsFromSubgroup(groupName, subgroupName);
+    if (!names.isEmpty() && !names.first().startsWith("::sep::")) {
+        addRowSeparator(subgroupName);
+    }
+
+    foreach (auto p, names) {
         if (p.startsWith("::sep::")) {
             addRowSeparator(p.mid(7));
         } else {
             addParamRow(params, p);
         }
     }
-    QTimer::singleShot(0, [this]() {
-        setUpdatesEnabled(true);
-    });
 }
 
 void ParamTable::clearParams()
 {
     setRowCount(0);
     mRows.clear();
+    mCells.clear();
+    mBlocks.clear();
+    mMarkedRow = -1;
+    mHoverRow = -1;
+    scheduleLayout();
 }
 
 bool ParamTable::hasChanges()
@@ -127,26 +108,203 @@ bool ParamTable::hasChanges()
     return false;
 }
 
-// The names get room for bold text, so that they still fit when their rows show changes
-int ParamTable::sizeHintForColumn(int column) const
+// The rows are laid out once after they are added, as it depends on how many there are in a block
+void ParamTable::scheduleLayout()
 {
-    int hint = QTableWidget::sizeHintForColumn(column);
-    if (column != 0) {
-        return hint;
+    if (!mLayoutPending) {
+        mLayoutPending = true;
+        QTimer::singleShot(0, this, [this]() {
+            if (mLayoutPending) {
+                layoutRows();
+            }
+        });
+    }
+}
+
+// The parameters between two separators are a block. It is on a card and when there is room it has two
+// columns, filled one after the other so that the parameters stay in the order they were added.
+void ParamTable::layoutRows()
+{
+    const int paramHeight = 38, titleHeight = 38, editorWidth = 236;
+    int columns = wantedColumns();
+
+    // Parameters of a configuration that no longer exists are left out
+    mRows.removeIf([](const QPair<QPointer<ConfigParams>, QString> &r) {
+        return !r.first && !r.second.startsWith("::sep::");
+    });
+
+    mLayoutPending = false;
+    setUpdatesEnabled(false);
+    setRowCount(0);
+    setColumnCount(2 * columns);
+    for (int c = 0;c < columns;c++) {
+        horizontalHeader()->setSectionResizeMode(2 * c, QHeaderView::Stretch);
+        horizontalHeader()->setSectionResizeMode(2 * c + 1, QHeaderView::Fixed);
     }
 
-    QFont bold = font();
-    bold.setBold(true);
-    QFontMetrics fmBold(bold);
-    int extra = 0;
-    for (int row = 0;row < rowCount();row++) {
-        const QTableWidgetItem *it = item(row, 0);
-        if (it && !it->font().bold()) {
-            extra = qMax(extra, fmBold.horizontalAdvance(it->text()) - fontMetrics().horizontalAdvance(it->text()));
+    mCells.fill(QPoint(-1, -1), mRows.size());
+    mBlocks.clear();
+    mHoverRow = -1;
+    int widestEditor = editorWidth;
+    for (int i = 0;i < mRows.size();) {
+        int row = rowCount();
+        if (!mRows.at(i).first) {
+            // A gap above the title, but not above the first one
+            setRowCount(row + 1);
+            setRowHeight(row, row == 0 ? titleHeight - 16 : titleHeight);
+            setSpan(row, 0, 1, columnCount());
+            mCells[i++] = QPoint(0, row);
+            continue;
+        }
+
+        int end = i;
+        while (end < mRows.size() && mRows.at(end).first) {
+            end++;
+        }
+        int rows = (end - i + columns - 1) / columns;
+        setRowCount(row + rows);
+        mBlocks.append(qMakePair(row, rows));
+        for (int r = row;r < row + rows;r++) {
+            setRowHeight(r, paramHeight);
+        }
+        for (int n = 0;i < end;i++, n++) {
+            QPoint cell(2 * (n / rows), row + n % rows);
+            QTableWidgetItem *item = new QTableWidgetItem(mRows.at(i).first->getLongName(mRows.at(i).second));
+            item->setFlags(Qt::ItemIsEnabled);
+            setItem(cell.y(), cell.x(), item);
+            QWidget *editor = mRows.at(i).first->getEditor(mRows.at(i).second);
+            editor->installEventFilter(this);
+            setCellWidget(cell.y(), cell.x() + 1, editor);
+            // Editors with more than one line, such as bit fields, make their row higher and get the width they need
+            setRowHeight(cell.y(), qMax(rowHeight(cell.y()), editor->sizeHint().height() + 12));
+            if (editor->sizeHint().height() > paramHeight) {
+                widestEditor = qMax(widestEditor, editor->sizeHint().width() + 28);
+            }
+            mCells[i] = cell;
+            setRowActive(i, false);
         }
     }
 
-    return hint + extra;
+    for (int c = 0;c < columns;c++) {
+        horizontalHeader()->resizeSection(2 * c + 1, widestEditor);
+    }
+
+    // Alone in a layout it stays at the top instead of in the middle of the room that is left over
+    QBoxLayout *box = parentWidget() ? qobject_cast<QBoxLayout*>(parentWidget()->layout()) : nullptr;
+    if (box && box->count() == 1) {
+        box->setAlignment(this, Qt::AlignTop);
+    }
+
+    updateChanged();
+    updateGeometry();
+    setUpdatesEnabled(true);
+}
+
+int ParamTable::wantedColumns() const
+{
+    return (mRows.size() > 1 && width() >= 800) ? 2 : 1;
+}
+
+// Back to one column when two no longer fit, and the other way
+void ParamTable::resizeEvent(QResizeEvent *event)
+{
+    QTableWidget::resizeEvent(event);
+    if (columnCount() != 2 * wantedColumns()) {
+        scheduleLayout();
+    }
+}
+
+// Draws the cards, the lines between the rows, the titles and a dot after the names of changed parameters.
+// The cells are drawn over it.
+void ParamTable::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(viewport());
+    painter.setRenderHint(QPainter::Antialiasing);
+    QColor line = Utility::getAppQColor("line");
+
+    for (auto block: mBlocks) {
+        int top = rowViewportPosition(block.first);
+        int bottom = rowViewportPosition(block.first + block.second - 1) + rowHeight(block.first + block.second - 1);
+        QRectF card(0.5, top + 0.5, viewport()->width() - 1, bottom - top - 1);
+        painter.setPen(line);
+        painter.setBrush(Utility::getAppQColor("cardBackground"));
+        painter.drawRoundedRect(card, 10, 10);
+        for (int r = 1;r < block.second;r++) {
+            double y = rowViewportPosition(block.first + r) + 0.5;
+            painter.drawLine(QPointF(card.left(), y), QPointF(card.right(), y));
+        }
+        if (columnCount() > 2) {
+            painter.drawLine(QPointF(columnViewportPosition(2), card.top()), QPointF(columnViewportPosition(2), card.bottom()));
+        }
+    }
+
+    for (int i = 0;i < mCells.size();i++) {
+        QRect rect = visualRect(model()->index(mCells.at(i).y(), mCells.at(i).x()));
+        if (mRows.at(i).second.startsWith("::sep::")) {
+            Utility::drawSectionHeader(&painter, rect.adjusted(2, rect.height() - 22, -2, -6), mRows.at(i).second.mid(7));
+            continue;
+        }
+
+        // The row that was searched for is marked, the row under the mouse is a little lighter
+        if (i == mMarkedRow || i == mHoverRow) {
+            QColor tint = Utility::getAppQColor("titleText");
+            tint.setAlpha(8);
+            if (i == mMarkedRow) {
+                tint = Utility::getAppQColor("accentDim");
+            }
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(tint);
+            painter.drawRoundedRect(rect.united(visualRect(model()->index(mCells.at(i).y(), mCells.at(i).x() + 1))).adjusted(3, 3, -3, -3), 7, 7);
+        }
+        if (i != mMarkedRow && rowChanged(i)) {
+            int textWidth = qMin(fontMetrics().horizontalAdvance(item(mCells.at(i).y(), mCells.at(i).x())->text()), rect.width() - 34);
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(Utility::getAppQColor("accent"));
+            painter.drawEllipse(QPointF(rect.left() + 14 + textWidth + 11, rect.center().y() + 1), 3, 3);
+        }
+    }
+
+    painter.end();
+    QTableWidget::paintEvent(event);
+}
+
+// The parameters in the order they were added, with the separators left out
+QVector<QPair<QPointer<ConfigParams>, QString>> ParamTable::params() const
+{
+    QVector<QPair<QPointer<ConfigParams>, QString>> res;
+    for (const auto &r: mRows) {
+        if (r.first) {
+            res.append(r);
+        }
+    }
+    return res;
+}
+
+// Scrolls to the parameter and marks it for a moment. False if it is not here.
+bool ParamTable::showParam(const QString &paramName)
+{
+    int row = -1;
+    for (int i = 0;i < mRows.size() && row < 0;i++) {
+        if (mRows.at(i).first && mRows.at(i).second == paramName) {
+            row = i;
+        }
+    }
+    if (row < 0) {
+        return false;
+    }
+
+    if (mLayoutPending) {
+        layoutRows();
+    }
+
+    mMarkedRow = row;
+    scrollTo(model()->index(mCells.at(row).y(), mCells.at(row).x()), QAbstractItemView::PositionAtCenter);
+    viewport()->update();
+    QTimer::singleShot(1500, this, [this]() {
+        mMarkedRow = -1;
+        viewport()->update();
+    });
+    return true;
 }
 
 bool ParamTable::rowChanged(int row)
@@ -155,27 +313,21 @@ bool ParamTable::rowChanged(int row)
     return r.first && r.first->getChangedParams().contains(r.second);
 }
 
-// Rows that differ from the device get the accent color and the device value as tooltip
+// Parameters that differ from the device have a dot after the name, an accent edge on the value and the
+// device value as tooltip
 void ParamTable::updateChanged()
 {
-    QColor accent = Utility::getAppQColor("accentText");
-    QColor tint = accent;
-    tint.setAlpha(28);
-
-    for (int row = 0;row < mRows.size();row++) {
-        QTableWidgetItem *it = item(row, 0);
-        if (!it || !mRows.at(row).first) {
+    for (int i = 0;i < mCells.size();i++) {
+        QTableWidgetItem *it = mRows.at(i).first ? item(mCells.at(i).y(), mCells.at(i).x()) : nullptr;
+        if (!it) {
             continue;
         }
 
-        bool changed = rowChanged(row);
-        QFont f = font();
-        f.setBold(changed);
-        it->setFont(f);
-        it->setData(Qt::ForegroundRole, changed ? QVariant(accent) : QVariant());
-        it->setData(Qt::BackgroundRole, changed ? QVariant(tint) : QVariant());
-        it->setToolTip(changed ? tr("Value on the VESC: %1").arg(referenceString(row)) : QString());
+        bool changed = rowChanged(i);
+        it->setToolTip(changed ? tr("Value on the VESC: %1").arg(referenceString(i)) : it->text());
+        Utility::setStyleProperty(cellWidget(mCells.at(i).y(), mCells.at(i).x() + 1), "changed", changed);
     }
+    viewport()->update();
 
     // Dot on the tab that holds this table
     for (QWidget *w = this;w->parentWidget();w = w->parentWidget()) {
@@ -199,7 +351,8 @@ QString ParamTable::referenceString(int row)
 
 void ParamTable::showContextMenu(const QPoint &pos)
 {
-    int row = rowAt(pos.y());
+    QModelIndex index = indexAt(pos);
+    int row = mCells.indexOf(QPoint(index.column() & ~1, index.row()));
     int changedRows = 0;
     for (int i = 0;i < mRows.size();i++) {
         changedRows += rowChanged(i);
@@ -230,4 +383,52 @@ void ParamTable::revertRow(int row)
         QString name = mRows.at(row).second;
         params->updateParamFromOther(name, params->getReference()->getParamCopy(name), nullptr);
     }
+}
+
+// The row under the mouse is lighter and its action buttons are bright; the buttons of the other rows are dim
+void ParamTable::updateHover()
+{
+    QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
+    QModelIndex index = viewport()->rect().contains(pos) ? indexAt(pos) : QModelIndex();
+    int row = index.isValid() ? mCells.indexOf(QPoint(index.column() & ~1, index.row())) : -1;
+    if (row != mHoverRow) {
+        setRowActive(mHoverRow, false);
+        setRowActive(row, true);
+        mHoverRow = row;
+        viewport()->update();
+    }
+}
+
+void ParamTable::setRowActive(int row, bool active)
+{
+    QWidget *editor = (row >= 0 && row < mCells.size() && mRows.at(row).first) ?
+                cellWidget(mCells.at(row).y(), mCells.at(row).x() + 1) : nullptr;
+    if (!editor) {
+        return;
+    }
+
+    for (QPushButton *button: editor->findChildren<QPushButton*>()) {
+        QPixmap pm = button->icon().pixmap(button->iconSize(), devicePixelRatioF());
+        QPainter painter(&pm);
+        painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        painter.fillRect(pm.rect(), Utility::getAppQColor(active ? "lightText" : "disabledText"));
+        painter.end();
+        button->setIcon(pm);
+    }
+}
+
+bool ParamTable::viewportEvent(QEvent *event)
+{
+    if (event->type() == QEvent::MouseMove || event->type() == QEvent::Leave) {
+        updateHover();
+    }
+    return QTableWidget::viewportEvent(event);
+}
+
+bool ParamTable::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::Enter || event->type() == QEvent::Leave) {
+        updateHover();
+    }
+    return QTableWidget::eventFilter(object, event);
 }

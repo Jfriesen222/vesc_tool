@@ -31,14 +31,8 @@ DetectFoc::DetectFoc(QWidget *parent) :
     ui->setupUi(this);
 
     ui->helpButton->setIcon(Utility::getIcon("icons/Help-96.png"));
-    ui->pushButton->setIcon(Utility::getIcon("icons/arrow_r.png"));
-    ui->pushButton_2->setIcon(Utility::getIcon("icons/arrow_r.png"));
-    ui->pushButton_3->setIcon(Utility::getIcon("icons/arrow_r.png"));
-    ui->rlButton->setIcon(Utility::getIcon("icons/rl.png"));
-    ui->lambdaButton->setIcon(Utility::getIcon("icons/lambda.png"));
+    ui->lambdaButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
     ui->applyAllButton->setIcon(Utility::getIcon("icons/apply.png"));
-    ui->calcGainButton->setIcon(Utility::getIcon("icons/Calculator-96.png"));
-    ui->calcKpKiButton->setIcon(Utility::getIcon("icons/Calculator-96.png"));
     ui->calcApplyLocalButton->setIcon(Utility::getIcon("icons/Calculator-96.png"));
 
     layout()->setContentsMargins(0, 0, 0, 0);
@@ -167,11 +161,13 @@ void DetectFoc::motorRLReceived(double r, double l, double ld_lq_diff)
 
     if (r < 1e-9 && l < 1e-9) {
         mVesc->emitStatusMessage(tr("Bad FOC Detection Result Received"), false);
+        setFailed({ui->resistanceTile, ui->inductanceTile, ui->inductanceDiffTile}, true);
         QMessageBox::critical(this,
                               tr("Bad Detection Result"),
                               tr("Could not measure the motor resistance and inductance."));
     } else {
         mVesc->emitStatusMessage(tr("FOC Detection Result Received"), true);
+        setFailed({ui->resistanceTile, ui->inductanceTile, ui->inductanceDiffTile}, false);
         ui->resistanceBox->setValue(r * 1e3);
         ui->inductanceBox->setValue(l);
         ui->inductanceDiffBox->setValue(ld_lq_diff);
@@ -208,12 +204,14 @@ void DetectFoc::motorLinkageReceived(double flux_linkage)
 
     if (flux_linkage < 1e-9) {
         mVesc->emitStatusMessage(tr("Bad FOC Detection Result Received"), false);
+        setFailed({ui->lambdaTile}, true);
         QMessageBox::critical(this,
                               tr("Bad Detection Result"),
                               tr("Could not measure the flux linkage properly. Adjust the start parameters "
                                  "according to the help text and try again."));
     } else {
         mVesc->emitStatusMessage(tr("FOC Detection Result Received"), true);
+        setFailed({ui->lambdaTile}, false);
         ui->lambdaBox->setValue(flux_linkage * 1e3);
         ui->obsGainBox->setValue(0.0);
         on_calcGainButton_clicked();
@@ -300,6 +298,8 @@ void DetectFoc::on_applyAllButton_clicked()
         } else {
             mVesc->emitStatusMessage(tr("Apply Parameters Failed"), false);
         }
+
+        updateColors();
     }
 }
 
@@ -325,34 +325,38 @@ void DetectFoc::updateColors()
     bool enc_offset_ok = ui->encOffsetBox->value() >= 0.0;
     bool enc_ratio_ok = ui->encRatioBox->value() >= 0.0;
 
-    QString style_red = "color: rgb(255, 255, 255);"
-                        "background-color: rgb(140,37,37);";
-
-    QString style_green = "color: rgb(255, 255, 255);"
-                          "background-color: rgb(95,140,95)";
-
-    ui->resistanceBox->setStyleSheet(QString("#resistanceBox {%1}").
-                                     arg(r_ok ? style_green : style_red));
-    ui->inductanceBox->setStyleSheet(QString("#inductanceBox {%1}").
-                                     arg(l_ok ? style_green : style_red));
-    ui->inductanceDiffBox->setStyleSheet(QString("#inductanceDiffBox {%1}").
-                                     arg(l_diff_ok ? style_green : style_red));
-    ui->lambdaBox->setStyleSheet(QString("#lambdaBox {%1}").
-                                 arg(lambda_ok ? style_green : style_red));
-    ui->obsGainBox->setStyleSheet(QString("#obsGainBox {%1}").
-                                  arg(gain_ok ? style_green : style_red));
-    ui->kpBox->setStyleSheet(QString("#kpBox {%1}").
-                             arg(kp_ok ? style_green : style_red));
-    ui->kiBox->setStyleSheet(QString("#kiBox {%1}").
-                             arg(ki_ok ? style_green : style_red));
-
-    ui->encOffsetBox->setStyleSheet(QString("#encOffsetBox {%1}").
-                             arg(enc_offset_ok ? style_green : style_red));
-    ui->encRatioBox->setStyleSheet(QString("#encRatioBox {%1}").
-                                    arg(enc_ratio_ok ? style_green : style_red));
+    // A tile is outlined green when it has a value
+    Utility::setStyleProperty(ui->resistanceTile, "ok", r_ok);
+    Utility::setStyleProperty(ui->inductanceTile, "ok", l_ok);
+    Utility::setStyleProperty(ui->inductanceDiffTile, "ok", l_diff_ok);
+    Utility::setStyleProperty(ui->lambdaTile, "ok", lambda_ok);
+    Utility::setStyleProperty(ui->obsGainTile, "ok", gain_ok);
+    Utility::setStyleProperty(ui->kpTile, "ok", kp_ok);
+    Utility::setStyleProperty(ui->kiTile, "ok", ki_ok);
+    Utility::setStyleProperty(ui->encOffsetTile, "ok", enc_offset_ok);
+    Utility::setStyleProperty(ui->encRatioTile, "ok", enc_ratio_ok);
 
     mAllValuesOk = r_ok && l_ok && lambda_ok && gain_ok && kp_ok && ki_ok;
     mEncoderValuesOk = enc_offset_ok && enc_ratio_ok;
+
+    // A step gets a tick when its results are there; the step to run next is marked and its button is the primary one
+    bool rl_done = r_ok && l_ok;
+    bool calc_done = kp_ok && ki_ok && gain_ok;
+    Utility::setStyleProperty(ui->rlStep, "ok", rl_done);
+    Utility::setStyleProperty(ui->lambdaStep, "ok", lambda_ok);
+    Utility::setStyleProperty(ui->calcStep, "ok", calc_done);
+    Utility::setStyleProperty(ui->rlButton, "primary", !rl_done);
+    Utility::setStyleProperty(ui->rlStep, "next", !rl_done);
+    Utility::setStyleProperty(ui->lambdaButton, "primary", rl_done && !lambda_ok);
+    Utility::setStyleProperty(ui->lambdaStep, "next", rl_done && !lambda_ok);
+    Utility::setStyleProperty(ui->applyAllButton, "primary", mAllValuesOk && !mLastOkValuesApplied);
+}
+
+void DetectFoc::setFailed(QList<QWidget*> tiles, bool failed)
+{
+    for (auto *t: tiles) {
+        Utility::setStyleProperty(t, "failed", failed);
+    }
 }
 
 void DetectFoc::on_calcKpKiButton_clicked()

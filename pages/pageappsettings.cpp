@@ -28,6 +28,7 @@ PageAppSettings::PageAppSettings(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->appWizardButton->setIcon(Utility::getIcon("icons/Wizard-96.png"));
+    Utility::setToolDescription(ui->textEdit, "app_setting_description");
     layout()->setContentsMargins(0, 0, 0, 0);
     mVesc = nullptr;
 }
@@ -45,36 +46,6 @@ VescInterface *PageAppSettings::vesc() const
 void PageAppSettings::setVesc(VescInterface *vesc)
 {
     mVesc = vesc;
-
-    if (mVesc) {
-        reloadParams();
-    }
-}
-
-void PageAppSettings::reloadParams()
-{
-    if (mVesc) {
-        ConfigParam *p = mVesc->infoConfig()->getParam("app_setting_description");
-        if (p != nullptr) {
-            QRegularExpression rx("(<img src=)|( width=)");
-            QStringList htmls = p->description.split(rx);
-            QStringList imgs = {"app_up", "app_default" , "app_down","Upload-96","Data Backup-96","Help-96"};
-            QString theme = "<img src=\"" + Utility::getThemePath() + "icons/";
-            QString out;
-            if(imgs.length() > htmls.length()/2 - 1) {
-                for(int i =0; i < htmls.length()-1; i+=2) {
-                    out.append(htmls[i] + theme + imgs[i/2]);
-                    out.append(".png\" width=");
-                }
-                out.append(htmls.last());
-                ui->textEdit->setHtml(out);
-            } else {
-                ui->textEdit->setHtml(p->description);
-            }
-        } else {
-            ui->textEdit->setText("App Setting Description not found.");
-        }
-    }
 }
 
 void PageAppSettings::on_appWizardButton_clicked()

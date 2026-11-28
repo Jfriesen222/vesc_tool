@@ -20,6 +20,7 @@
 #include "pagemotorinfo.h"
 #include "ui_pagemotorinfo.h"
 #include "widgets/helpdialog.h"
+#include "utility.h"
 
 PageMotorInfo::PageMotorInfo(QWidget *parent) :
     QWidget(parent),
@@ -27,6 +28,8 @@ PageMotorInfo::PageMotorInfo(QWidget *parent) :
 {
     ui->setupUi(this);
     layout()->setContentsMargins(0, 0, 0, 0);
+    ui->descriptionHelpButton->setIcon(Utility::getIcon("icons/Help-96.png"));
+    ui->descriptionNoteIcon->setPixmap(Utility::getIcon("icons/About-96.png"));
     mVesc = nullptr;
 }
 

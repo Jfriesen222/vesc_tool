@@ -20,6 +20,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
+#include <QScrollBar>
+#include <QQuickWidget>
 #include <QDebug>
 #include <QInputDialog>
 #include <QFileDialog>
@@ -36,6 +38,7 @@
 #include "utility.h"
 #include "widgets/paramdialog.h"
 #include "widgets/paramtable.h"
+#include "widgets/searchbox.h"
 
 namespace {
 void stepTowards(double &value, double goal, double step) {
@@ -179,6 +182,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionReadMcconf->setIcon(Utility::getIcon("icons/motor_up.png"));
     ui->actionReadMcconfDefault->setIcon(Utility::getIcon("icons/motor_default.png"));
     ui->actionWriteMcconf->setIcon(Utility::getIcon("icons/motor_down.png"));
+    ui->actionWriteMcconf->setIconText(tr("Write"));
+    ui->actionWriteAppconf->setIconText(tr("Write"));
     ui->actionReadAppconf->setIcon(Utility::getIcon("icons/app_up.png"));
     ui->actionReadAppconfDefault->setIcon(Utility::getIcon("icons/app_default.png"));
     ui->actionWriteAppconf->setIcon(Utility::getIcon("icons/app_down.png"));
@@ -261,8 +266,47 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->dispDuty->setUnit(" %");
     ui->dispDuty->setDecimals(1);
 
-    // Remove the menu with the option to hide the toolbar
-    ui->mainToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    for (QAbstractSpinBox *box: ui->deck->findChildren<QAbstractSpinBox*>()) {
+        Utility::setSpinUnit(box);
+    }
+
+    // Every key of the toolbar is named after its action
+    for (QToolButton *key: ui->rail->findChildren<QToolButton*>()) {
+        key->setDefaultAction(findChild<QAction*>(key->objectName().chopped(6)));
+    }
+    ui->stopKeyLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+
+    // The ends of the page list fade out while there are more pages above or below them
+    QWidget *pageFade[2];
+    for (int i = 0;i < 2;i++) {
+        pageFade[i] = new QWidget(ui->pageList);
+        QColor fadeColor = Utility::getAppQColor("frameBackground");
+        QLinearGradient fade(0, 0, 0, 40);
+        fade.setColorAt(i == 0 ? 0.0 : 1.0, fadeColor);
+        fadeColor.setAlpha(0);
+        fade.setColorAt(i == 0 ? 1.0 : 0.0, fadeColor);
+        QPalette fadePalette;
+        fadePalette.setBrush(QPalette::Window, fade);
+        pageFade[i]->setPalette(fadePalette);
+        pageFade[i]->setAutoFillBackground(true);
+        pageFade[i]->setAttribute(Qt::WA_TransparentForMouseEvents);
+    }
+    auto placeFade = [this, pageFade]() {
+        QScrollBar *bar = ui->pageList->verticalScrollBar();
+        pageFade[0]->setGeometry(0, 0, ui->pageList->width() - 8, 40);
+        pageFade[0]->setVisible(bar->value() > bar->minimum());
+        pageFade[1]->setGeometry(0, ui->pageList->height() - 40, ui->pageList->width() - 8, 40);
+        pageFade[1]->setVisible(bar->value() < bar->maximum());
+    };
+    connect(ui->pageList->verticalScrollBar(), &QScrollBar::valueChanged, this, placeFade);
+    connect(ui->pageList->verticalScrollBar(), &QScrollBar::rangeChanged, this, placeFade);
+
+    new SearchBox(ui->searchEdit, ui->pageList, ui->pageWidget, ui->canList, mVesc, this);
+    connect(ui->actionSendAlive, &QAction::toggled, this, [this](bool on) {
+        if (!on) {
+            setRunning(nullptr);
+        }
+    });
 
     mVesc->fwConfig()->loadParamsXml(Utility::configPath("fw.xml"));
     Utility::configLoadLatest(mVesc);
@@ -436,7 +480,6 @@ MainWindow::MainWindow(QWidget *parent) :
         mAppConfRead = false;
         mConfReadFailed = false;
 
-        mPageMotorSettings->reloadParams();
         mPageMotor->reloadParams();
         mPageBldc->reloadParams();
         mPageDc->reloadParams();
@@ -444,7 +487,6 @@ MainWindow::MainWindow(QWidget *parent) :
         mPageGpd->reloadParams();
         mPageControllers->reloadParams();
         mPageMotorInfo->reloadParams();
-        mPageAppSettings->reloadParams();
         mPageAppGeneral->reloadParams();
         mPageAppPpm->reloadParams();
         mPageAppAdc->reloadParams();
@@ -507,6 +549,13 @@ MainWindow::MainWindow(QWidget *parent) :
         for (int i = 0;i < mVesc->customConfigNum();i++) {
             connect(mVesc->customConfig(i), &ConfigParams::changedParamsChanged,
                     this, &MainWindow::updateConfigChanges, Qt::UniqueConnection);
+
+            // The page is named after its configuration as well
+            QString page = QString("app_custom_config_%1").arg(i);
+            QLabel *title = mPageNameIdList.contains(page) ? ui->pageWidget->widget(mPageNameIdList.value(page))->findChild<QLabel*>("pageTitle") : nullptr;
+            if (title) {
+                title->setText(mVesc->customConfig(i)->getParam("hw_name")->longName);
+            }
         }
         updateConfigChanges();
     });
@@ -678,6 +727,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *e)
             if (isPress) {
                 mVesc->commands()->setCurrent(ui->currentBox->value());
                 ui->actionSendAlive->setChecked(true);
+                setRunning(ui->currentCell);
             } else {
                 mVesc->commands()->setCurrent(0.0);
                 ui->actionSendAlive->setChecked(false);
@@ -688,6 +738,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *e)
             if (isPress) {
                 mVesc->commands()->setCurrent(-ui->currentBox->value());
                 ui->actionSendAlive->setChecked(true);
+                setRunning(ui->currentCell);
             } else {
                 mVesc->commands()->setCurrent(0.0);
                 ui->actionSendAlive->setChecked(false);
@@ -714,6 +765,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *e)
             if (isPress) {
                 mVesc->commands()->setCurrentBrake(-ui->currentBox->value());
                 ui->actionSendAlive->setChecked(true);
+                setRunning(ui->currentCell);
             } else {
                 mVesc->commands()->setCurrent(0.0);
                 ui->actionSendAlive->setChecked(false);
@@ -844,7 +896,7 @@ void MainWindow::timerSlot()
     if (mStatusInfoTime) {
         mStatusInfoTime--;
         if (!mStatusInfoTime) {
-            mStatusLabel->setStyleSheet(qApp->styleSheet());
+            setStatusState("");
         }
     } else {
         QString str = mVesc->getConnectedPortName();
@@ -1005,6 +1057,7 @@ void MainWindow::timerSlot()
         lastKeyPower = keyPower;
         mVesc->commands()->setDutyCycle(keyPower);
         ui->actionSendAlive->setChecked(true);
+        setRunning(keyPower != 0.0 ? ui->dutyCell : nullptr);
     }
 
     // Run startup checks
@@ -1041,13 +1094,21 @@ void MainWindow::timerSlot()
     }
 }
 
+// The status label is green for a good message, red for a bad one and plain for the connection
+void MainWindow::setStatusState(const QString &state)
+{
+    mStatusLabel->setProperty("state", state);
+    mStatusLabel->style()->unpolish(mStatusLabel);
+    mStatusLabel->style()->polish(mStatusLabel);
+}
+
 void MainWindow::showStatusInfo(QString info, bool isGood)
 {
     if (isGood) {
-        mStatusLabel->setStyleSheet("QLabel { background-color : lightgreen; color : black; }");
+        setStatusState("ok");
         mPageDebugPrint->printConsole("Status: " + info + "<br>");
     } else {
-        mStatusLabel->setStyleSheet("QLabel { background-color : red; color : black; }");
+        setStatusState("bad");
         mPageDebugPrint->printConsole("<font color=\"#00A1E4\">Status: " + info + "</font><br>");
     }
 
@@ -1133,6 +1194,7 @@ void MainWindow::serialPortNotWritable(const QString &port)
 void MainWindow::valuesReceived(MC_VALUES values, unsigned int mask)
 {
     (void)mask;
+    ui->dispCurrent->setBraking(values.current_motor * values.duty_now < 0.0);
     ui->dispCurrent->setVal(values.current_motor);
     ui->dispDuty->setVal(values.duty_now * 100.0);
 }
@@ -1142,6 +1204,8 @@ void MainWindow::paramChangedDouble(QObject *src, QString name, double newParam)
     (void)src;
     if (name == "l_current_max") {
         ui->dispCurrent->setRange(fabs(newParam));
+    } else if (name == "l_current_min") {
+        ui->dispCurrent->setRangeNeg(fabs(newParam));
     }
 }
 
@@ -1193,6 +1257,7 @@ void MainWindow::on_fullBrakeButton_clicked()
 {
     mVesc->commands()->setDutyCycle(0);
     ui->actionSendAlive->setChecked(true);
+    setRunning(ui->fullBrakeButton);
 }
 
 void MainWindow::on_actionReadMcconf_triggered()
@@ -1374,36 +1439,51 @@ void MainWindow::on_dutyButton_clicked()
 {
     mVesc->commands()->setDutyCycle(ui->dutyBox->value());
     ui->actionSendAlive->setChecked(true);
+    setRunning(ui->dutyCell);
 }
 
 void MainWindow::on_currentButton_clicked()
 {
     mVesc->commands()->setCurrent(ui->currentBox->value());
     ui->actionSendAlive->setChecked(true);
+    setRunning(ui->currentCell);
 }
 
 void MainWindow::on_speedButton_clicked()
 {
     mVesc->commands()->setRpm(int(ui->speedBox->value()));
     ui->actionSendAlive->setChecked(true);
+    setRunning(ui->speedCell);
 }
 
 void MainWindow::on_posButton_clicked()
 {
     mVesc->commands()->setPos(ui->posBox->value());
     ui->actionSendAlive->setChecked(true);
+    setRunning(ui->posCell);
 }
 
 void MainWindow::on_brakeCurrentButton_clicked()
 {
     mVesc->commands()->setCurrentBrake(ui->brakeCurrentBox->value());
     ui->actionSendAlive->setChecked(true);
+    setRunning(ui->brakeCurrentCell);
 }
 
 void MainWindow::on_handbrakeButton_clicked()
 {
     mVesc->commands()->setHandbrake(ui->handbrakeBox->value());
     ui->actionSendAlive->setChecked(true);
+    setRunning(ui->handbrakeCell);
+}
+
+// Marks the cell or the brake key of the command that was sent last, until the commands are no longer kept alive
+void MainWindow::setRunning(QWidget *cell)
+{
+    for (QFrame *c: ui->deck->findChildren<QFrame*>(QString(), Qt::FindDirectChildrenOnly)) {
+        Utility::setStyleProperty(c, "running", c == cell);
+    }
+    Utility::setStyleProperty(ui->fullBrakeButton, "running", cell == ui->fullBrakeButton);
 }
 
 void MainWindow::addPageItem(QString name, QString icon, QString groupIcon, bool bold, bool indented)
@@ -1414,10 +1494,82 @@ void MainWindow::addPageItem(QString name, QString icon, QString groupIcon, bool
     QListWidgetItem *item = new QListWidgetItem();
     item->setSizeHint(QSize(width,height));
     ui->pageList->addItem(item);
-    PageListItem *li = new PageListItem(name, icon, groupIcon, this);
+    PageListItem *li = new PageListItem(name, icon, this);
     li->setBold(bold);
     li->setIndented(indented);
     ui->pageList->setItemWidget(item, li);
+    // The search places an indented page under the page before it that is not indented
+    item->setData(Qt::UserRole, indented);
+
+    // The name of the page goes to the left of its tabs, or in a row above the page when it has none. The pages
+    // of the motor and app configuration are named after it and get a write button.
+    QWidget *page = ui->pageWidget->widget(ui->pageList->count() - 1);
+    QAction *write = groupIcon.contains("mcconf") ? ui->actionWriteMcconf :
+                     groupIcon.contains("appconf") ? ui->actionWriteAppconf : nullptr;
+    QLabel *title = page->findChild<QLabel*>("pageTitle");
+    QTabWidget *tabs = page->findChild<QTabWidget*>(QString(), Qt::FindDirectChildrenOnly);
+    QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(page->layout());
+    if (!title && (tabs || layout)) {
+        title = new QLabel;
+        title->setObjectName("pageTitle");
+        title->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        QToolButton *button = nullptr;
+        if (write) {
+            button = new QToolButton;
+            button->setDefaultAction(write);
+            button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button->setObjectName("pageWriteButton");
+        }
+
+        if (tabs && (!layout || layout->indexOf(tabs) == 0)) {
+            // The name ends with a short line before the tabs
+            QWidget *corner = new QWidget;
+            QHBoxLayout *cornerLayout = new QHBoxLayout(corner);
+            cornerLayout->setContentsMargins(0, 0, 11, 0);
+            cornerLayout->setSpacing(0);
+            QFrame *rule = new QFrame;
+            rule->setObjectName("pageTitleRule");
+            rule->setFixedSize(1, 18);
+            cornerLayout->addWidget(title);
+            cornerLayout->addWidget(rule);
+            tabs->setCornerWidget(corner, Qt::TopLeftCorner);
+            if (button) {
+                tabs->setCornerWidget(button, Qt::TopRightCorner);
+            }
+        } else {
+            QHBoxLayout *row = new QHBoxLayout;
+            row->addWidget(title);
+            row->addStretch();
+            if (button) {
+                row->addWidget(button);
+            }
+            layout->insertLayout(0, row);
+        }
+    }
+    if (title) {
+        title->setText(write ? QString("<font color=\"%1\">%2 &nbsp;/&nbsp;</font> %3").
+                               arg(Utility::getAppHexColor("mutedText"), write == ui->actionWriteMcconf ? tr("Motor") : tr("App"), name) : name);
+    }
+    page->setProperty("writeAction", QVariant::fromValue<QObject*>(write));
+
+    // The same room around the content of every page, or of each of its tabs. Not around a page that is all QML.
+    // The name of the page is at the top, as high as on the pages where the room is inside the tabs.
+    QList<QWidget*> padded = {page};
+    if (tabs && layout && layout->count() == 1) {
+        padded.clear();
+        for (int i = 0;i < tabs->count();i++) {
+            padded.append(tabs->widget(i));
+        }
+    }
+    for (QWidget *w: padded) {
+        if (w->layout() && !w->findChild<QQuickWidget*>(QString(), Qt::FindDirectChildrenOnly)) {
+            w->layout()->setContentsMargins(16, (w == page && title) ? 1 : 14, 16, 14);
+        }
+    }
+    // The room above the content is then inside the tabs, when they are over the whole page
+    if (tabs && layout && padded.first() == page && title && title->parentWidget() != page) {
+        tabs->setProperty("roomy", true);
+    }
 }
 
 void MainWindow::saveParamFileDialog(QString conf, bool wrapIfdef)
@@ -1474,14 +1626,41 @@ void MainWindow::updateConfigChanges()
     int mcChanges = motorConfs ? mVesc->mcConfig()->getChangedParams().size() : 0;
     int appChanges = motorConfs ? mVesc->appConfig()->getChangedParams().size() : 0;
 
-    ui->actionWriteMcconf->setIcon(mcChanges > 0 ? Utility::getIconWithDot("icons/motor_down.png") :
-                                                   Utility::getIcon("icons/motor_down.png"));
     ui->actionWriteMcconf->setToolTip(mcChanges > 0 ? tr("Write motor configuration (%n unwritten change(s))", "", mcChanges) :
                                                       tr("Write motor configuration"));
-    ui->actionWriteAppconf->setIcon(appChanges > 0 ? Utility::getIconWithDot("icons/app_down.png") :
-                                                     Utility::getIcon("icons/app_down.png"));
     ui->actionWriteAppconf->setToolTip(appChanges > 0 ? tr("Write app configuration (%n unwritten change(s))", "", appChanges) :
                                                         tr("Write app configuration"));
+
+    // The write keys of the toolbar and the write buttons of the pages count the changes
+    for (auto write: {qMakePair(ui->actionWriteMcconf, mcChanges), qMakePair(ui->actionWriteAppconf, appChanges)}) {
+        for (QObject *object: write.first->associatedObjects()) {
+            QToolButton *button = qobject_cast<QToolButton*>(object);
+            if (!button) {
+                continue;
+            }
+
+            // The count is a small disc. On a key of the toolbar it hangs over the top right corner, so it
+            // belongs to the toolbar and not to the key, which would cut it off.
+            bool key = ui->rail->isAncestorOf(button);
+            QWidget *owner = key ? ui->rail : button;
+            QLabel *badge = owner->findChild<QLabel*>(button->objectName() + "Badge", Qt::FindDirectChildrenOnly);
+            if (!badge) {
+                badge = new QLabel(owner);
+                badge->setObjectName(button->objectName() + "Badge");
+                badge->setProperty("badge", true);
+                badge->setAlignment(Qt::AlignCenter);
+                badge->setAttribute(Qt::WA_TransparentForMouseEvents);
+            }
+            badge->setNum(write.second);
+            badge->adjustSize();
+            QPoint corner = button->mapTo(owner, QPoint(button->width(), 0));
+            badge->move(corner.x() - badge->width() + (key ? 5 : -21), key ? corner.y() - 5 : (button->height() - badge->height()) / 2);
+            badge->raise();
+            badge->setVisible(write.second > 0);
+            Utility::setStyleProperty(button, "changed", write.second > 0);
+            button->setVisible(key || write.second > 0);
+        }
+    }
 
     for (int i = 0;i < ui->pageList->count();i++) {
         PageListItem *item = dynamic_cast<PageListItem*>(ui->pageList->itemWidget(ui->pageList->item(i)));
@@ -1750,12 +1929,11 @@ void MainWindow::reloadPages()
     addPageItem(tr("Motor Analysis"),  theme + "icons/motor.png", "", false, true);
     mPageNameIdList.insert("motor_comparison", ui->pageList->count() - 1);
 
-    VTextBrowser *vt = new VTextBrowser(this);
-    ConfigParam *p = mVesc->infoConfig()->getParam("dev_tools_description");
-    if (p) {
-        vt->setText(p->description);
-    }
-    ui->pageWidget->addWidget(vt);
+    QWidget *devTools = new QWidget(this);
+    VTextBrowser *vt = new VTextBrowser;
+    Utility::setToolDescription(vt, "dev_tools_description");
+    (new QVBoxLayout(devTools))->addWidget(vt);
+    ui->pageWidget->addWidget(devTools);
     addPageItem(tr("VESC Dev Tools"),  theme + "icons/v_icon-96.png", "", true);
 
     mPageTerminal = new PageTerminal(this);
@@ -1830,7 +2008,7 @@ void MainWindow::reloadPages()
     // Adjust sizes
     QFontMetrics fm(this->font());
     int width = fm.horizontalAdvance("Welcome & Wizards++++++++++++");
-    int height = fm.height()*1.25;
+    int height = fm.height()*1.8;
 
     for(int i = 0; i < ui->pageList->count(); i++) {
         QListWidgetItem *item = ui->pageList->item(i);
@@ -1841,19 +2019,11 @@ void MainWindow::reloadPages()
     ui->pageList->setMaximumWidth(width);
     ui->canList->setMinimumWidth(width);
     ui->canList->setMaximumWidth(width);
-    ui->pageLabel->setMaximumWidth(width);
-    ui->pageLabel->setMaximumHeight((460 * width) / 1550);
     ui->scanCanButton->setMaximumWidth(width);
 
     ui->pageList->setCurrentRow(0);
     ui->pageList->setGridSize(QSize(0.85*width , height));
     ui->pageWidget->setCurrentIndex(0);
-
-    // Adjust palette for pageList
-    QPalette menuPalette = ui->pageList->palette();
-    menuPalette.setColor(QPalette::Active,QPalette::Highlight,Utility::getAppQColor("brightHighlightActive"));
-    menuPalette.setColor(QPalette::Inactive,QPalette::Highlight,Utility::getAppQColor("brightHighlightInactive"));
-    ui->pageList->setPalette(menuPalette);
 }
 
 void MainWindow::checkUdev()
@@ -1989,6 +2159,18 @@ void MainWindow::on_pageList_currentRowChanged(int currentRow)
     if (currentRow >= 0) {
         ui->pageWidget->setCurrentIndex(currentRow);
     }
+
+    for (int i = 0;i < ui->pageList->count();i++) {
+        PageListItem *item = dynamic_cast<PageListItem*>(ui->pageList->itemWidget(ui->pageList->item(i)));
+        if (item) {
+            item->setSelected(i == currentRow);
+        }
+    }
+
+    // The column of toolbar keys that reads and writes what is on this page
+    QObject *write = ui->pageWidget->currentWidget() ? ui->pageWidget->currentWidget()->property("writeAction").value<QObject*>() : nullptr;
+    Utility::setStyleProperty(ui->motorKeysLabel, "current", write == ui->actionWriteMcconf);
+    Utility::setStyleProperty(ui->appKeysLabel, "current", write == ui->actionWriteAppconf);
 }
 
 void MainWindow::on_actionParameterEditorMcconf_triggered()
@@ -2283,6 +2465,10 @@ void MainWindow::pingCanRx(QVector<int> devs, bool isTimeout)
 
 void MainWindow::on_canList_currentRowChanged(int currentRow)
 {
+    for (int i = 0;i < ui->canList->count();i++) {
+        Utility::setStyleProperty(ui->canList->itemWidget(ui->canList->item(i)), "selected", i == currentRow);
+    }
+
     if (!ui->canList->isEnabled()) {
         return;
     }

@@ -33,15 +33,18 @@ class PageListItem : public QWidget
 public:
     explicit PageListItem(QString name = "",
                           QString icon = "",
-                          QString groupIcon = "",
                           QWidget *parent = 0);
     void setName(const QString &name);
     void setIcon(const QString &path);
-    void setGroupIcon(const QString &path);
     QString name();
+    QPixmap icon() const { return mIcon; }
     void setBold(bool bold);
     void setIndented(bool indented);
     void setChanged(bool changed);
+    void setSelected(bool selected);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 
 signals:
 
@@ -50,9 +53,14 @@ public slots:
 private:
     QLabel *mIconLabel;
     QLabel *mNameLabel;
-    QLabel *mGroupLabel;
     QLabel *mChangedDot;
     QSpacerItem *mSpaceStart;
+    QPixmap mIcon;
+    bool mSelected;
+    bool mIndented;
+    bool mBold;
+
+    void updateColors();
 
 };
 

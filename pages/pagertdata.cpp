@@ -25,6 +25,115 @@
 
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
+#include <QPainter>
+#include <QPainterPath>
+#include <QRegularExpression>
+#include <algorithm>
+
+namespace {
+// Name of a trace with its latest value, for the legend
+QString legendName(QString name, double value, int decimals, QString unit = "")
+{
+    return QString("%1   %2 %3").arg(name).arg(value, 0, 'f', decimals).arg(unit);
+}
+
+// A reading with its unit smaller and dimmed
+QString readingText(double value, int decimals, QString unit = "")
+{
+    return QString("%1 <small><font color=\"%2\">%3</font></small>").arg(value, 0, 'f', decimals).
+            arg(Utility::getAppHexColor("mutedText"), unit);
+}
+
+// A whole number with thin spaces between groups of three digits
+QString groupedText(qint64 value)
+{
+    return QString::number(value).replace(QRegularExpression("(\\d)(?=(\\d{3})+$)"), "\\1\u2009");
+}
+}
+
+Sparkline::Sparkline(QWidget *parent) : QWidget(parent)
+{
+    setFixedSize(74, 26);
+}
+
+void Sparkline::setColor(QColor color)
+{
+    mColor = color;
+}
+
+void Sparkline::setData(const QVector<double> &values)
+{
+    // Every value is drawn. Leaving some out makes short peaks come and go as the values move along.
+    mValues = values;
+    update();
+}
+
+void Sparkline::paintEvent(QPaintEvent *event)
+{
+    (void)event;
+    if (mValues.size() < 2) {
+        return;
+    }
+
+    auto range = std::minmax_element(mValues.begin(), mValues.end());
+    double min = *range.first;
+    double span = *range.second - min;
+    QRectF r = QRectF(rect()).adjusted(3, 3, -3, -3);
+    QPainterPath path;
+    for (int i = 0;i < mValues.size();i++) {
+        QPointF p(r.left() + r.width() * i / (mValues.size() - 1),
+                  span > 1e-9 ? r.bottom() - r.height() * (mValues.at(i) - min) / span : r.center().y());
+        if (i == 0) {
+            path.moveTo(p);
+        } else {
+            path.lineTo(p);
+        }
+    }
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QColor line = mColor;
+    line.setAlphaF(0.9);
+    painter.setPen(QPen(line, 1.4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.drawPath(path);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(mColor);
+    painter.drawEllipse(path.currentPosition(), 2.2, 2.2);
+}
+
+LevelBar::LevelBar(QWidget *parent) : QWidget(parent)
+{
+    setFixedHeight(6);
+}
+
+void LevelBar::setLevel(double value, double limitStart, double limitEnd)
+{
+    mValue = value;
+    mLimitStart = limitStart;
+    mLimitEnd = limitEnd;
+    update();
+}
+
+void LevelBar::paintEvent(QPaintEvent *event)
+{
+    (void)event;
+    QRectF r(0, height() - 3, width(), 3);
+    double scale = mLimitEnd > 0.0 ? r.width() / mLimitEnd : 0.0;
+    QColor zone = Utility::getAppQColor("warning");
+    zone.setAlphaF(0.45);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Utility::getAppQColor("line"));
+    painter.drawRoundedRect(r, 1.5, 1.5);
+    if (scale > 0.0) {
+        painter.setBrush(zone);
+        painter.drawRoundedRect(r.adjusted(qBound(0.0, mLimitStart * scale, r.width()), 0, 0, 0), 1.5, 1.5);
+        painter.setBrush(Utility::getAppQColor("infoText"));
+        painter.drawRoundedRect(QRectF(r.topLeft(), QSizeF(qBound(0.0, mValue * scale, r.width()), r.height())), 1.5, 1.5);
+    }
+}
 
 PageRtData::PageRtData(QWidget *parent) :
     QWidget(parent),
@@ -34,33 +143,49 @@ PageRtData::PageRtData(QWidget *parent) :
     layout()->setContentsMargins(0, 0, 0, 0);
     mVesc = nullptr;
 
-    ui->rescaleButton->setIcon(Utility::getIcon("icons/expand_off.png"));
+    // The streaming rate shares the row of the tabs. The values sit under the plot of the
+    // first tab and the plot tools over the top right of the well of the open tab.
+    mLiveChip = new QLabel;
+    mLiveChip->setProperty("chip", "live");
+    mLiveChip->hide();
+    ui->tabWidget->setCornerWidget(mLiveChip, Qt::TopRightCorner);
+    auto placeOnTab = [this]() {
+        QWidget *tab = ui->tabWidget->currentWidget();
+        QFrame *well = tab->findChild<QFrame*>(QString(), Qt::FindDirectChildrenOnly);
+        static_cast<QGridLayout*>(well->layout())->addWidget(ui->buttonFrame, 0, 0, Qt::AlignTop | Qt::AlignRight);
+        ui->buttonFrame->raise();
+    };
+    connect(ui->tabWidget, &QTabWidget::currentChanged, placeOnTab);
+    placeOnTab();
 
-    QIcon mycon = QIcon(Utility::getIcon("icons/expand_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_off.png"), QIcon::Normal, QIcon::Off);
-    ui->zoomHButton->setIcon(mycon);
+    // The checked state shows as a raised button, so the icons stay the same
+    ui->rescaleButton->setIcon(Utility::getIcon("icons/size_off.png"));
+    ui->zoomHButton->setIcon(Utility::getIcon("icons/expand_off.png"));
+    ui->zoomVButton->setIcon(Utility::getIcon("icons/expand_v_off.png"));
+    QIcon logIcon(Utility::getIcon("icons/led_off.png"));
+    logIcon.addPixmap(Utility::getIcon("icons/led_bad.png"), QIcon::Normal, QIcon::On);
+    ui->logRtButton->setIcon(logIcon);
+    ui->logRtButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
-    mycon = QIcon(Utility::getIcon("icons/expand_v_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_off.png"), QIcon::Normal, QIcon::Off);
-    ui->zoomVButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/size_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/size_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/size_off.png"), QIcon::Normal, QIcon::Off);
-    ui->autoscaleButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/rt_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/rt_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/rt_off.png"), QIcon::Normal, QIcon::Off);
-    ui->logRtButton->setIcon(mycon);
+    // Each tile shows a trend line in the colour of the chip before its caption
+    QList<QPair<QLabel*, Sparkline*>> tiles = {
+        {ui->powerCaption, ui->powerSpark}, {ui->dutyCaption, ui->dutySpark}, {ui->erpmCaption, ui->erpmSpark},
+        {ui->currentInCaption, ui->currentInSpark}, {ui->currentMotorCaption, ui->currentMotorSpark}};
+    QStringList tileColors = {"plot_graph7", "plot_graph3", "plot_graph4", "plot_graph1", "plot_graph2"};
+    for (int i = 0;i < tiles.size();i++) {
+        QColor color = Utility::getAppQColor(tileColors.at(i));
+        tiles.at(i).second->setColor(color);
+        tiles.at(i).first->setText(QString("<span style=\"color:%1\">&#9632;</span>&nbsp; %2").
+                                   arg(color.name(), tiles.at(i).first->text()));
+    }
 
     mTimer = new QTimer(this);
     mTimer->start(20);
 
     mSecondCounter = 0.0;
     mLastUpdateTime = 0;
+    mRateCount = 0;
+    mRateStart = 0;
 
     mUpdateValPlot = false;
     mUpdatePosPlot = false;
@@ -71,6 +196,9 @@ PageRtData::PageRtData(QWidget *parent) :
     for(int j = 0;j < 5; j++) {
         Utility::setPlotColors(allPlots[j]);
         allPlots[j]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
+        Utility::setPlotLegendRow(allPlots[j]);
+        allPlots[j]->legend->setVisible(true);
     }
 
     // Current and duty
@@ -120,32 +248,17 @@ PageRtData::PageRtData(QWidget *parent) :
     ui->focPlot->graph(graphIndex)->setName("Q Voltage");
     graphIndex++;
 
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
-
-    ui->currentPlot->legend->setVisible(true);
-    ui->currentPlot->legend->setFont(legendFont);
-    ui->currentPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->currentPlot->xAxis->setLabel("Seconds (s)");
     ui->currentPlot->yAxis->setLabel("Ampere (A)");
     ui->currentPlot->yAxis2->setLabel("Duty Cycle");
 
-    ui->tempPlot->legend->setVisible(true);
-    ui->tempPlot->legend->setFont(legendFont);
-    ui->tempPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->tempPlot->xAxis->setLabel("Seconds (s)");
     ui->tempPlot->yAxis->setLabel("Temperature MOSFET (\u00B0C)");
     ui->tempPlot->yAxis2->setLabel("Temperature Motor (\u00B0C)");
 
-    ui->rpmPlot->legend->setVisible(true);
-    ui->rpmPlot->legend->setFont(legendFont);
-    ui->rpmPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->rpmPlot->xAxis->setLabel("Seconds (s)");
     ui->rpmPlot->yAxis->setLabel("ERPM");
 
-    ui->focPlot->legend->setVisible(true);
-    ui->focPlot->legend->setFont(legendFont);
-    ui->focPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->focPlot->xAxis->setLabel("Seconds (s)");
     ui->focPlot->yAxis->setLabel("Current");
     ui->focPlot->yAxis2->setLabel("Voltage");
@@ -165,9 +278,6 @@ PageRtData::PageRtData(QWidget *parent) :
     ui->posPlot->graph(0)->setPen(QPen(Utility::getAppQColor("plot_graph1")));
     ui->posPlot->graph(0)->setName("Position");
 
-    ui->posPlot->legend->setVisible(true);
-    ui->posPlot->legend->setFont(legendFont);
-    ui->posPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->posPlot->xAxis->setLabel("Sample");
     ui->posPlot->yAxis->setLabel("Degrees");
 
@@ -207,6 +317,20 @@ void PageRtData::timerSlot()
         }
     }
 
+    // The header shows the rate at which values arrive, while they do
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (now - mRateStart >= 1000) {
+        if (mRateCount > 0) {
+            // In a table the lamp and the text are centered on each other
+            mLiveChip->setText(QString("<table cellspacing=\"0\" cellpadding=\"0\"><tr><td valign=\"middle\"><img src=\"%1desktop/icons/led_ok.png\" "
+                                       "width=\"16\" height=\"16\"></td><td valign=\"middle\">&nbsp;%2</td></tr></table>").
+                               arg(Utility::getThemePath(), tr("Streaming · %1 Hz").arg(qRound(mRateCount * 1000.0 / (now - mRateStart)))));
+        }
+        mRateCount = 0;
+        mRateStart = now;
+    }
+    mLiveChip->setVisible(now - mLastUpdateTime < 2000 && !mLiveChip->text().isEmpty());
+
     if (mUpdateValPlot) {
         int dataSize = mTempMosVec.size();
 
@@ -220,6 +344,15 @@ void PageRtData::timerSlot()
         ui->currentPlot->graph(graphIndex++)->setData(xAxis, mCurrInVec);
         ui->currentPlot->graph(graphIndex++)->setData(xAxis, mCurrMotorVec);
         ui->currentPlot->graph(graphIndex++)->setData(xAxis, mDutyVec);
+        ui->currentPlot->graph(0)->setName(legendName("Current in", mCurrInVec.last(), 2, "A"));
+        ui->currentPlot->graph(1)->setName(legendName("Current motor", mCurrMotorVec.last(), 2, "A"));
+        ui->currentPlot->graph(2)->setName(legendName("Duty cycle", mDutyVec.last() * 100.0, 1, "%"));
+
+        ui->powerSpark->setData(mPowerVec);
+        ui->dutySpark->setData(mDutyVec);
+        ui->erpmSpark->setData(mRpmVec);
+        ui->currentInSpark->setData(mCurrInVec);
+        ui->currentMotorSpark->setData(mCurrMotorVec);
 
         // Temperature plot
         ui->tempPlot->clearGraphs();
@@ -228,7 +361,7 @@ void PageRtData::timerSlot()
 
         ui->tempPlot->addGraph();
         ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph1")));
-        ui->tempPlot->graph(graphIndex)->setName("Temperature MOSFET");
+        ui->tempPlot->graph(graphIndex)->setName(legendName("MOSFET", mTempMosVec.last(), 1, "\u00B0C"));
         ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMosVec);
         ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
 
@@ -237,21 +370,21 @@ void PageRtData::timerSlot()
         if (!mTempMos1Vec.isEmpty() && mTempMos1Vec.last() != 0.0) {
             ui->tempPlot->addGraph();
             ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph2")));
-            ui->tempPlot->graph(graphIndex)->setName("Temperature MOSFET 1");
+            ui->tempPlot->graph(graphIndex)->setName(legendName("MOSFET 1", mTempMos1Vec.last(), 1, "\u00B0C"));
             ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMos1Vec);
             ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
             graphIndex++;
 
             ui->tempPlot->addGraph();
             ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph3")));
-            ui->tempPlot->graph(graphIndex)->setName("Temperature MOSFET 2");
+            ui->tempPlot->graph(graphIndex)->setName(legendName("MOSFET 2", mTempMos2Vec.last(), 1, "\u00B0C"));
             ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMos2Vec);
             ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
             graphIndex++;
 
             ui->tempPlot->addGraph();
             ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph4")));
-            ui->tempPlot->graph(graphIndex)->setName("Temperature MOSFET 3");
+            ui->tempPlot->graph(graphIndex)->setName(legendName("MOSFET 3", mTempMos3Vec.last(), 1, "\u00B0C"));
             ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMos3Vec);
             ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMosfetBox->isChecked());
             graphIndex++;
@@ -259,7 +392,7 @@ void PageRtData::timerSlot()
 
         ui->tempPlot->addGraph(ui->tempPlot->xAxis, ui->tempPlot->yAxis2);
         ui->tempPlot->graph(graphIndex)->setPen(QPen(Utility::getAppQColor("plot_graph5")));
-        ui->tempPlot->graph(graphIndex)->setName("Temperature Motor");
+        ui->tempPlot->graph(graphIndex)->setName(legendName("Motor", mTempMotorVec.last(), 1, "\u00B0C"));
         ui->tempPlot->graph(graphIndex)->setData(xAxis, mTempMotorVec);
         ui->tempPlot->graph(graphIndex)->setVisible(ui->tempShowMotorBox->isChecked());
         graphIndex++;
@@ -267,6 +400,7 @@ void PageRtData::timerSlot()
         // RPM plot
         graphIndex = 0;
         ui->rpmPlot->graph(graphIndex++)->setData(xAxis, mRpmVec);
+        ui->rpmPlot->graph(0)->setName(legendName("ERPM", mRpmVec.last(), 0));
 
         // FOC plot
         graphIndex = 0;
@@ -274,6 +408,10 @@ void PageRtData::timerSlot()
         ui->focPlot->graph(graphIndex++)->setData(xAxis, mIqVec);
         ui->focPlot->graph(graphIndex++)->setData(xAxis, mVdVec);
         ui->focPlot->graph(graphIndex++)->setData(xAxis, mVqVec);
+        ui->focPlot->graph(0)->setName(legendName("D Current", mIdVec.last(), 2, "A"));
+        ui->focPlot->graph(1)->setName(legendName("Q Current", mIqVec.last(), 2, "A"));
+        ui->focPlot->graph(2)->setName(legendName("D Voltage", mVdVec.last(), 2, "V"));
+        ui->focPlot->graph(3)->setName(legendName("Q Voltage", mVqVec.last(), 2, "V"));
 
         if (ui->autoscaleButton->isChecked()) {
             ui->currentPlot->rescaleAxes();
@@ -312,7 +450,29 @@ void PageRtData::timerSlot()
 void PageRtData::valuesReceived(MC_VALUES values, unsigned int mask)
 {
     (void)mask;
-    ui->rtText->setValues(values);
+
+    ui->powerValue->setText(readingText(values.v_in * values.current_in, 1, "W"));
+    ui->dutyValue->setText(readingText(values.duty_now * 100.0, 1, "%"));
+    ui->erpmValue->setText(groupedText(qRound64(values.rpm)));
+    ui->currentInValue->setText(readingText(values.current_in, 2, "A"));
+    ui->currentMotorValue->setText(readingText(values.current_motor, 2, "A"));
+    ui->tempMosValue->setText(readingText(values.temp_mos, 1, "\u00B0C"));
+    ui->tempMotorValue->setText(readingText(values.temp_motor, 1, "\u00B0C"));
+    ConfigParams *mcConf = mVesc->mcConfig();
+    ui->tempMosBar->setLevel(values.temp_mos, mcConf->getParamDouble("l_temp_fet_start"),
+                             mcConf->getParamDouble("l_temp_fet_end"));
+    ui->tempMotorBar->setLevel(values.temp_motor, mcConf->getParamDouble("l_temp_motor_start"),
+                               mcConf->getParamDouble("l_temp_motor_end"));
+    bool noFault = values.fault_code == FAULT_CODE_NONE;
+    ui->faultValue->setText(noFault ? tr("None") : values.fault_str.mid(11));
+    Utility::setStyleProperty(ui->faultValue, "ok", noFault);
+    ui->vinValue->setText(readingText(values.v_in, 1, "V"));
+    ui->ahDrawnValue->setText(readingText(values.amp_hours * 1000.0, 1, "mAh"));
+    ui->ahChargedValue->setText(readingText(values.amp_hours_charged * 1000.0, 1, "mAh"));
+    ui->whDrawnValue->setText(readingText(values.watt_hours, 2, "Wh"));
+    ui->whChargedValue->setText(readingText(values.watt_hours_charged, 2, "Wh"));
+    ui->tachValue->setText(groupedText(values.tachometer));
+    ui->tachAbsValue->setText(groupedText(values.tachometer_abs));
 
     const int maxS = 500;
 
@@ -329,6 +489,8 @@ void PageRtData::valuesReceived(MC_VALUES values, unsigned int mask)
     appendDoubleAndTrunc(&mRpmVec, values.rpm, maxS);
     appendDoubleAndTrunc(&mVdVec, values.vd, maxS);
     appendDoubleAndTrunc(&mVqVec, values.vq, maxS);
+    appendDoubleAndTrunc(&mPowerVec, values.v_in * values.current_in, maxS);
+    mRateCount++;
 
     qint64 tNow = QDateTime::currentMSecsSinceEpoch();
 

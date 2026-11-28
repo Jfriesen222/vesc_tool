@@ -38,6 +38,8 @@
 #define STR1(x)         #x
 #define STR(x)          STR1(x)
 
+class VTextBrowser;
+
 class Utility : public QObject
 {
     Q_OBJECT
@@ -139,6 +141,11 @@ public:
     Q_INVOKABLE static QString getThemePath();
 
     static void setPlotColors(QCustomPlot* plot);
+    static void setPlotLegendRow(QCustomPlot *plot);
+    static void drawSectionHeader(QPainter *painter, const QRect &rect, const QString &text);
+    static void setStyleProperty(QWidget *widget, const char *name, bool value);
+    static void setSpinUnit(QAbstractSpinBox *box);
+    static void setToolDescription(VTextBrowser *edit, const QString &name);
     static void plotSavePdf(QCustomPlot* plot, int width = 1280, int height = 720, QString title = "");
     static void plotSavePng(QCustomPlot* plot, int width = 1280, int height = 720, QString title = "");
 
@@ -160,7 +167,6 @@ public:
     static QString waitForLine(QTcpSocket *socket, int timeoutMs);
 
     static QPixmap getIcon(QString path);
-    static QPixmap getIconWithDot(QString path);
     static QPixmap getChangedDot();
 
     Q_INVOKABLE static bool downloadUrlEventloop(QString path, QString dest);

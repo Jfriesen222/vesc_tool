@@ -56,6 +56,22 @@ DispEditor::DispEditor(QWidget *parent) :
     on_imgScaleBox_valueChanged(ui->imgScaleBox->value());
 }
 
+void DispEditor::addSideWidget(QWidget *widget)
+{
+    // Under the preview, above the space that is left
+    ui->verticalLayout_3->insertWidget(ui->verticalLayout_3->count() - 1, widget);
+}
+
+void DispEditor::addEditorHeader(QWidget *widget)
+{
+    // At the top of the editor well, with a line under it
+    QFrame *line = new QFrame;
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    ui->editorFrameLayout->insertWidget(0, line);
+    ui->editorFrameLayout->insertWidget(0, widget);
+}
+
 void DispEditor::updateSize(int width, int height)
 {
     ui->displayEdit->setImageSize(width, height);
@@ -502,10 +518,13 @@ void DispEditor::on_imgScaleBox_valueChanged(int arg1)
 
 void DispEditor::updatePalette()
 {
-    QGridLayout *l = new QGridLayout;
-    l->setVerticalSpacing(1);
-    l->setHorizontalSpacing(1);
-    l->setContentsMargins(1, 1, 1, 1);
+    // A strip of swatches under the editor; the checked one is the colour in use
+    QHBoxLayout *l = new QHBoxLayout;
+    l->setSpacing(8);
+    l->setContentsMargins(10, 4, 10, 4);
+    QLabel *caption = new QLabel(tr("PALETTE"));
+    caption->setProperty("caption", true);
+    l->addWidget(caption);
 
     int colors = 0;
     if (ui->formatBox->currentIndex() == 0) {
@@ -524,6 +543,11 @@ void DispEditor::updatePalette()
                                     (double)i / ((double)colors - 1.0));
 
         QPushButton *b = new QPushButton();
+        b->setProperty("swatch", true);
+        b->setCheckable(true);
+        b->setAutoExclusive(true);
+        b->setChecked(i == colors - 1);
+        b->setIconSize(QSize(26, 16));
         auto updateColor = [b, this, i] (QColor col) {
             QPixmap px(50, 50);
             QPainter painter(&px);
@@ -534,8 +558,7 @@ void DispEditor::updatePalette()
             ui->displayEdit->setEditColor(col);
         };
 
-        const int cols = 6;
-        l->addWidget(b, i / cols, i - cols * (i / cols));
+        l->addWidget(b);
         mPalette.append(c);
         updateColor(c);
 
@@ -555,6 +578,8 @@ void DispEditor::updatePalette()
             }
         });
     }
+
+    l->addStretch();
 
     auto layoutOld = ui->colorWidget->layout();
     if (layoutOld != nullptr) {

@@ -33,7 +33,6 @@
 #include "widgets/detectfochall.h"
 #include "pages/pageconnection.h"
 #include "pages/pagefirmware.h"
-#include "widgets/aspectimglabel.h"
 
 class SetupWizardMotor : public QWizard
 {
@@ -67,13 +66,6 @@ public:
     };
 
     SetupWizardMotor(VescInterface *vesc, QWidget *parent = 0);
-
-private slots:
-    void idChanged(int id);
-
-private:
-    AspectImgLabel *mSideLabel;
-
 };
 
 class IntroPage : public QWizardPage

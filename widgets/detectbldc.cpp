@@ -84,6 +84,9 @@ void DetectBldc::on_applyButton_clicked()
             }
 
             mVesc->emitStatusMessage(tr("Detection Result Applied"), true);
+            Utility::setStyleProperty(ui->applyStep, "ok", true);
+            Utility::setStyleProperty(ui->applyButton, "primary", false);
+            Utility::setStyleProperty(ui->applyStep, "next", false);
         } else {
             QMessageBox::warning(this,
                                  tr("Apply Detection Result"),
@@ -114,12 +117,6 @@ void DetectBldc::setVesc(VescInterface *vesc)
     }
 }
 
-void DetectBldc::showEvent(QShowEvent *event)
-{
-    ui->resultBrowser->setMaximumHeight(ui->gridLayout->geometry().height());
-    QWidget::showEvent(event);
-}
-
 void DetectBldc::bldcDetectReceived(bldc_detect param)
 {
     if (!mRunning) {
@@ -128,7 +125,15 @@ void DetectBldc::bldcDetectReceived(bldc_detect param)
 
     mRunning = false;
 
-    if (param.cycle_int_limit < 0.01 && param.bemf_coupling_k < 0.01) {
+    // The detect step shows whether the detection worked, and Apply is the next step after a good one
+    bool ok = !(param.cycle_int_limit < 0.01 && param.bemf_coupling_k < 0.01);
+    Utility::setStyleProperty(ui->detectStep, "ok", ok);
+    Utility::setStyleProperty(ui->detectStep, "failed", !ok);
+    Utility::setStyleProperty(ui->applyStep, "ok", false);
+    Utility::setStyleProperty(ui->applyButton, "primary", ok);
+    Utility::setStyleProperty(ui->applyStep, "next", ok);
+
+    if (!ok) {
         mVesc->emitStatusMessage(tr("Bad Detection Result Received"), false);
         ui->resultBrowser->setText(tr("Detection failed."));
     } else {

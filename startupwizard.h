@@ -28,7 +28,10 @@
 
 #include "vescinterface.h"
 #include "widgets/vtextbrowser.h"
-#include "widgets/aspectimglabel.h"
+
+// Gives a wizard its look: page title and subtitle on top, the steps of the run beside the page,
+// Cancel apart from Back and Next
+void setUpWizardFrame(QWizard *wizard);
 
 class StartupWizard : public QWizard
 {
@@ -42,12 +45,6 @@ public:
     };
 
     explicit StartupWizard(VescInterface *vesc, QWidget *parent = 0);
-
-private slots:
-    void idChanged(int id);
-
-private:
-    AspectImgLabel *mSideLabel;
 };
 
 class StartupIntroPage : public QWizardPage

@@ -30,7 +30,7 @@ PpmMap::PpmMap(QWidget *parent) :
     ui->setupUi(this);
 
     ui->helpButton->setIcon(Utility::getIcon("icons/Help-96.png"));
-    ui->applyButton->setIcon(Utility::getIcon("icons/apply.png"));
+    ui->resetButton->setIcon(Utility::getIcon("icons/Restart-96.png"));
     ui->applyButton->setIcon(Utility::getIcon("icons/Ok-96.png"));
 
     layout()->setContentsMargins(0, 0, 0, 0);

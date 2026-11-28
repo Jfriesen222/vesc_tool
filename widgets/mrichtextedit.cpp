@@ -38,6 +38,7 @@
 #include <QUrl>
 #include <QPlainTextEdit>
 #include <QMenu>
+#include <QPainter>
 #include <QDialog>
 
 MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
@@ -205,14 +206,8 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
 
     // text color
 
-    QPixmap pix(16, 16);
-    pix.fill(QApplication::palette().window().color());
-    f_bgcolor->setIcon(pix);
     connect(f_bgcolor, SIGNAL(clicked()), this, SLOT(textBgColor()));
 
-    QPixmap pix2(16, 16);
-    pix2.fill(QApplication::palette().windowText().color());
-    f_fgcolor->setIcon(pix2);
     connect(f_fgcolor, SIGNAL(clicked()), this, SLOT(textFgColor()));
 
     // images
@@ -634,25 +629,26 @@ void MRichTextEdit::fontChanged(const QFont &f) {
     }
 }
 
+// A colour button shows its symbol over a bar in the colour it applies
+static QIcon colorIcon(QString symbol, const QColor &c)
+{
+    QPixmap pix(96, 96);
+    pix.fill(Qt::transparent);
+    QPainter p(&pix);
+    p.drawPixmap(QRect(12, 0, 72, 72), Utility::getIcon(symbol));
+    p.fillRect(QRect(8, 80, 80, 16), c);
+    return QIcon(pix);
+}
+
 void MRichTextEdit::bgColorChanged(const QColor &c) {
-    QPixmap pix(16, 16);
-    if (c.isValid()) {
-        pix.fill(c);
-    } else {
-        pix.fill(QApplication::palette().window().color());
-    }
-    f_bgcolor->setIcon(pix);
+    f_bgcolor->setIcon(colorIcon("icons_textedit/Fill Color-96.png",
+                                 c.isValid() ? c : QApplication::palette().window().color()));
 }
 
 void MRichTextEdit::fgColorChanged(const QColor &c)
 {
-    QPixmap pix(16, 16);
-    if (c.isValid()) {
-        pix.fill(c);
-    } else {
-        pix.fill(QApplication::palette().windowText().color());
-    }
-    f_fgcolor->setIcon(pix);
+    f_fgcolor->setIcon(colorIcon("icons_textedit/Text Color-96.png",
+                                 c.isValid() ? c : QApplication::palette().windowText().color()));
 }
 
 void MRichTextEdit::slotCurrentCharFormatChanged(const QTextCharFormat &format) {

@@ -45,6 +45,8 @@ PageAppImu::PageAppImu(QWidget *parent) :
     {
         Utility::setPlotColors(plots[i]);
         plots[i]->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+        Utility::setPlotLegendRow(plots[i]);
+        plots[i]->legend->setVisible(true);
     }
 
     int graphIndex = 0;
@@ -98,24 +100,10 @@ PageAppImu::PageAppImu(QWidget *parent) :
     ui->gyroPlot->graph(graphIndex)->setName("Gyro Z");
     graphIndex++;
 
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
-
-    ui->accelPlot->legend->setVisible(true);
-    ui->accelPlot->legend->setFont(legendFont);
-    ui->accelPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->accelPlot->xAxis->setLabel("Seconds (s)");
     ui->accelPlot->yAxis->setLabel("Acceleration (G)");
-
-    ui->rpyPlot->legend->setVisible(true);
-    ui->rpyPlot->legend->setFont(legendFont);
-    ui->rpyPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->rpyPlot->xAxis->setLabel("Seconds (s)");
     ui->rpyPlot->yAxis->setLabel("Angle (Deg)");
-
-    ui->gyroPlot->legend->setVisible(true);
-    ui->gyroPlot->legend->setFont(legendFont);
-    ui->gyroPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
     ui->gyroPlot->xAxis->setLabel("Seconds (s)");
     ui->gyroPlot->yAxis->setLabel("Angular Velocity (Deg/s)");
 
@@ -174,28 +162,22 @@ void PageAppImu::timerSlot()
         ui->rpyPlot->graph(graphIndex++)->setData(xAxis, mRollVec);
         ui->rpyPlot->graph(graphIndex++)->setData(xAxis, mPitchVec);
         ui->rpyPlot->graph(graphIndex++)->setData(xAxis, mYawVec);
-        ui->rpyPlot->xAxis->setLabel(QString("Seconds (s) \n Roll: %1 Pitch: %2 Yaw: %3")
-                    .arg(mRollVec.last(), 8, 'f', 3, QLatin1Char(' '))
-                    .arg(mPitchVec.last(), 8, 'f', 3, QLatin1Char(' '))
-                    .arg(mYawVec.last(), 8, 'f', 3, QLatin1Char(' ')));
+        setLegendValues(ui->rpyPlot, {"Roll", "Pitch", "Yaw"},
+                        {mRollVec.last(), mPitchVec.last(), mYawVec.last()}, "°");
 
         graphIndex = 0;
         ui->accelPlot->graph(graphIndex++)->setData(xAxis, mAccXVec);
         ui->accelPlot->graph(graphIndex++)->setData(xAxis, mAccYVec);
         ui->accelPlot->graph(graphIndex++)->setData(xAxis, mAccZVec);
-        ui->accelPlot->xAxis->setLabel(QString("Seconds (s) \n X: %1 Y: %2 Z: %3")
-                    .arg(mAccXVec.last(), 8, 'f', 3, QLatin1Char(' '))
-                    .arg(mAccYVec.last(), 8, 'f', 3, QLatin1Char(' '))
-                    .arg(mAccZVec.last(), 8, 'f', 3, QLatin1Char(' ')));
+        setLegendValues(ui->accelPlot, {"Acc X", "Acc Y", "Acc Z"},
+                        {mAccXVec.last(), mAccYVec.last(), mAccZVec.last()}, " G");
 
         graphIndex = 0;
         ui->gyroPlot->graph(graphIndex++)->setData(xAxis, mGyroXVec);
         ui->gyroPlot->graph(graphIndex++)->setData(xAxis, mGyroYVec);
         ui->gyroPlot->graph(graphIndex++)->setData(xAxis, mGyroZVec);
-        ui->gyroPlot->xAxis->setLabel(QString("Seconds (s) \n X: %1 Y: %2 Z: %3")
-                    .arg(mGyroXVec.last(), 8, 'f', 3, QLatin1Char(' '))
-                    .arg(mGyroYVec.last(), 8, 'f', 3, QLatin1Char(' '))
-                    .arg(mGyroZVec.last(), 8, 'f', 3, QLatin1Char(' ')));
+        setLegendValues(ui->gyroPlot, {"Gyro X", "Gyro Y", "Gyro Z"},
+                        {mGyroXVec.last(), mGyroYVec.last(), mGyroZVec.last()}, " °/s");
 
         ui->rpyPlot->rescaleAxes();
         ui->accelPlot->rescaleAxes();
@@ -248,5 +230,14 @@ void PageAppImu::appendDoubleAndTrunc(QVector<double> *vec, double num, int maxS
 
     if(vec->size() > maxSize) {
         vec->remove(0, vec->size() - maxSize);
+    }
+}
+
+// Shows the latest value of each trace after its name in the legend
+void PageAppImu::setLegendValues(QCustomPlot *plot, const QStringList &names,
+                                 const QList<double> &values, const QString &unit)
+{
+    for (int i = 0;i < names.size();i++) {
+        plot->graph(i)->setName(QString("%1   %2%3").arg(names.at(i)).arg(values.at(i), 0, 'f', 3).arg(unit));
     }
 }

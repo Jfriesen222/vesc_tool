@@ -35,19 +35,37 @@ public:
     void addParamSubgroup(ConfigParams *params, QString groupName, QString subgroupName);
     void clearParams();
     bool hasChanges();
+    QVector<QPair<QPointer<ConfigParams>, QString>> params() const;
+    bool showParam(const QString &paramName);
 
 protected:
-    int sizeHintForColumn(int column) const override;
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    bool viewportEvent(QEvent *event) override;
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
-    // Parameter shown in each row, empty for separators
+    // Parameters and separators in the order they were added. A separator has no parameters and ::sep:: before
+    // its title as name.
     QVector<QPair<QPointer<ConfigParams>, QString>> mRows;
+    // Where each of them is in the table, as column and row of the name
+    QVector<QPoint> mCells;
+    // First row and number of rows of each card
+    QVector<QPair<int, int>> mBlocks;
+    bool mLayoutPending;
+    int mMarkedRow;
+    int mHoverRow;
 
+    void scheduleLayout();
+    void layoutRows();
+    int wantedColumns() const;
     bool rowChanged(int row);
     QString referenceString(int row);
     void updateChanged();
     void showContextMenu(const QPoint &pos);
     void revertRow(int row);
+    void updateHover();
+    void setRowActive(int row, bool active);
 
 };
 

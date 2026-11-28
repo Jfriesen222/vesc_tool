@@ -20,6 +20,7 @@
 #include "pagedisplaytool.h"
 #include "ui_pagedisplaytool.h"
 #include "vbytearray.h"
+#include "utility.h"
 
 #include <QLayout>
 #include <QFileDialog>
@@ -34,6 +35,12 @@ PageDisplayTool::PageDisplayTool(QWidget *parent) :
 
     mOverlayUpdating = false;
     on_updateSizeButton_clicked();
+
+    // The settings of each editor go under its preview
+    ui->fullEditor->addSideWidget(ui->tabWidget_2);
+    ui->fontEditor->addSideWidget(ui->fontEditBox);
+    ui->fullEditor->addEditorHeader(ui->sizeWidgetDisp);
+    ui->customEditor->addEditorHeader(ui->sizeWidget);
 
     // This seems to be required to scale the right pane layout properly. No idea why...
     ui->fontEditor->setVisible(false);
@@ -307,7 +314,7 @@ void PageDisplayTool::reloadFontEditorOverlay()
     imgBorder.fill(Qt::transparent);
     QPainter p(&imgBorder);
 
-    QColor col = Qt::red;
+    QColor col = Utility::getAppQColor("vescBlue");
     col.setAlphaF(0.5);
 
     for (int i = 0;i < charNum;i++) {

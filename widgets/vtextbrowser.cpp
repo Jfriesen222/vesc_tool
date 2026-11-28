@@ -54,6 +54,22 @@ void VTextBrowser::mouseReleaseEvent(QMouseEvent *e)
     QTextEdit::mouseReleaseEvent(e);
 }
 
+// Lines are at most this wide, and wrap to the box when it is narrower
+void VTextBrowser::setMaxTextWidth(int width)
+{
+    mMaxTextWidth = width;
+    setLineWrapMode(FixedPixelWidth);
+    setLineWrapColumnOrWidth(qMin(width, viewport()->width()));
+}
+
+void VTextBrowser::resizeEvent(QResizeEvent *e)
+{
+    QTextEdit::resizeEvent(e);
+    if (mMaxTextWidth > 0) {
+        setLineWrapColumnOrWidth(qMin(mMaxTextWidth, viewport()->width()));
+    }
+}
+
 void VTextBrowser::mouseMoveEvent(QMouseEvent *e)
 {
     if (!anchorAt(e->pos()).isEmpty()) {

@@ -18,7 +18,6 @@
     */
 
 #include "displaybar.h"
-#include "utility.h"
 #include <QPainter>
 #include <cmath>
 
@@ -26,68 +25,78 @@ DisplayBar::DisplayBar(QWidget *parent) : QWidget(parent)
 {
     mName = "Current";
     mRange = 60.0;
+    mRangeNeg = 0.0;
     mVal = 0.0;
+    mPeak = 0.0;
+    mBraking = false;
     mUnit = " A";
     mDecimals = 2;
 }
 
+// The name, a tape of segments that fills from the zero in the middle and the value in a readout
 void DisplayBar::paintEvent(QPaintEvent *event)
 {
+    (void)event;
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    int w = width();
-    int h = height();
-    double f_disp = 0.3;
-    double f_val = 1.0 - f_disp;
+    // It is on the black housing of the bottom bar in both themes, so the colors are not from the theme
+    const QColor cText(244, 244, 245), cMuted(140, 139, 147), cLit(47, 183, 242), cBrake(63, 212, 135), cHot(242, 181, 74);
+    const int w = width(), h = height();
+    const int nameW = 64, readW = 92;
 
-    painter.fillRect(event->rect(), Qt::transparent);
-    painter.setBrush(Utility::getAppQColor("black"));
-    painter.drawRoundedRect(event->rect(), 5.0, 5.0);
-
-    painter.setBrush(QBrush(Utility::getAppQColor("red")));
-    painter.fillRect(w / 2 - 1, 0, 2, h, QColor(150,37,37));
-    painter.fillRect(0, h * f_disp - 1, w, 2, Utility::getAppQColor("darkAccent"));
-
-
-
-    QPen pen;
-    QFont font;
-
-    // Name
-    pen.setColor(Utility::getAppQColor("white"));
-    font.setFamily("DejaVu Sans Mono");
-    font.setBold(true);
-    font.setPixelSize(h * f_val - 2);
-    painter.setPen(pen);
+    QFont font = this->font();
+    font.setPointSizeF(font.pointSizeF() * 0.78);
+    font.setWeight(QFont::Medium);
+    font.setLetterSpacing(QFont::AbsoluteSpacing, 1.3);
     painter.setFont(font);
-    painter.drawText(QRect(0, h * f_disp + 1, w / 2 - 2, h * f_val - 1),
-                     Qt::AlignCenter, mName);
+    painter.setPen(cMuted);
+    painter.drawText(QRect(0, 0, nameW, h), Qt::AlignLeft | Qt::AlignVCenter, mName.toUpper());
 
-    // Value
-    pen.setColor(Utility::getAppQColor("white"));
-    font.setFamily("DejaVu Sans Mono");
-    font.setBold(true);
-    font.setPixelSize(h * f_val - 2);
-    painter.setPen(pen);
+    QRectF read(w - readW + 0.5, 1.5, readW - 1, h - 3);
+    painter.setPen(QColor(255, 255, 255, 23));
+    painter.setBrush(Qt::black);
+    painter.drawRoundedRect(read, 5, 5);
+    font.setLetterSpacing(QFont::AbsoluteSpacing, 0);
     painter.setFont(font);
-    QString str = QString("%1%2").arg(mVal, 0, 'f', mDecimals).arg(mUnit);
-    painter.drawText(QRect(w / 2 + 1, h * f_disp + 1, w / 2 - 2, h * f_val - 1),
-                     Qt::AlignCenter, str);
+    painter.setPen(cMuted);
+    painter.drawText(read.adjusted(0, 1, -7, 0), Qt::AlignRight | Qt::AlignVCenter, mUnit.trimmed());
+    font.setPointSizeF(this->font().pointSizeF() * 1.18);
+    painter.setFont(font);
+    painter.setPen(cText);
+    painter.drawText(read.adjusted(0, 0, -20, 0), Qt::AlignRight | Qt::AlignVCenter, QString::number(mVal, 'f', mDecimals));
 
-    double xsp = (double)w / 2.0 + 1.0;
-    double xsm = (double)w / 2.0 - 1.0;
-    double valw = (mVal / mRange) * ((double)w / 2.0 - 2.0);
-    double valh = (double)h * f_disp - 2.0;
-
-    if (fabs(valw) > 0.1) {
-        if (valw >= 0.0) {
-            painter.setBrush(Utility::getAppQColor("green"));
-            painter.drawRect(xsp, 1, valw, valh);
-        } else {
-            painter.setBrush(Utility::getAppQColor("red"));
-            painter.drawRect(xsm + valw, 1, -valw, valh);
+    // Segments: lit up to the value, amber in the last tenth before the limit of their side, dark past it
+    const double pitch = 4.5, segW = 3.0, segH = h - 9.0, top = 2.0;
+    const double cx = std::round((nameW + w - readW) / 2.0);
+    const int n = ((w - readW - nameW) / 2.0 - 12.0) / pitch;
+    const double v = qBound(-1.0, mVal / mRange, 1.0);
+    const double peak = qBound(-1.0, mPeak / mRange, 1.0);
+    painter.setPen(Qt::NoPen);
+    for (int side = -1;side <= 1;side += 2) {
+        double limit = (side < 0 && mRangeNeg > 0.0) ? mRangeNeg / mRange : 1.0;
+        for (int i = 0;i < n;i++) {
+            double f = (i + 0.5) / n;
+            bool lit = side * v > 0.0 && f <= fabs(v) + 0.5 / n;
+            bool hot = f > limit * 0.9;
+            QColor c = f > limit + 0.5 / n ? QColor(255, 255, 255, 7) : hot ? QColor(224, 160, 48, 66) : QColor(255, 255, 255, 19);
+            if (lit) {
+                c = hot ? cHot : mBraking ? cBrake : cLit;
+            }
+            painter.setBrush(c);
+            painter.drawRoundedRect(QRectF(side > 0 ? cx + 2.5 + i * pitch : cx - 2.5 - i * pitch - segW, top, segW, segH), 1, 1);
         }
+    }
+
+    painter.fillRect(QRectF(cx - 0.5, top - 1, 1, segH + 4), QColor(255, 255, 255, 216));
+    for (double f: {0.25, 0.5, 0.75, 1.0}) {
+        for (int side = -1;side <= 1;side += 2) {
+            painter.fillRect(QRectF(std::round(cx + side * (2.5 + f * n * pitch)), top + segH + 2, 1, 2), QColor(255, 255, 255, 71));
+        }
+    }
+
+    if (fabs(peak) > fabs(v) + 0.02) {
+        painter.fillRect(QRectF(cx + (peak > 0.0 ? 1 : -1) * (2.5 + fabs(peak) * n * pitch) - 1, top, 2, segH), Qt::white);
     }
 }
 
@@ -119,7 +128,22 @@ double DisplayBar::val() const
 void DisplayBar::setVal(double val)
 {
     mVal = val;
+    // The mark of the peak falls back in about a second
+    mPeak = fabs(val) > fabs(mPeak) ? val : mPeak * 0.97;
     update();
+}
+
+// The limit of the negative side, when it is lower than the range
+void DisplayBar::setRangeNeg(double range)
+{
+    mRangeNeg = range;
+    update();
+}
+
+// Braking is shown in green
+void DisplayBar::setBraking(bool braking)
+{
+    mBraking = braking;
 }
 
 double DisplayBar::range() const

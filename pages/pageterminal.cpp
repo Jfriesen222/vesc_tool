@@ -20,6 +20,7 @@
 #include "pageterminal.h"
 #include "ui_pageterminal.h"
 #include "utility.h"
+#include <QRegularExpression>
 
 PageTerminal::PageTerminal(QWidget *parent) :
     QWidget(parent),
@@ -63,7 +64,19 @@ void PageTerminal::setVesc(VescInterface *vesc)
 
 void PageTerminal::printReceived(QString str)
 {
-    ui->terminalBrowser->queueConsoleText(str + "\n");
+    // The echo of a command is drawn in the info colour and fault codes in the bad colour
+    QStringList lines;
+    for (auto line: str.split("\n")) {
+        QString html = line.toHtmlEscaped().replace(" ", "&nbsp;");
+        if (line.startsWith("-> ")) {
+            html = "<font color=\"" + Utility::getAppHexColor("infoText") + "\">" + html + "</font>";
+        } else {
+            html.replace(QRegularExpression("FAULT_CODE_\\w+"),
+                         "<font color=\"" + Utility::getAppHexColor("dangerText") + "\">\\0</font>");
+        }
+        lines.append(html);
+    }
+    ui->terminalBrowser->queueConsoleText(lines.join("<br>") + "<br>", true);
 }
 
 void PageTerminal::on_sendButton_clicked()

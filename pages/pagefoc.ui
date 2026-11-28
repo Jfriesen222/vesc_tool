@@ -16,9 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
-     <property name="tabShape">
-      <enum>QTabWidget::Triangular</enum>
-     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -32,6 +29,19 @@
        </item>
        <item>
         <widget class="DetectFoc" name="detectFoc" native="true"/>
+       </item>
+       <item>
+        <spacer name="generalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -50,19 +60,19 @@
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="leftMargin">
-           <number>6</number>
+           <number>10</number>
           </property>
           <property name="topMargin">
-           <number>6</number>
+           <number>10</number>
           </property>
           <property name="rightMargin">
-           <number>6</number>
+           <number>10</number>
           </property>
           <property name="bottomMargin">
-           <number>6</number>
+           <number>10</number>
           </property>
           <property name="spacing">
-           <number>2</number>
+           <number>8</number>
           </property>
           <item row="1" column="0">
            <widget class="QPushButton" name="openloopGenericButton">
@@ -102,6 +112,19 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <spacer name="sensorlessSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_3">
@@ -115,6 +138,19 @@
        <item>
         <widget class="DetectFocHall" name="detectFocHall" native="true"/>
        </item>
+       <item>
+        <spacer name="hallSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_4">
@@ -127,6 +163,19 @@
        </item>
        <item>
         <widget class="DetectFocEncoder" name="detectFocEncoder" native="true"/>
+       </item>
+       <item>
+        <spacer name="encoderSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -169,11 +218,41 @@
         <widget class="ParamTable" name="offsetTab"/>
        </item>
        <item>
-        <widget class="QPushButton" name="offsetMeasureButton">
-         <property name="text">
-          <string>Measure Offsets</string>
+        <layout class="QHBoxLayout" name="offsetLayout">
+         <item>
+          <spacer name="offsetButtonSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="offsetMeasureButton">
+           <property name="text">
+            <string>Measure Offsets</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="offsetSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

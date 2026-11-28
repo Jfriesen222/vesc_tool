@@ -77,6 +77,9 @@ void DetectFocHall::on_applyButton_clicked()
         mVesc->mcConfig()->updateParamInt("foc_hall_table__6", ui->hall6Box->value());
         mVesc->mcConfig()->updateParamInt("foc_hall_table__7", ui->hall7Box->value());
         mVesc->emitStatusMessage(tr("Hall Sensor Parameters Applied"), true);
+        Utility::setStyleProperty(ui->applyStep, "ok", true);
+        Utility::setStyleProperty(ui->applyButton, "primary", false);
+        Utility::setStyleProperty(ui->applyStep, "next", false);
     }
 }
 
@@ -97,6 +100,18 @@ void DetectFocHall::setVesc(VescInterface *vesc)
 
 void DetectFocHall::focHallTableReceived(QVector<int> hall_table, int res)
 {
+    // The tiles show whether the last detection worked, and Apply is the next step after a good one
+    for (auto *t: {ui->hall0Tile, ui->hall1Tile, ui->hall2Tile, ui->hall3Tile,
+         ui->hall4Tile, ui->hall5Tile, ui->hall6Tile, ui->hall7Tile}) {
+        Utility::setStyleProperty(t, "ok", res == 0);
+        Utility::setStyleProperty(t, "failed", res != 0);
+    }
+    Utility::setStyleProperty(ui->detectStep, "ok", res == 0);
+    Utility::setStyleProperty(ui->detectStep, "failed", res != 0);
+    Utility::setStyleProperty(ui->applyStep, "ok", false);
+    Utility::setStyleProperty(ui->applyButton, "primary", res == 0);
+    Utility::setStyleProperty(ui->applyStep, "next", res == 0);
+
     if (res != 0) {
         mVesc->emitStatusMessage(tr("Bad FOC Hall Detection Result Received"), false);
     } else {

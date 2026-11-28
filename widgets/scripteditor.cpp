@@ -27,6 +27,9 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QSettings>
+#include <QSyntaxStyle>
+#include <QHBoxLayout>
+#include <QToolButton>
 #include "utility.h"
 
 ScriptEditor::ScriptEditor(QWidget *parent) :
@@ -37,10 +40,6 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     mIsModeLisp = false;
 
     ui->searchHideButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
-    ui->openFileButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
-    ui->saveButton->setIcon(Utility::getIcon("icons/Save-96.png"));
-    ui->saveAsButton->setIcon(Utility::getIcon("icons/Save as-96.png"));
-    ui->refreshButton->setIcon(Utility::getIcon("icons/Refresh-96.png"));
     ui->fileChangedReloadButton->setIcon(Utility::getIcon("icons/Refresh-96.png"));
     ui->fileChangeIgnoreButton->setIcon(Utility::getIcon("icons/Cancel-96.png"));
     ui->fileChangedWidget->setStyleSheet("background-color:rgba(200, 52, 52, 100);");
@@ -48,8 +47,34 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     ui->fileChangedWidget->setVisible(false);
     ui->codeEdit->setTabReplaceSize(4);
 
+    // The code is drawn on the well colour of the page in the app colours, with a faint current line
+    QSyntaxStyle *style = Utility::isDarkMode() ? QSyntaxStyle::darkStyle() : QSyntaxStyle::defaultStyle();
+    QColor well = Utility::getAppQColor("wellBackground");
+    QColor title = Utility::getAppQColor("titleText");
+    QColor currentLine = QColor::fromRgbF(well.redF() * 0.955 + title.redF() * 0.045,
+                                          well.greenF() * 0.955 + title.greenF() * 0.045,
+                                          well.blueF() * 0.955 + title.blueF() * 0.045);
+    QString scheme = "<style-scheme>";
+    auto addStyle = [&scheme](QString names, QString attributes) {
+        for (auto n: names.split(" ")) {
+            scheme += QString("<style name=\"%1\" %2/>").arg(n, attributes);
+        }
+    };
+    addStyle("Text", QString("foreground=\"%1\" background=\"%2\"").
+             arg(Utility::getAppHexColor("lightText"), well.name()));
+    addStyle("CurrentLine", QString("background=\"%1\"").arg(currentLine.name()));
+    addStyle("Keyword Preprocessor", QString("foreground=\"%1\"").arg(Utility::getAppHexColor("infoText")));
+    addStyle("Function Type", QString("foreground=\"%1\"").arg(Utility::getAppHexColor("warningText")));
+    addStyle("Number", QString("foreground=\"%1\"").arg(Utility::getAppHexColor("positiveText")));
+    addStyle("String", QString("foreground=\"%1\"").arg(Utility::getAppHexColor("accentText")));
+    addStyle("Comment", QString("foreground=\"%1\" italic=\"true\"").arg(Utility::getAppHexColor("mutedText")));
+    addStyle("Parentheses LineNumber", QString("foreground=\"%1\"").arg(Utility::getAppHexColor("mutedText")));
+    addStyle("CurrentLineNumber", QString("foreground=\"%1\"").arg(Utility::getAppHexColor("lightText")));
+    style->load(scheme + "</style-scheme>");
+    ui->codeEdit->setSyntaxStyle(style);
+
     connect(ui->codeEdit, &QCodeEditor::saveTriggered, [this]() {
-        on_saveButton_clicked();
+        save();
     });
 
     connect(ui->codeEdit, &QCodeEditor::searchTriggered, [this]() {
@@ -80,6 +105,36 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
 ScriptEditor::~ScriptEditor()
 {
     delete ui;
+}
+
+QWidget *ScriptEditor::fileButtons(QTabWidget *tabs, QWidget *first)
+{
+    // The file buttons act on the editor in the open tab
+    QWidget *w = new QWidget;
+    QHBoxLayout *l = new QHBoxLayout(w);
+    l->setContentsMargins(0, 0, 8, 0);
+    l->setSpacing(2);
+    l->addWidget(first);
+
+    auto addButton = [tabs, l](QString icon, QString toolTip, void (ScriptEditor::*slot)()) {
+        QToolButton *b = new QToolButton;
+        b->setIcon(Utility::getIcon(icon));
+        b->setToolTip(toolTip);
+        l->addWidget(b);
+        connect(b, &QToolButton::clicked, [tabs, slot]() {
+            ScriptEditor *editor = qobject_cast<ScriptEditor*>(tabs->currentWidget());
+            if (editor) {
+                (editor->*slot)();
+            }
+        });
+    };
+
+    addButton("icons/Open Folder-96.png", tr("Open file..."), &ScriptEditor::openFile);
+    addButton("icons/Save-96.png", tr("Save file"), &ScriptEditor::save);
+    addButton("icons/Save as-96.png", tr("Save file as..."), &ScriptEditor::saveAs);
+    addButton("icons/Refresh-96.png", tr("Refresh editor with file content. Warning: This will replace unsaved changes in the editor."), &ScriptEditor::reload);
+
+    return w;
 }
 
 QCodeEditor *ScriptEditor::codeEditor()
@@ -186,7 +241,7 @@ void ScriptEditor::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void ScriptEditor::on_openFileButton_clicked()
+void ScriptEditor::openFile()
 {
     QString path = fileNow();
     if (path.isEmpty()) {
@@ -216,13 +271,13 @@ void ScriptEditor::on_openFileButton_clicked()
     }
 }
 
-void ScriptEditor::on_saveButton_clicked()
+void ScriptEditor::save()
 {
     QString fileName = fileNow();
 
     QFileInfo fi(fileName);
     if (!fi.exists()) {
-        on_saveAsButton_clicked();
+        saveAs();
         return;
     }
 
@@ -244,7 +299,7 @@ void ScriptEditor::on_saveButton_clicked()
     emit fileSaved(fileName);
 }
 
-void ScriptEditor::on_saveAsButton_clicked()
+void ScriptEditor::saveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     tr("Save %1").arg(mIsModeLisp ? "LispBM" : "Qml"), fileNow(),
@@ -329,7 +384,7 @@ void ScriptEditor::on_searchCaseSensitiveBox_toggled(bool checked)
     ui->codeEdit->searchSetCaseSensitive(checked);
 }
 
-void ScriptEditor::on_refreshButton_clicked()
+void ScriptEditor::reload()
 {
     QString fileName = fileNow();
 
@@ -369,6 +424,6 @@ void ScriptEditor::on_fileChangeIgnoreButton_clicked()
 
 void ScriptEditor::on_fileChangedReloadButton_clicked()
 {
-    on_refreshButton_clicked();
+    reload();
     on_fileChangeIgnoreButton_clicked();
 }

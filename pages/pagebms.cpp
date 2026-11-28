@@ -34,7 +34,8 @@ PageBms::PageBms(QWidget *parent) :
     mQml->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     auto layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    // Clear of the round corners of the page panel
+    layout->setContentsMargins(4, 4, 4, 4);
     layout->addWidget(mQml);
 }
 

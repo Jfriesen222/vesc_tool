@@ -20,6 +20,7 @@
 #include "canlistitem.h"
 #include "utility.h"
 #include <QHBoxLayout>
+#include <QPainter>
 
 CANListItem::CANListItem(FW_RX_PARAMS p,
                          int ID,
@@ -29,6 +30,7 @@ CANListItem::CANListItem(FW_RX_PARAMS p,
     mIconLabel = new QLabel;
     mNameLabel = new QLabel;
     mIdLabel = new QLabel;
+    mIdLabel->setObjectName("canId");
     mSpaceStart = new QSpacerItem(6, 0);
 
     static QStringList vlDevs = {
@@ -128,16 +130,21 @@ void CANListItem::setName(const QString &name)
     mNameLabel->setText(name);
     QFont f = mNameLabel->font();
     f.setPointSize(this->font().pointSize()*0.9);
-    f.setBold(true);
     f.setStyleStrategy(QFont::PreferAntialias);
     mNameLabel->setAlignment(Qt::AlignCenter);
     mNameLabel->setFont(f);
 }
 
+// The icon is drawn in the muted text color
 void CANListItem::setIcon(const QString &path)
 {
     if (!path.isEmpty()) {
-        mIconLabel->setPixmap(QPixmap(path));
+        QPixmap pm(path);
+        QPainter painter(&pm);
+        painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        painter.fillRect(pm.rect(), Utility::getAppQColor("mutedText"));
+        painter.end();
+        mIconLabel->setPixmap(pm);
 
         QFontMetrics fm(this->font());
         int height = fm.height()*1.1;
@@ -151,21 +158,8 @@ void CANListItem::setIcon(const QString &path)
 void CANListItem::setID(int canID)
 {
     this->ID = canID;
-    QFont f = mIdLabel->font();
-
-    if (canID == -1) {
-        mIdLabel->setText("local");
-        f.setPointSize(this->font().pointSize() * 0.75);
-    } else {
-        mIdLabel->setText(QString::number(canID));
-        f.setPointSize(this->font().pointSize() * 0.9);
-    }
-
-    mIdLabel->setMinimumWidth(30);
-    mIdLabel->setFrameStyle(QFrame::Panel);
-    f.setBold(true);
+    mIdLabel->setText(canID == -1 ? "local" : QString::number(canID));
     mIdLabel->setAlignment(Qt::AlignCenter);
-    mIdLabel->setFont(f);
 }
 
 int CANListItem::getID()

@@ -47,6 +47,11 @@ PageFirmware::PageFirmware(QWidget *parent) :
     ui->uploadAllButton->setIcon(Utility::getIcon("icons/Download-96.png"));
     ui->readVersionButton->setIcon(Utility::getIcon("icons/Upload-96.png"));
     ui->dlArchiveButton->setIcon(Utility::getIcon("icons/Download-96.png"));
+    ui->dlFwButton->setIcon(Utility::getIcon("icons/Download-96.png"));
+
+    // The download progress shows once a download starts
+    ui->displayDlFw->setVisible(false);
+    ui->displayDl->setVisible(false);
 
     mTimer = new QTimer(this);
     mTimer->start(500);
@@ -110,6 +115,8 @@ void PageFirmware::setVesc(VescInterface *vesc)
                 this, SLOT(fwRxChanged(bool,bool)));
 
         connect(mVesc, &VescInterface::fwArchiveDlProgress, [this](QString msg, double prog) {
+            ui->displayDl->setVisible(true);
+            ui->displayDlFw->setVisible(true);
             ui->displayDl->setText(msg);
             ui->displayDl->setValue(100.0 * prog);
             ui->displayDlFw->setText(msg);
@@ -121,15 +128,18 @@ void PageFirmware::setVesc(VescInterface *vesc)
 void PageFirmware::reloadParams()
 {
     if (mVesc) {
-        QStringList fws = mVesc->getSupportedFirmwares();
-        QString str;
-        for (int i = 0;i < fws.size();i++) {
-            str.append(fws.at(i));
-            if (i < (fws.size() - 1)) {
-                str.append(", ");
-            }
+        QLayoutItem *item;
+        while ((item = ui->supportedLayout->takeAt(0))) {
+            delete item->widget();
+            delete item;
         }
-        ui->supportedLabel->setText(str);
+
+        for (const auto &fw: mVesc->getSupportedFirmwares()) {
+            auto chip = new QLabel(fw);
+            chip->setProperty("chip", "plain");
+            ui->supportedLayout->addWidget(chip);
+        }
+        ui->supportedLayout->addStretch();
     }
 }
 
@@ -142,7 +152,7 @@ void PageFirmware::timerSlot()
         }
 
         if (!mVesc->isPortConnected()) {
-            ui->currentLabel->clear();
+            setDeviceRows({});
         }
     }
 }
@@ -173,53 +183,60 @@ void PageFirmware::fwRxChanged(bool rx, bool limited)
 
     FW_RX_PARAMS params = mVesc->getLastFwRxParams();
 
-    QString fwStr;
-    QString strUuid = Utility::uuid2Str(params.uuid, true);
-
-    if (!strUuid.isEmpty()) {
-        fwStr += ", UUID: " + strUuid;
-    }
-
+    QList<QPair<QString, QString>> rows;
     if (params.major >= 0) {
-        fwStr = QString("Fw: v%1.%2").arg(params.major).arg(params.minor, 2, 10, QLatin1Char('0'));
+        QString fw = QString("%1.%2").arg(params.major).arg(params.minor, 2, 10, QLatin1Char('0'));
         if (!params.fwName.isEmpty()) {
-            fwStr += " (" + params.fwName + ")";
+            fw += " (" + params.fwName + ")";
         }
+        rows.append({tr("Firmware"), fw});
 
         if (!params.hw.isEmpty()) {
-            fwStr += ", Hw: " + params.hw;
-        }
-
-        if (!strUuid.isEmpty()) {
-            fwStr += "\n" + strUuid;
+            rows.append({tr("Hardware"), params.hw});
         }
     }
 
-    fwStr += "\n" + QString("Paired: %1, Status: ").
-            arg(params.isPaired ? "true" : "false");
-    if (params.isTestFw > 0) {
-        fwStr += QString("BETA %1").arg(params.isTestFw);
-    } else {
-        fwStr += "STABLE";
+    QString strUuid = Utility::uuid2Str(params.uuid, true);
+    if (!strUuid.isEmpty()) {
+        rows.append({tr("UUID"), strUuid});
     }
 
-    fwStr += "\nHW Type: " + params.hwTypeStr();
-
+    rows.append({tr("Status"), params.isTestFw > 0 ? tr("Beta %1").arg(params.isTestFw) : tr("Stable")});
+    rows.append({tr("Paired"), params.isPaired ? tr("Yes") : tr("No")});
+    rows.append({tr("HW type"), params.hwTypeStr()});
     if (params.hwType == HW_TYPE_VESC) {
-        fwStr += ", Phase Filters: ";
-        fwStr += params.hasPhaseFilters ? "Yes" : "No";
+        rows.append({tr("Phase filters"), params.hasPhaseFilters ? tr("Yes") : tr("No")});
     }
+    rows.append({tr("NRF name"), params.nrfNameSupported ? tr("Yes") : tr("No")});
+    rows.append({tr("NRF pin"), params.nrfPinSupported ? tr("Yes") : tr("No")});
 
-    fwStr += "\nNRF Name: ";
-    fwStr += (params.nrfNameSupported ? "Yes" : "No");
-    fwStr += ", Pin: ";
-    fwStr += (params.nrfPinSupported ? "Yes" : "No");
-
-    ui->currentLabel->setText(fwStr);
+    setDeviceRows(rows);
     updateHwList(params);
     updateBlList(params);
     updateArchFwList();
     update();
+}
+
+void PageFirmware::setDeviceRows(const QList<QPair<QString, QString>> &rows)
+{
+    QLayoutItem *item;
+    while ((item = ui->currentLayout->takeAt(0))) {
+        delete item->widget();
+        delete item;
+    }
+
+    for (int i = 0;i < rows.size();i++) {
+        auto key = new QLabel(rows.at(i).first);
+        auto value = new QLabel(rows.at(i).second);
+        key->setProperty("muted", true);
+        value->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        value->setWordWrap(true);
+        for (auto l: {key, value}) {
+            l->setProperty("kv", i == 0 ? "first" : "row");
+        }
+        ui->currentLayout->addWidget(key, i, 0);
+        ui->currentLayout->addWidget(value, i, 1);
+    }
 }
 
 void PageFirmware::updateHwList(FW_RX_PARAMS params)
@@ -781,6 +798,7 @@ void PageFirmware::reloadLatest(bool download)
 void PageFirmware::on_dlArchiveButton_clicked()
 {
     ui->dlArchiveButton->setEnabled(false);
+    ui->displayDl->setVisible(true);
     ui->displayDl->setText("Preparing download...");
     reloadArchive(true);
     ui->dlArchiveButton->setEnabled(true);
@@ -789,6 +807,7 @@ void PageFirmware::on_dlArchiveButton_clicked()
 void PageFirmware::on_dlFwButton_clicked()
 {
     ui->dlFwButton->setEnabled(false);
+    ui->displayDlFw->setVisible(true);
     ui->displayDlFw->setText("Preparing download...");
 
     if (mVesc) {

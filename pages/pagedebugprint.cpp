@@ -19,6 +19,7 @@
 
 #include "pagedebugprint.h"
 #include "ui_pagedebugprint.h"
+#include "utility.h"
 #include <QDateTime>
 
 PageDebugPrint::PageDebugPrint(QWidget *parent) :
@@ -26,6 +27,7 @@ PageDebugPrint::PageDebugPrint(QWidget *parent) :
     ui(new Ui::PageDebugPrint)
 {
     ui->setupUi(this);
+    ui->clearButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
     layout()->setContentsMargins(0, 0, 0, 0);
 }
 
@@ -36,6 +38,8 @@ PageDebugPrint::~PageDebugPrint()
 
 void PageDebugPrint::printConsole(QString str)
 {
-    ui->consoleBrowser->queueConsoleText(QDateTime::currentDateTime().
-                                        toString("yyyy-MM-dd hh:mm:ss: ") + str, true);
+    // The time is dimmed so that the message stands out
+    ui->consoleBrowser->queueConsoleText(QString("<font color=\"%1\">%2</font>").
+                                        arg(Utility::getAppHexColor("mutedText"),
+                                            QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss: ")) + str, true);
 }

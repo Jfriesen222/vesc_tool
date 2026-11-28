@@ -26,6 +26,8 @@
 #include <QWidget>
 #include <QCheckBox>
 
+class QCustomPlot;
+
 namespace Ui {
 class PageAppImu;
 }
@@ -75,6 +77,8 @@ private:
     QCheckBox *mUseYawBox;
 
     void appendDoubleAndTrunc(QVector<double> *vec, double num, int maxSize);
+    void setLegendValues(QCustomPlot *plot, const QStringList &names,
+                         const QList<double> &values, const QString &unit);
 };
 
 #endif // PAGEAPPIMU_H

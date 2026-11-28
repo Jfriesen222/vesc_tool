@@ -21,6 +21,7 @@
 #define HELPDIALOG_H
 
 #include <QDialog>
+#include <QTextEdit>
 #include "configparams.h"
 
 namespace Ui {
@@ -40,6 +41,7 @@ public:
     static void showHelp(QWidget *parent, ConfigParams *params, QString name, bool modal = true);
     static void showHelp(QWidget *parent, QString title, QString text);
     static void showHelpMonospace(QWidget *parent, QString title, QString text);
+    static void setReadingSpacing(QTextEdit *edit);
 
 private slots:
     void on_okButton_clicked();

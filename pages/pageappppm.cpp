@@ -29,14 +29,19 @@ PageAppPpm::PageAppPpm(QWidget *parent) :
     layout()->setContentsMargins(0, 0, 0, 0);
     mVesc = nullptr;
 
+    Utility::setPlotColors(ui->throttlePlot);
     ui->throttlePlot->addGraph();
     ui->throttlePlot->graph()->setName("Throttle Curve");
     ui->throttlePlot->graph()->setPen(QPen(Utility::getAppQColor("plot_graph1")));
     ui->throttlePlot->xAxis->setLabel("Throttle Value");
     ui->throttlePlot->yAxis->setLabel("Output Value");
+    for (QCPAxis *axis: {ui->throttlePlot->xAxis, ui->throttlePlot->yAxis}) {
+        axis->setRange(-1.0, 1.0);
+        axis->setNumberFormat("f");
+        axis->setNumberPrecision(1);
+    }
+    Utility::setPlotLegendRow(ui->throttlePlot);
     ui->throttlePlot->legend->setVisible(true);
-    ui->throttlePlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignRight|Qt::AlignBottom);
-    Utility::setPlotColors(ui->throttlePlot);
 }
 
 PageAppPpm::~PageAppPpm()
@@ -98,7 +103,6 @@ void PageAppPpm::paramChangedDouble(QObject *src, QString name, double newParam)
             y.append(val);
         }
         ui->throttlePlot->graph()->setData(x, y);
-        ui->throttlePlot->rescaleAxes();
         ui->throttlePlot->replotWhenVisible();
     }
 }

@@ -32,7 +32,24 @@ ParameterEditor::ParameterEditor(QWidget *parent) :
     ui(new Ui::ParameterEditor)
 {
     ui->setupUi(this);
+
+    // The name of the type over its fields, which line up with the fields above
+    connect(ui->typeBox, &QComboBox::currentTextChanged, ui->typeCaption, [this](const QString &text) {
+        ui->typeCaption->setText(text.toUpper());
+    });
+    for (int i = 0;i < ui->stackedWidget->count();i++) {
+        if (ui->stackedWidget->widget(i)->layout()) {
+            ui->stackedWidget->widget(i)->layout()->setContentsMargins(0, 0, 0, 0);
+        }
+    }
+
+    // The parameter list starts level with the columns under the tabs
+    ui->paramColumnSpacer->changeSize(0, ui->tabWidget_2->tabBar()->sizeHint().height() +
+                                      ui->horizontalLayout_6->contentsMargins().top(), QSizePolicy::Fixed, QSizePolicy::Fixed);
+    ui->paramSerialOrderList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     setEditorValues("new_parameter", ConfigParam());
+    ui->typeCaption->setText(ui->typeBox->currentText().toUpper());
 
     windowIcon().addPixmap(Utility::getIcon("icons/Horizontal Settings Mixer-96.png"));
     ui->paramRemoveButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
@@ -81,7 +98,7 @@ ParameterEditor::ParameterEditor(QWidget *parent) :
 
     mStatusInfoTime = 0;
     mStatusLabel = new QLabel(this);
-    ui->statusBar->addPermanentWidget(mStatusLabel);
+    ui->statusBar->addWidget(mStatusLabel);
     mTimer = new QTimer(this);
     mTimer->start(20);
 
@@ -131,6 +148,10 @@ void ParameterEditor::setParams(const ConfigParams *params)
     showStatusInfo(tr("Parameters Loaded"), true);
 
     updateUi();
+
+    // The grouping opens on its first group and subgroup
+    ui->groupList->setCurrentRow(0);
+    ui->subgroupList->setCurrentRow(0);
 }
 
 void ParameterEditor::timerSlot()
@@ -138,9 +159,6 @@ void ParameterEditor::timerSlot()
     // Update status label
     if (mStatusInfoTime) {
         mStatusInfoTime--;
-        if (!mStatusInfoTime) {
-            mStatusLabel->setStyleSheet(qApp->styleSheet());
-        }
     } else {
         if (!mStatusLabel->text().isEmpty()) {
             mStatusLabel->clear();
@@ -202,9 +220,7 @@ void ParameterEditor::on_paramOpenButton_clicked()
     if (p) {
         setEditorValues(selected, *p);
 
-        if (ui->previewTable->rowCount() > 0) {
-            ui->previewTable->removeRow(0);
-        }
+        ui->previewTable->clearParams();
 
         if (p->type != CFG_T_UNDEFINED) {
             ui->previewTable->addParamRow(&mParams, selected);
@@ -258,9 +274,7 @@ void ParameterEditor::on_paramSaveButton_clicked()
         showStatusInfo(tr("New parameter added: %1").arg(name), true);
     }
 
-    if (ui->previewTable->rowCount() > 0) {
-        ui->previewTable->removeRow(0);
-    }
+    ui->previewTable->clearParams();
 
     if (p.type != CFG_T_UNDEFINED) {
         ui->previewTable->addParamRow(&mParams, name);
@@ -636,14 +650,9 @@ void ParameterEditor::addEnum(QString name)
 
 void ParameterEditor::showStatusInfo(QString info, bool isGood)
 {
-    if (isGood) {
-        mStatusLabel->setStyleSheet("QLabel { background-color : lightgreen; color : black; }");
-    } else {
-        mStatusLabel->setStyleSheet("QLabel { background-color : red; color : black; }");
-    }
-
     mStatusInfoTime = 80;
-    mStatusLabel->setText(info);
+    mStatusLabel->setText(QString("<font color=\"%1\">\u25CF</font>&nbsp; %2").
+                          arg(Utility::getAppHexColor(isGood ? "positive" : "danger"), info.toHtmlEscaped()));
 }
 
 void ParameterEditor::updateGroupList()

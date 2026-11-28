@@ -79,12 +79,14 @@ private:
     Ui::PageLogAnalysis *ui;
     VescInterface *mVesc;
     QCPCurve *mVerticalLine;
+    QCPItemText *mPlotHint;
     Vesc3DView *m3dView;
     QCheckBox *mUseYawBox;
     QTimer *mPlayTimer;
     QTimer *mGnssTimer;
     double mPlayPosNow;
     QString mVescLastPath;
+    bool mVescLogListed;
     qint32 mGnssMsTodayLast;
     QString mLastSaveCsvPath;
     QString mLastSaveAsPath;
@@ -122,7 +124,6 @@ private:
     QVector<int> mInd_fault;
 
     struct SelectoData {
-        QStringList dataLabels;
         QStringList checkedY1Boxes;
         QStringList checkedY2Boxes;
         int scrollPos;
@@ -195,6 +196,10 @@ private:
     void storeSelection();
     void restoreSelection();
     void setFileButtonsEnabled(bool en);
+    void toggleSeries(int row);
+    bool isPlotted(int row);
+    void showMap(bool show);
+    void showOpenedLog();
 
 };
 

@@ -47,6 +47,11 @@ PageVescPackage::PageVescPackage(QWidget *parent) :
     ui->dlArchiveButton->setIcon(Utility::getIcon("icons/Refresh-96.png"));
     ui->installButton->setIcon(Utility::getIcon("icons/Download-96.png"));
     ui->uninstallButton->setIcon(Utility::getIcon("icons/Delete-96.png"));
+    ui->installIconLabel->setPixmap(QIcon(Utility::getIcon("icons/About-96.png")).pixmap(16, 16));
+    ui->installInfoLabel->setText(ui->installButton->toolTip() + ".");
+    QFont mono = ui->descriptionEdit->font();
+    mono.setFamily("Roboto Mono");
+    ui->descriptionEdit->setFont(mono);
 
     QSettings set;
     ui->loadEdit->setText(set.value("pagevescpackage/lastpkgload", "").toString());

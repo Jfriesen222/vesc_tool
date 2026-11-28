@@ -2340,8 +2340,6 @@ void MapWidget::paint(QPainter &painter, int width, int height, bool highQuality
     }
 
     double start_txt = 30.0;
-    const double txt_row_h = 20.0;
-    const double txtOffset = 250.0;
 
     painter.setTransform(txtTrans);
 
@@ -2361,9 +2359,7 @@ void MapWidget::paint(QPainter &painter, int width, int height, bool highQuality
     }
 
     painter.setTransform(txtTrans);
-    font.setPointSize(10);
-    painter.setFont(font);
-    painter.setPen(QPen(textColor));
+    QStringList stats;
 
     // Draw units (m)
     if (mDrawGrid) {
@@ -2375,75 +2371,92 @@ void MapWidget::paint(QPainter &painter, int width, int height, bool highQuality
         } else {
             txt = QString::asprintf("Grid res: %.0f cm", res * 100.0);
         }
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
+        stats << txt;
     }
 
-    // Draw zoom level
-    txt = QString::asprintf("Zoom: %.7f", mScaleFactor);
-    painter.drawText(int(width - txtOffset), int(start_txt), txt);
-    start_txt += txt_row_h;
+    // Zoom levels, tile counts, trace sizes and route data are diagnostics
+    if (mDrawOsmStats) {
+        txt = QString::asprintf("Zoom: %.7f", mScaleFactor);
+        stats << txt;
 
-    // Draw OSM zoom level
-    if (mDrawOpenStreetmap) {
-        txt = QString::asprintf("OSM zoom: %d", mOsmZoomLevel);
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
+        if (mDrawOpenStreetmap) {
+            txt = QString::asprintf("OSM zoom: %d", mOsmZoomLevel);
+            stats << txt;
 
-        if (mDrawOsmStats) {
             txt = QString::asprintf("DL Tiles: %d", mOsm->getTilesDownloaded());
-            painter.drawText(int(width - txtOffset), int(start_txt), txt);
-            start_txt += txt_row_h;
+            stats << txt;
 
             txt = QString::asprintf("HDD Tiles: %d", mOsm->getHddTilesLoaded());
-            painter.drawText(int(width - txtOffset), int(start_txt), txt);
-            start_txt += txt_row_h;
+            stats << txt;
 
             txt = QString::asprintf("RAM Tiles: %d", mOsm->getRamTilesLoaded());
-            painter.drawText(int(width - txtOffset), int(start_txt), txt);
-            start_txt += txt_row_h;
+            stats << txt;
         }
 
-        txt = QString::asprintf("© OpenStreetMap Contributors");
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
-    }
-
-    if (mInteractionMode != InteractionModeDefault) {
-        txt = QString::asprintf("IMode: %d", mInteractionMode);
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
-    }
-
-    // Some info
-    if (info_segments > 0) {
-        txt = QString::asprintf("Info seg: %d", info_segments);
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
-    }
-
-    if (info_points > 0) {
-        txt = QString::asprintf("Info pts: %d", info_points);
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
-    }
-
-    // Route info
-    if (mRoutes.at(mRouteNow).size() > 0) {
-        LocPoint prev = mRoutes.at(mRouteNow).first();
-        double len = 0.0;
-        for (int i = 1;i < mRoutes.at(mRouteNow).size();i++) {
-            len += prev.getDistanceTo(mRoutes.at(mRouteNow).at(i));
-            prev = mRoutes.at(mRouteNow).at(i);
+        if (mInteractionMode != InteractionModeDefault) {
+            txt = QString::asprintf("IMode: %d", mInteractionMode);
+            stats << txt;
         }
 
-        txt = QString::asprintf("RP: %lld", mRoutes.at(mRouteNow).size());
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
+        if (info_segments > 0) {
+            txt = QString::asprintf("Info seg: %d", info_segments);
+            stats << txt;
+        }
 
-        txt = QString::asprintf("RLen: %.2f m", len);
-        painter.drawText(int(width - txtOffset), int(start_txt), txt);
-        start_txt += txt_row_h;
+        if (info_points > 0) {
+            txt = QString::asprintf("Info pts: %d", info_points);
+            stats << txt;
+        }
+
+        if (mRoutes.at(mRouteNow).size() > 0) {
+            LocPoint prev = mRoutes.at(mRouteNow).first();
+            double len = 0.0;
+            for (int i = 1;i < mRoutes.at(mRouteNow).size();i++) {
+                len += prev.getDistanceTo(mRoutes.at(mRouteNow).at(i));
+                prev = mRoutes.at(mRouteNow).at(i);
+            }
+
+            txt = QString::asprintf("RP: %lld", mRoutes.at(mRouteNow).size());
+            stats << txt;
+
+            txt = QString::asprintf("RLen: %.2f m", len);
+            stats << txt;
+        }
+    }
+
+    // Texts sit on a small panel in the window colour, so that they read on any tile: the stats at the
+    // top right and the map attribution at the bottom left
+    QFont statsFont = this->font();
+    if (statsFont.pointSizeF() > 0.0) {
+        statsFont.setPointSizeF(statsFont.pointSizeF() * 0.85);
+    } else {
+        statsFont.setPixelSize(qMax(1, int(statsFont.pixelSize() * 0.85)));
+    }
+    painter.setFont(statsFont);
+
+    auto drawPanel = [&](const QString &text, bool topRight) {
+        QRectF textRect = painter.boundingRect(QRectF(), Qt::AlignLeft, text);
+        QRectF panel(0.0, 0.0, textRect.width() + 16.0, textRect.height() + 10.0);
+        if (topRight) {
+            panel.moveTopRight(QPointF(width - 8.0, start_txt - 20.0));
+        } else {
+            panel.moveBottomLeft(QPointF(8.0, height - 8.0));
+        }
+        QColor panelColor = palette().color(QPalette::Window);
+        panelColor.setAlpha(180);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(panelColor);
+        painter.drawRoundedRect(panel, 6.0, 6.0);
+        painter.setPen(palette().color(QPalette::WindowText));
+        painter.drawText(panel.adjusted(8.0, 5.0, -8.0, -5.0), topRight ? Qt::AlignRight : Qt::AlignLeft, text);
+    };
+
+    if (!stats.isEmpty()) {
+        drawPanel(stats.join("\n"), true);
+    }
+
+    if (mDrawOpenStreetmap) {
+        drawPanel("© OpenStreetMap Contributors", false);
     }
 
     painter.end();

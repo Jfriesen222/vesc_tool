@@ -20,7 +20,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts 1.3
-import QtQuick.Controls.Material 2.2
 import QtQuick.Window 2.2
 
 import Vedder.vesc.utility 1.0
@@ -42,14 +41,18 @@ Item {
     property bool mainIsTablet: container.width >= 700 && Math.min(Screen.width, Screen.height) >= 600
     readonly property bool phoneLandscape: mainIsHorizontal && !mainIsTablet
     readonly property var rideSession: null
-    property real rtVin: 0
+    property real rtVin: welcomeStart.vin
     property string lastDeviceAddr: ""
     property string lastDeviceName: ""
     property string lastDeviceIcon: "icons/Connected-96.png"
     property real lastDeviceTime: 0
 
     function timeAgo(time) {
-        return ""
+        var minutes = Math.round((Date.now() - time) / 60000)
+        return minutes < 2 ? qsTr("just now") :
+               minutes < 60 ? qsTr("%1 min ago").arg(minutes) :
+               minutes < 2880 ? qsTr("%1 h ago").arg(Math.round(minutes / 60)) :
+                                qsTr("%1 days ago").arg(Math.round(minutes / 1440))
     }
 
     function displayPath(path) {
@@ -76,7 +79,7 @@ Item {
                                      "You are not connected to the VESC. Please connect in order " +
                                      "to quick pair an NRF-based remote.", false, false)
         } else {
-            nrfPairStartDialog.open()
+            QmlUi.showNrfPair()
         }
     }
 
@@ -86,10 +89,7 @@ Item {
                                      "You are not connected to the VESC. Please connect in order " +
                                      "to map directions.", false, false)
         } else {
-            enabled = false
-            directionSetupDialog.open()
-            directionSetup.scanCan()
-            enabled = true
+            QmlUi.showDirSetup()
         }
     }
 
@@ -118,99 +118,167 @@ Item {
         }
     }
 
+    // The wizards and tools open in this column instead of across the whole page
+    Item {
+        id: dialogArea
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Math.min(parent.width, 650)
+        height: parent.height
+    }
+
     SetupWizardFoc {
         id: focWizard
-        dialogParent: container
+        dialogParent: dialogArea
     }
 
     SetupWizardIMU {
         id: imuWizard
-        dialogParent: container
+        dialogParent: dialogArea
     }
 
     MultiSettings {
         id: multiSettings
-        dialogParent: container
+        dialogParent: dialogArea
     }
 
     BleSetupDialog {
         id: bleSetupDialog
-        dialogParent: container
-    }
-
-    Dialog {
-        id: directionSetupDialog
-        title: "Direction Setup"
-        standardButtons: Dialog.Close
-        modal: true
-        focus: true
-        padding: 10
-
-        Overlay.modal: Rectangle {
-            color: "#AA000000"
-        }
-
-        width: parent.width - 10
-        closePolicy: Popup.CloseOnEscape
-        x: 5
-        y: parent.height / 2 - height / 2
-        parent: container
-
-        DirectionSetup {
-            id: directionSetup
-            anchors.fill: parent
-            dialogParent: container
-        }
+        dialogParent: dialogArea
     }
 
     Rectangle {
         anchors.fill: parent
-        color: Material.background
+        color: Utility.getAppHexColor("darkBackground")
+    }
+
+    component HeaderTab: TabButton {
+        id: headerTab
+        width: implicitWidth
+        // Marks a tab whose page comes from the connected hardware or app
+        property string badge: ""
+        implicitWidth: tabRow.implicitWidth + 4
+        implicitHeight: 44
+        padding: 0
+        hoverEnabled: true
+
+        contentItem: Item {
+            Row {
+                id: tabRow
+                anchors.centerIn: parent
+                spacing: 6
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: headerTab.text
+                    font.pixelSize: 13
+                    font.weight: headerTab.checked ? Font.Medium : Font.Normal
+                    color: Utility.getAppHexColor(headerTab.checked ? "titleText" : headerTab.hovered ? "lightText" : "mutedText")
+                }
+
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: headerTab.badge !== ""
+                    width: badgeText.implicitWidth + 9
+                    height: 16
+                    radius: 4
+                    color: "transparent"
+                    border.color: Qt.alpha(Utility.getAppHexColor("infoText"), 0.4)
+
+                    Text {
+                        id: badgeText
+                        anchors.centerIn: parent
+                        text: headerTab.badge
+                        font.pixelSize: 9
+                        font.weight: Font.Medium
+                        font.letterSpacing: 0.7
+                        color: Utility.getAppHexColor("infoText")
+                    }
+                }
+            }
+        }
+
+        background: Item {
+            Rectangle {
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: 2
+                radius: 1
+                visible: headerTab.checked
+                color: Utility.getAppHexColor("accent")
+            }
+        }
     }
 
     ColumnLayout {
         id: gaugeColumn
         anchors.fill: parent
+        spacing: 0
 
-        TabBar {
-            id: tabBar
+        Item {
+            id: header
             Layout.fillWidth: true
-            implicitWidth: 0
-            clip: true
+            Layout.preferredHeight: 44
 
-            onCurrentIndexChanged: {
-                if (swipeView.currentIndex !== currentIndex) {
-                    swipeView.setCurrentIndex(currentIndex)
+            Text {
+                id: pageTitle
+                x: 16
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr("Welcome & Wizards")
+                font.pointSize: 14
+                font.weight: Font.Medium
+                color: Utility.getAppHexColor("titleText")
+            }
+
+            Rectangle {
+                id: titleDivider
+                anchors.left: pageTitle.right
+                anchors.leftMargin: 18
+                anchors.verticalCenter: parent.verticalCenter
+                width: 1
+                height: 18
+                color: Utility.getAppHexColor("lineStrong")
+            }
+
+            TabBar {
+                id: tabBar
+                anchors.left: titleDivider.right
+                anchors.leftMargin: 16
+                anchors.right: parent.right
+                height: parent.height
+                spacing: 14
+                clip: true
+
+                onCurrentIndexChanged: {
+                    if (swipeView.currentIndex !== currentIndex) {
+                        swipeView.setCurrentIndex(currentIndex)
+                    }
                 }
-            }
 
-            background: Rectangle {
-                opacity: 1
-                color: Utility.getAppHexColor("lightBackground")
-            }
+                background: Item {}
 
-            property int buttonWidth: Math.max(120,
-                                               tabBar.width /
-                                               (rep.model.length +
-                                                (uiHwPage.visible ? 1 : 0) +
-                                                (uiAppPage.visible ? 1 : 0)))
+                Repeater {
+                    id: rep
+                    model: ["Start", "RT Data", "Profiles", "LogView"]
 
-            Repeater {
-                id: rep
-                model: ["RT Data", "Profiles", "LogView"]
-
-                TabButton {
-                    text: modelData
-                    width: tabBar.buttonWidth
+                    HeaderTab {
+                        text: modelData
+                    }
                 }
             }
         }
 
-        TabButton {
+        Rectangle {
+            id: headerRule
+            Layout.fillWidth: true
+            height: 1
+            color: Utility.getAppHexColor("line")
+        }
+
+        HeaderTab {
             id: uiHwButton
             visible: uiHwPage.visible
             text: "HwUi"
-            width: tabBar.buttonWidth
+            badge: "HW"
         }
 
         Page {
@@ -225,11 +293,11 @@ Item {
             }
         }
 
-        TabButton {
+        HeaderTab {
             id: uiAppButton
             visible: uiAppPage.visible
             text: "AppUi"
-            width: tabBar.buttonWidth
+            badge: "APP"
         }
 
         Page {
@@ -260,6 +328,11 @@ Item {
                 if (tabBar.currentIndex !== currentIndex) {
                     tabBar.setCurrentIndex(currentIndex)
                 }
+            }
+
+            WelcomeStart {
+                id: welcomeStart
+                panel: container
             }
 
             Page {
@@ -326,67 +399,14 @@ Item {
             }
         }
 
-        NrfPair {
-            id: nrfPair
-            Layout.fillWidth: true
-            Layout.preferredWidth: 500
-            visible: false
-            hideAfterPair: true
-        }
-
-        ImageButton {
-            id: connectButton
-            Layout.fillWidth: true
-            Layout.fillHeight: false
-            Layout.preferredWidth: 500
-            Layout.preferredHeight: 80
-
-            buttonText: "Connect"
-            imageSrc: "qrc" + Utility.getThemePath() + "icons/Connected-96.png"
-
-            onClicked: {
-                if (!VescIf.isPortConnected()) {
-                    connScreen.opened = true
-                }
-            }
-        }
-    }
-
-    Rectangle {
-        parent: container
-        anchors.fill: parent
-        color: "black"
-
-        // The pages under it do not swipe while it is open
-        MouseArea {
-            anchors.fill: parent
-            enabled: connScreen.opened
-        }
-
-        ConnectScreen {
-            id: connScreen
-            x: 0
-            y: 0
-            height: parent.height
-            width: parent.width
-            opened: true
-            fullLogo: false
-
-            Component.onCompleted: {
-                VescIf.bleDevice().emitScanDone()
-            }
-
-            onYChanged: {
-                parent.color.a = Math.min(1, Math.max(1 - y / height, 0))
-            }
-        }
     }
 
     Connections {
         target: VescIf
         function onPortConnectedChanged() {
-            connScreen.opened = VescIf.isPortConnected() ? false : true
-            connectButton.visible = !VescIf.isPortConnected()
+            if (!VescIf.isPortConnected()) {
+                swipeView.setCurrentIndex(0)
+            }
         }
     }
 
@@ -423,12 +443,16 @@ Item {
         swipeView.interactive = true
         tabBar.visible = true
         tabBar.enabled = true
+        header.visible = true
+        headerRule.visible = true
 
         if (VescIf.isPortConnected() && VescIf.qmlHwLoaded()) {
             if (VescIf.getLastFwRxParams().qmlHwFullscreen) {
                 swipeView.interactive = false
                 tabBar.visible = false
                 tabBar.enabled = false
+                header.visible = false
+                headerRule.visible = false
             }
 
             hwUiObj = Qt.createQmlObject(VescIf.qmlHw(), uiHw, "HwUi")
@@ -441,11 +465,10 @@ Item {
             }
 
             uiHwButton.visible = true
-            swipeView.insertItem(0, uiHwPage)
-            tabBar.insertItem(0, uiHwButton)
+            swipeView.insertItem(rep.count, uiHwPage)
+            tabBar.insertItem(rep.count, uiHwButton)
             uiHwPage.visible = true
-            swipeView.setCurrentIndex(1)
-            swipeView.setCurrentIndex(0)
+            swipeView.setCurrentIndex(rep.count)
         } else {
             uiHwPage.visible = false
             uiHwPage.parent = null
@@ -457,6 +480,8 @@ Item {
                 swipeView.interactive = false
                 tabBar.visible = false
                 tabBar.enabled = false
+                header.visible = false
+                headerRule.visible = false
             }
 
             appUiObj = Qt.createQmlObject(VescIf.qmlApp(), uiApp, "AppUi")
@@ -469,11 +494,10 @@ Item {
             }
 
             uiAppButton.visible = true
-            swipeView.insertItem(0, uiAppPage)
-            tabBar.insertItem(0, uiAppButton)
+            swipeView.insertItem(rep.count, uiAppPage)
+            tabBar.insertItem(rep.count, uiAppButton)
             uiAppPage.visible = true
-            swipeView.setCurrentIndex(1)
-            swipeView.setCurrentIndex(0)
+            swipeView.setCurrentIndex(rep.count)
         } else {
             uiAppPage.visible = false
             uiAppPage.parent = null
@@ -499,39 +523,6 @@ Item {
     }
 
     Dialog {
-        id: nrfPairStartDialog
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        modal: true
-        focus: true
-        rightMargin: 10
-        leftMargin: 10
-        closePolicy: Popup.CloseOnEscape
-        title: "NRF Pairing"
-
-        Overlay.modal: Rectangle {
-            color: "#AA000000"
-        }
-
-        parent: container
-        y: parent.y + parent.height / 2 - height / 2
-
-        Text {
-            color: {color = Utility.getAppHexColor("lightText")}
-            verticalAlignment: Text.AlignVCenter
-            anchors.fill: parent
-            wrapMode: Text.WordWrap
-            text:
-                "After clicking OK the VESC will be put in pairing mode for 10 seconds. Switch" +
-                "on your remote during this time to complete the pairing process."
-        }
-
-        onAccepted: {
-            nrfPair.visible = true
-            nrfPair.startPairing()
-        }
-    }
-
-    Dialog {
         id: qmlLoadDialog
         standardButtons: Dialog.Yes | Dialog.Cancel
         modal: true
@@ -545,7 +536,7 @@ Item {
             color: "#AA000000"
         }
 
-        parent: container
+        parent: dialogArea
         y: parent.y + parent.height / 2 - height / 2
         width: parent.width - 20
 

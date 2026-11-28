@@ -21,6 +21,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include "utility.h"
+#include "startupwizard.h"
 
 SetupWizardMotor::SetupWizardMotor(VescInterface *vesc, QWidget *parent)
     : QWizard(parent)
@@ -39,31 +40,8 @@ SetupWizardMotor::SetupWizardMotor(VescInterface *vesc, QWidget *parent)
     setPage(Page_Conclusion, new ConclusionPage(vesc));
 
     setStartId(Page_Intro);
-    setWizardStyle(ModernStyle);
-    QPixmap icon_logo = QIcon(":/res/icon.svg").pixmap(QSize(this->devicePixelRatioF() * 48, this->devicePixelRatioF() * 48));
-    icon_logo.setDevicePixelRatio(this->devicePixelRatioF());
-    setPixmap(QWizard::LogoPixmap, icon_logo);
-    resize(800, 450);
-
+    setUpWizardFrame(this);
     setWindowTitle(tr("Motor Setup Wizard"));
-
-    mSideLabel = new AspectImgLabel(Qt::Vertical);
-    mSideLabel->setPixmap(QPixmap("://res/logo_vertical.png"));
-    mSideLabel->setScaledContents(true);
-    setSideWidget(mSideLabel);
-
-    connect(this, SIGNAL(currentIdChanged(int)),
-            this, SLOT(idChanged(int)));
-}
-
-void SetupWizardMotor::idChanged(int id)
-{
-    if (id == Page_Intro || id == Page_Conclusion) {
-        setSideWidget(mSideLabel);
-        mSideLabel->setVisible(true);
-    } else {
-        setSideWidget(0);
-    }
 }
 
 IntroPage::IntroPage(VescInterface *vesc, QWidget *parent)
@@ -272,11 +250,12 @@ CurrentsPage::CurrentsPage(VescInterface *vesc, QWidget *parent)
     mParamTab->addParamRow(mVesc->mcConfig(), "l_in_current_min");
     mConfigureBatteryCutoff = true;
 
-    mLabel = new QLabel(tr("<font color=\"red\">WARNING: </font>"
+    mLabel = new QLabel(tr("WARNING: "
                            "Using too high current settings can damage the motor, the VESC "
                            "and/or the battery. Make sure to read the specifications of your "
                            "system if you are not sure about how to configure the current limits."));
     mLabel->setWordWrap(true);
+    mLabel->setProperty("warning", true);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(mParamTab);
@@ -548,7 +527,7 @@ bool BldcPage::validatePage()
 
 void BldcPage::initializePage()
 {
-    mParamTab->setRowCount(0);
+    mParamTab->clearParams();
     mParamTab->addParamRow(mVesc->mcConfig(), "sl_cycle_int_limit");
     mParamTab->addParamRow(mVesc->mcConfig(), "sl_bemf_coupling_k");
     mParamTab->addRowSeparator(tr("Hall Sensor Settings"));

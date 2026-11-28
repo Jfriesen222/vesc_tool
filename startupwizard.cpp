@@ -22,7 +22,10 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QDesktopServices>
+#include <QPainter>
+#include <QPushButton>
 #include "utility.h"
+#include "widgets/helpdialog.h"
 
 StartupWizard::StartupWizard(VescInterface *vesc, QWidget *parent)
     : QWizard(parent)
@@ -35,31 +38,107 @@ StartupWizard::StartupWizard(VescInterface *vesc, QWidget *parent)
     setPage(Page_Conclusion, new StartupConclusionPage(vesc));
 
     setStartId(Page_Intro);
-    setWizardStyle(ModernStyle);
-    QPixmap icon_logo = QIcon(":/res/icon.svg").pixmap(QSize(this->devicePixelRatioF() * 48, this->devicePixelRatioF() * 48));
-    icon_logo.setDevicePixelRatio(this->devicePixelRatioF());
-    setPixmap(QWizard::LogoPixmap, icon_logo);
-    resize(800, 450);
-
+    setUpWizardFrame(this);
     setWindowTitle(tr("VESC Tool Introduction"));
-
-    mSideLabel = new AspectImgLabel(Qt::Vertical);
-    mSideLabel->setPixmap(Utility::getIcon("logo_vertical.png"));
-    mSideLabel->setScaledContents(true);
-    setSideWidget(mSideLabel);
-
-    connect(this, SIGNAL(currentIdChanged(int)),
-            this, SLOT(idChanged(int)));
 }
 
-void StartupWizard::idChanged(int id)
+void setUpWizardFrame(QWizard *wizard)
 {
-    if (id == Page_Intro || id == Page_Conclusion) {
-        setSideWidget(mSideLabel);
-        mSideLabel->setVisible(true);
-    } else {
-        setSideWidget(0);
-    }
+    // The Mac style puts the title and subtitle above the page, on every platform. A transparent
+    // background replaces its default picture.
+    QPixmap background(1, 1);
+    background.fill(Qt::transparent);
+    wizard->setWizardStyle(QWizard::MacStyle);
+    wizard->setPixmap(QWizard::BackgroundPixmap, background);
+    wizard->setButtonLayout({QWizard::CancelButton, QWizard::Stretch, QWizard::BackButton,
+                             QWizard::NextButton, QWizard::CommitButton, QWizard::FinishButton});
+    wizard->setButtonText(QWizard::BackButton, QWizard::tr("Back"));
+    wizard->setButtonText(QWizard::NextButton, QWizard::tr("Next"));
+    wizard->resize(880, 560);
+
+    // Back and Next point the way they go, Cancel is a plain outline
+    wizard->button(QWizard::BackButton)->setIcon(Utility::getIcon("icons/chevron_l.png"));
+    wizard->button(QWizard::NextButton)->setIcon(Utility::getIcon("icons/chevron_r.png"));
+    wizard->button(QWizard::NextButton)->setLayoutDirection(Qt::RightToLeft);
+    qobject_cast<QPushButton*>(wizard->button(QWizard::CancelButton))->setFlat(true);
+
+    // The pages visited, the current one and those that follow from the choices made so far
+    QLabel *steps = new QLabel;
+    steps->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    steps->setFixedWidth(236);
+    steps->setProperty("steps", true);
+    wizard->setSideWidget(steps);
+
+    QObject::connect(wizard, &QWizard::currentIdChanged, steps, [wizard, steps](int id) {
+        if (!wizard->page(id)) {
+            return;
+        }
+
+        // The page sits on the dialog without a frame, its subtitle as a caption under the title
+        if (auto *frame = qobject_cast<QFrame*>(wizard->page(id)->parentWidget())) {
+            frame->setFrameShape(QFrame::NoFrame);
+            frame->setAutoFillBackground(false);
+            frame->layout()->setContentsMargins(0, 0, 0, 0);
+            for (QLabel *subTitle: frame->findChildren<QLabel*>(QString(), Qt::FindDirectChildrenOnly)) {
+                Utility::setStyleProperty(subTitle, "hint", true);
+            }
+        }
+
+        QList<int> ids = wizard->visitedIds();
+        if (!ids.contains(id)) {
+            ids.append(id);
+        }
+        for (int n = wizard->page(id)->nextId();wizard->page(n) && !ids.contains(n);n = wizard->page(n)->nextId()) {
+            ids.append(n);
+        }
+
+        // One row per page: a numbered circle, green with a tick when done, ringed when current, joined by lines
+        const int rowH = 38;
+        QPixmap pm(QSize(steps->width(), 16 + ids.size() * rowH) * steps->devicePixelRatioF());
+        pm.setDevicePixelRatio(steps->devicePixelRatioF());
+        pm.fill(Qt::transparent);
+        QPainter p(&pm);
+        p.setRenderHint(QPainter::Antialiasing);
+        QFont numberFont = steps->font();
+        numberFont.setPixelSize(10);
+        numberFont.setWeight(QFont::Medium);
+        for (int i = 0;i < ids.size();i++) {
+            bool now = ids.at(i) == id;
+            bool done = !now && wizard->hasVisitedPage(ids.at(i));
+            QRectF circle(16.5, 16.5 + i * rowH + 9, 19, 19);
+            QRectF text(48, 16 + i * rowH, steps->width() - 56, rowH);
+
+            p.setBrush(Qt::NoBrush);
+            if (i > 0) {
+                p.setPen(Utility::getAppQColor("lineStrong"));
+                p.drawLine(QPointF(circle.center().x(), circle.top() - 15), QPointF(circle.center().x(), circle.top() - 3));
+            }
+            if (now) {
+                p.setPen(QPen(Utility::getAppQColor("accentDim"), 3));
+                p.drawEllipse(circle.adjusted(-2, -2, 2, 2));
+            }
+            p.setPen(done ? Qt::NoPen : QPen(Utility::getAppQColor(now ? "accent" : "lineStrong")));
+            p.setBrush(done ? QBrush(Utility::getAppQColor("positive")) : QBrush());
+            p.drawEllipse(circle);
+            if (done) {
+                p.setPen(QPen(Qt::white, 1.6, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+                QPointF c = circle.center();
+                p.drawPolyline(QPolygonF({c + QPointF(-4, 0), c + QPointF(-1.2, 2.8), c + QPointF(4, -2.6)}));
+            } else {
+                p.setFont(numberFont);
+                p.setPen(Utility::getAppQColor(now ? "accent" : "mutedText"));
+                p.drawText(circle, Qt::AlignCenter, QString::number(i + 1));
+            }
+
+            QFont titleFont = steps->font();
+            titleFont.setWeight(now ? QFont::Medium : QFont::Normal);
+            p.setFont(titleFont);
+            p.setPen(Utility::getAppQColor(now ? "titleText" : (done ? "lightText" : "mutedText")));
+            p.drawText(text, Qt::AlignLeft | Qt::AlignVCenter,
+                       QFontMetrics(titleFont).elidedText(wizard->page(ids.at(i))->title(), Qt::ElideRight, text.width()));
+        }
+        steps->setPixmap(pm);
+    });
 }
 
 StartupIntroPage::StartupIntroPage(VescInterface *vesc, QWidget *parent)
@@ -77,6 +156,8 @@ StartupIntroPage::StartupIntroPage(VescInterface *vesc, QWidget *parent)
         setTitle("Text not found.");
         mBrowser->setText("Text not found.");
     }
+
+    HelpDialog::setReadingSpacing(mBrowser);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(mBrowser);
@@ -111,6 +192,8 @@ StartupUsagePage::StartupUsagePage(VescInterface *vesc, QWidget *parent)
             this, SLOT(scrollValueChanged(int)));
     connect(mBrowser->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
             this, SLOT(scrollRangeChanged()));
+
+    HelpDialog::setReadingSpacing(mBrowser);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(mBrowser);
@@ -162,6 +245,8 @@ StartupWarrantyPage::StartupWarrantyPage(VescInterface *vesc, QWidget *parent)
     connect(mBrowser->verticalScrollBar(), SIGNAL(rangeChanged(int,int)),
             this, SLOT(scrollRangeChanged()));
 
+    HelpDialog::setReadingSpacing(mBrowser);
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(mBrowser);
     layout->addWidget(mAcceptBox);
@@ -203,6 +288,8 @@ StartupConclusionPage::StartupConclusionPage(VescInterface *vesc, QWidget *paren
         setTitle("Text not found.");
         mBrowser->setText("Text not found.");
     }
+
+    HelpDialog::setReadingSpacing(mBrowser);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(mBrowser);

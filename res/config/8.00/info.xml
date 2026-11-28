@@ -384,496 +384,112 @@ p, li { white-space: pre-wrap; }
             <longName>Motor Setting Description</longName>
             <type>0</type>
             <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Motor Settings&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is where you can edit your motor settings. It is &lt;span style=&quot; color:#00A1E4;&quot;&gt;very important&lt;/span&gt; to setup your VESC every time you connect a different motor, otherwise the VESC and/or the motor are likely to get damaged. The easiest way to set up your VESC for your motor is to use the &lt;span style=&quot; font-weight:600;&quot;&gt;Motor Setup Wizard&lt;/span&gt;. This wizard can be accessed from the welcome page, from the help menu or using the button at the bottom of this page.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The motor settings are stored in their own configuration structure. Every time you make changes to the motor configuration you have to write the configuration to the VESC in order to apply the new settings. Reading/writing the motor configuration can be done using the buttons on the toolbar to the right. The functions of these toolbar buttons are the following:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/18336.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAABLCAAASwgGgauYuAAABVklEQVRIi
-e2TzSvsURzGP8eMWbGTndj4A2zE9iYlkZWSW2RjZeU/IOnGxn8wC3XLy9KCErYslNW9jZTU2LCQl8Toc
-xeO+s2PMZPc3Tyrc57vc57vyzkH6qjjv0HtS+1n1E11sYJ+NsbnajH/od6qnQkur5bUB7UjpW9Wr9Qnd
-T8Za/jAPAcsAU3Acip8AZwCYyl+GHgGjtN+7xIAU0BXXA+p/YlYCVgFxtVsgp8ANoC7D/zKqm9Ri5bjR
-M3FERXU9jim3nimQ31Uu9XdaiMaBa6Bs7j/AwRg4E0QQjgH9oDJSP0E/gJHn1af6qQnVt+a4PJqIa5H4
-6U2x65mI1+1g1qxBbwAv4A24Hcl4ZcShBDugXVgGtgJIRQrabOVAjVgBbgEtj8TlSVQM0AGaIxULv6LU
-vpgCKEALFSrIt3BCDAYk6wB84BAHjgEbqr4HfD66uqo4xvxDxCS2gMcR6zcAAAAAElFTkSuQmCC&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Motor Configuration&lt;/span&gt;. This button will read the current motor configuration from the VESC to VESC Tool.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#00A1E4;&quot;&gt;Warning&lt;/span&gt;: All of the motor settings currently in VESC Tool will be overwritten by pressing this button.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/15613.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAABLCAAASwgGgauYuAAAB0ElEQVRIi
-e2TP0iVURjGf+/VMhRpyGhxUaigyUGsCEKJ/kizNCQJbhG0FgXR2NgalHAdkjalqSGIaAhqKMLaCi80S
-mZ5Ky/5a7jnk9Ptuy1tcR84fN/3PM95n/e8nA86+O8Rahcw3EZfiYjNf0pQu9SnaqNlvVJ3lviH1LdpH
-S/RR9TlpI8U5JFUtMCWeibbdFYdS+8Hk+erWi0JuJ001aMF2a/WsoAlNbJNd9VPqbsiYF79ovZnvj71o
-1otAipJuwbsAtaAOnA1Iswauwg8B+4AOxL3CFgHpjLfaaAHeFgQ3WoPMAvcSuLeiHiXHzsiGuoV4CUwl
-uhNYAGYAeYSNwMsAp+3A4AhYE/q6EPiyrAM1IDDGVcFLqv7gW/ACWAyTWM7oA/YAjYiot6mOBHxU60Dv
-Rn3Rn0NTNMcV43mKMcLTwVYSc8D7YoDqLuBQeB9i1QFLtAcz/2IaORiBVgFngGX8ptTgunkf9zCPwD2p
-QYX2nV3TP2uXi8LUcfVdfVGdk2nMn1CPZV9n/ztP0jkbAp5op5XR9VJ9Z76Q51Tu8sCShr6MyAJo+qiu
-paKbqgv1HPFydQB9aZ66C8Bw8kzWDpztRcYoHmzVtsV6qADAH4B7oGeIcdpjWQAAAAASUVORK5CYII=&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Default Motor Configuration&lt;/span&gt;. This button will read the default motor configuration from the VESC to VESC Tool. The default configuration is hard-coded in firmware, and is how the VESC is configured right after uploading new firmware.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#00A1E4;&quot;&gt;Warning&lt;/span&gt;: All of the motor settings currently in VESC Tool will be overwritten by pressing this button.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/2057.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAABLCAAASwgGgauYuAAABcUlEQVRIi
-e3UvY9McRTG8c8Zq5L5C0SIbK+hEZH9A0TIVkJCRaXaSiNRKv0Fxku8hEJBQbKxCo0tVLLBNiKhofCaM
-GMfxdxiXDMZsu18m5vz3HPOc84vv3uZMWOz1GiQZBGHsAXb8AXBZezBAl5V1bl2oyRL2I8XVXV+rFuST
-pKtSQ5kyPYm7iTpJRkk+Z5kV6uum+RDkp9JVkbfdf5Yp2qjqvoYNFK/qvpVtdHEb7GOY63ZDqOP5+2hO
-21hCgNcx/EkcyP6SdzF180awG3sxj5ojusgro1L/m+DqnqDxzjVSCfwEqtTDZKcTbKGW430NMlakqOtu
-itYTNI1PJ6rVZV/2eAGutjZxPP4gfutvAf4hYvYgZvjmv9lUFUfccHw7mueS83NGs37hjs4g0dV9W6Sw
-dwYrYfT2It7VbU8ofYS3uPhpOYTSbKQ5HOS+RGtl+T1lLrl9oc2bgNVtZLkSFWtj8jP8GnKbE+0fj8zZ
-mye3xJypFIwh222AAAAAElFTkSuQmCC&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Write Motor Configuration&lt;/span&gt;. This button will write the motor configuration that currently is in VESC Tool to the VESC. Every time you make a change to the motor configuration in VESC Tool you must use this button to apply the new settings. The new settings will be used as soon as you write them to the VESC, and they will be stored in the flash memory of the VESC persistently.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Every motor setting has three small buttons to the right of its value. They have the following functions:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/29987.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAtUlEQVQ4j
-e2TOwrCQBRF7xO7kB24hCzA7EPBMuAKXIkrML1uJNZZg41lwDaeNKMGNXHyERsPDNyBx3mXgZF+ARAAg
-c+sechM0s5d12bGkHICEuDqTjJUFgEFDwog6isLgZxXciDsI0zfyG6kXWUJULYIy6b3nDY4z5JWLm8kx
-S5nkrYuXzq1rLXd15odPs1Pem35C78qHB2TJGAmaT7QdTSzk5xw0fIrfFk+N4ybl3uR3RuOSQVo+Pcrl
-OWFigAAAABJRU5ErkJggg==&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Current Value&lt;/span&gt;. This button will read the current value for this setting from the VESC.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/2982.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAAA7DAAAOwwHHb6hkAAACCElEQVQ4j
-a2US0uVURSGn3U0yy6W3a+DEqNJCU4iMioEIZo0iKioHEiTJo2aNG7UH8hBRdQsgm5YFAgFEREhRAQ1q
-bygBTXITE3Jp8HZR0/H76gDX/jY7L32ete71rfWhnlGZB2qK4GtwHpgATAMdAPdETE6J2a1Qj2mdqq/1
-Qn/x4T6Tb2uNsyoUM0BN4BTSU0n8BroA8aApUA9cABoBMaB1oi4XU7d3qTgrrpmlkx2qz1qX5Y9l9YNl
-KnnDJltyjJUluyPAC3qM+Al0Av8AWqA7UAzsAuoKBeplPAqsA3YDxwqUT0BfAduAjuAPXMh/BQRZ9UVQ
-B2wEagChoAvwGfyP6Q9BciGejS1xl/1kXparVer1Zy6Sm1UK4t8lqg1sxG+VUecjmG1qcSnJdkG1Sup9
-aalfBl4ChwEGoDNwCKgA+hX2yLiWro7kNZlwIuImCpBkcIetVWtzcjiTlJfl/ar1VfqgNqrLs4iHEvrk
-NqlPlQvpbEcUTuKfEJdrl5IQ9EEU41dwDmgDXhMftya01cFLAS+Fi5GhBHxM51FSn0y2r4U5V650VPfq
-/3q2qKznPpEHVW3UGK4lUh/qffVi+oZ8y/QTvVEaqt36kn1sPog+bRnKahQj6vPnf58fUj1Op/apIBx8
-89Z9WQpyqRXS34EC5MyCHRFxA91HdBEvp3eRMTHLI55wz/tOPCh0cJ7OwAAAABJRU5ErkJggg==&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Default Value&lt;/span&gt;. This button will read the default value for this setting from the VESC.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/3626.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABsUlEQVQ4j
-a2Uu25TURBF10RIETVKAo1BRMJIQco34IrOHcqroEbwDbTg9PxBREEVBC30KYOJYiqIgo2QoEt4CLwoP
-E6uTm6s8Jjqas+efebM3WfgP0dMSqrTQBNoJLQH9CLi+x+dos6p62pfHXocw8TW1bkzdajeBJ4As0AX2
-ATeZvoa0AZuAJ+A5Yh4NamzlnqoflaX1KkazpS6nJxDtXWa2Iw6UL+oC4XAVbVR8BeSO1Bn6gQ7OaOlC
-nZB3VJ/qT/V5+r5Sn45azql2HQOe7t6TfVe/oy76v38vlN0v61+SEcwLr4OXAQ2I2JYOeslcBvYALYSm
-x0nk/sMuJQaR4KXGf3xXrXziNiJiKfAN+AB8BV4UUyrl7UNgHMnhlkfD4FbwFpEvJlEHHf4HpDRq6iLH
-8BjRv4so5m1e1XBXWAAtOu8lwfuRIRVMLntrN2lSI5ts1KqqV21W4OvZs2jEy2ksftp1sUiN6/OF9hic
-vu1xk5SSz1I4sqEp7eWnIN8+0dx2nLYYOTL14x8NrZTk+Pl8BFYnbgciut31P2a9bWfudprnnXBXknoH
-X+zYP8lfgOHlZEKN7DBYwAAAABJRU5ErkJggg==&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Show Help&lt;/span&gt;. This button will show a help dialog describing what this setting does. If you are not sure about a setting the help dialog can be very useful.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The full motor configuration, including the notes you make on the &lt;span style=&quot; font-weight:600;&quot;&gt;Description&lt;/span&gt; page, can also be written to and read from XML files using the &lt;span style=&quot; font-weight:600;&quot;&gt;File&lt;/span&gt; menu. This is a good way to keep your settings when going between different VESC Tool versions, to share your settings and to store your configuration in general.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Notice that uploading new firmware to the VESC will reset all its settings to their default values for that firmware. This means that after uploading firmware to the VESC you have to perform the motor configuration again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <description>&lt;p class=&quot;lead&quot;&gt;How the VESC drives the motor: motor type, limits, motor parameters and control loops.&lt;/p&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/warning.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;warn&quot;&gt;Wrong settings can damage the motor and the VESC. Run the setup again for a different motor.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/warning.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;warn&quot;&gt;A firmware upload resets all settings. Use &lt;b&gt;Backup Configs&lt;/b&gt; first and &lt;b&gt;Restore Configs&lt;/b&gt; after (Welcome page).&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;The &lt;b&gt;Motor Setup Wizard&lt;/b&gt; below (also &lt;b&gt;Wizards &amp;gt; Setup Motors FOC&lt;/b&gt;) detects the motor and sets the limits. Start there.&lt;/p&gt;
+
+&lt;h3&gt;Read and write&lt;/h3&gt;
+&lt;p&gt;You edit a copy of the configuration in VESC Tool. The VESC uses it only after you write it. The keys are in column &lt;b&gt;M&lt;/b&gt; under CONFIG in the toolbar. They act on the device selected under CAN DEVICES in the sidebar.&lt;/p&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/motor_up.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Read&lt;/td&gt;&lt;td&gt;Reads the motor configuration from the VESC.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/motor_default.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Read default&lt;/td&gt;&lt;td&gt;Reads the defaults built into the firmware.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/motor_down.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Write&lt;/td&gt;&lt;td&gt;Writes the configuration to the VESC. It applies at once and is kept after power off.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/warning.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;warn&quot; colspan=&quot;2&quot;&gt;Read and Read default replace changes you have not written.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Changed parameters get an orange dot and edge, and their tab and page get a dot. The Write key turns orange and shows the count, and so does the &lt;b&gt;Write&lt;/b&gt; button in the page header. Right-click a changed parameter to revert it.&lt;/p&gt;
+
+&lt;h3&gt;Parameters&lt;/h3&gt;
+&lt;p&gt;Each parameter has three buttons after its value. They light up when you point at the row.&lt;/p&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/Upload-96.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Read current&lt;/td&gt;&lt;td&gt;Reads the value of this parameter from the VESC.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/Data Backup-96.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Read default&lt;/td&gt;&lt;td&gt;Reads the default value of this parameter.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/Help-96.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Help&lt;/td&gt;&lt;td&gt;Explains what the parameter does.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;To find a parameter, type part of its name in the search field at the top of the sidebar (Ctrl+K, Cmd+K on macOS).&lt;/p&gt;
+&lt;p class=&quot;muted&quot;&gt;The page list shows the page of the motor type chosen under General. A backup holds the motor and app configuration and stays in VESC Tool on this computer. To move a configuration, save it as an XML file in the File menu.&lt;/p&gt;</description>
             <cDefine></cDefine>
         </motor_setting_description>
         <app_setting_description>
             <longName>App Setting Description</longName>
             <type>0</type>
             <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;App Settings&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is where you can edit your app settings. The VESC can run one or more apps, and the apps are used to enable different functions on the communication interfaces of the VESC. If you are going to use your VESC with USB or CAN-bus you don't have to change the app configuration since these interfaces always are active. If you want to use conventional input devices such as nunchuks, ebike throttles or RC remote controllers you have to configure the apps accordingly.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The easiest way to configure your VESC for conventional input devices is to use the &lt;span style=&quot; font-weight:600;&quot;&gt;Input Setup Wizard&lt;/span&gt;. This wizard can be accessed from the welcome page, from the help menu or using the button at the bottom of this page.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The app settings are stored in their own configuration structure. Every time you make changes to the app configuration you have to write the configuration to the VESC in order to apply the new settings. Reading/writing the app configuration can be done using the buttons on the toolbar to the right. The functions of these toolbar buttons are the following:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/7220.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAABLCAAASwgGgauYuAAABQklEQVRIi
-e2SvyvFURyGn3O7UUQGUZSUkiwMMjLK4C+4IoPVZDCxyMBAKf+ATBjMMpso+QMkSoQU8rMewz1yffteX
-Ve2+9Sp8znv2/t2TgcqVPg31EE1+4M+q26rPeWEN6jn6mQRvUl9UN/VtXIKFs1zpTak6FPqffTdqLW/C
-e9SH/1iOaFn1AN1Q22Lt8iVGh7UHb/zpHYXePpi6FCc99TdUgt61SP1OIacxf1SgWdVPVWr4zymvqgdJ
-ZUUBN2q44mzOvUiUViv3qlzaTlFv2ERhoFmoFWdj2cBuAVy6kII4e0vBRPANdAS1yeXQD8wAOyVlJR8I
-rVdfVanU7xV6om6ntQyCWOI5iryV8/GOQuMAgJbyZAQwiuwCYyojd+0REEnMBPHGuAVeAcOyT9JJoQwQ
-wrxK88BKyGE/TRPhQrl8QHWazO2mBBwJwAAAABJRU5ErkJggg==&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read App Configuration&lt;/span&gt;. This button will read the current app configuration from the VESC to VESC Tool.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#00A1E4;&quot;&gt;Warning&lt;/span&gt;: All of the app settings currently in VESC Tool will be overwritten by pressing this button.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/863.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAABLCAAASwgGgauYuAAABr0lEQVRIi
-e3Ty4vPURgG8Ocwl0y5l2Q3YeGyURS2yIYsLCj3CIvZKFlI/gS7ScqClZ1LlMWsLKRsSEhMWUiYyaUI4
-zIfmzP19ev3G8pO89Rbp/d53ts5502m8N+jJAnmJ5nXhv9cSnn5z1WwFl/xvcUG/iL2FB7j6J+EF/yOh
-+ip3HQcw4yWmC68wic8wLTJCuxpJP+JzQ2uH29wBV0N/7Y66UH8wPpOyWfhJZ5iHNdQWjSra6cHGr6ru
-F0neYJznQrsxfva6X0s76A7i7soWIQvOFK50xjB7HaBgxiq54WTXONWfMQcHMdnzK3cUoxhdzNm4lH6k
-nxMklLK604Fqqan2r4kN0op7ys3nOROkv3N6514sOdJdmJaKWV8kgIrk4wmWZFkWZJxXG7wC5P0J1mS5
-FlzguvVuTkdgN4kh5LcTLIjyYfa8ZuG3UryLcmudgku4gVWtOG6cB7vsAqjGOzQyCUMo7uVmImh+ohns
-AFrcBj36i/bVPdlHOs6FNhS+Y3tyG4M4FH9IWN4W7d8cdVsx4nmwrXk6MPJiUUt7URVuCBJb5KRUspYJ
-90UppBfSZTT+9DAGgIAAAAASUVORK5CYII=&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Default App Configuration&lt;/span&gt;. This button will read the default app configuration from the VESC to VESC Tool. The default configuration is hard-coded in firmware, and is how the VESC is configured right after uploading new firmware.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#00A1E4;&quot;&gt;Warning&lt;/span&gt;: All of the app settings currently in VESC Tool will be overwritten by pressing this button.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/17702.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAABLCAAASwgGgauYuAAABZ0lEQVRIi
-e2SP0vVYRTHP8c/DYreJVwTRJeG4L4AF99ALWU4KORLaBHCoCkyBEGctZaWFpdWXWxqcIiaMgpTRMggu
-BfulY+DR/j146o/yPF+4cBz/ny/5znPc6CLLv4XUXTUCWAh3SGgCbSATxGxWqpdBO4BLyJit1I3NdT+t
-N/qkzz3lupG1L9qW127SrPnn3EijIhWRLQAgXb6pyXedOaXgUfqYKUGVaD2ALPAJrAK1ID7N9YAqHP+9
-m8i4gewDczdZINZYB/YSn8DmFTHrmWqdfWz+iU/8FeelzM/pB6oSwXOsHqiPu+kWV7TAN4DDwrhBlCPi
-K/qQ+Bd2reCxmOgDdzNBblyiolcwQu8LuQ+qEfqVsk+qqfq1LXPlEIvU/xQrWVsVG2qTzvU31L31LdVG
-9TUn+p8IfZMbaijl3Be5V/cLsb7OhVHxB91BthJcgADwEpEfL/kXuvAHWAcOK40SRddVMIZ9sYKkh40m
-jAAAAAASUVORK5CYII=&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Write App Configuration&lt;/span&gt;. This button will write the app configuration that currently is in VESC Tool to the VESC. Every time you make a change to the app configuration in VESC Tool you must use this button to apply the new settings. The new settings will be used as soon as you write them to the VESC, and they will be stored in the flash memory of the VESC persistently.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Every app setting has three small buttons to the right of its value. They have the following functions:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/19309.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAtUlEQVQ4j
-e2TOwrCQBRF7xO7kB24hCzA7EPBMuAKXIkrML1uJNZZg41lwDaeNKMGNXHyERsPDNyBx3mXgZF+ARAAg
-c+sechM0s5d12bGkHICEuDqTjJUFgEFDwog6isLgZxXciDsI0zfyG6kXWUJULYIy6b3nDY4z5JWLm8kx
-S5nkrYuXzq1rLXd15odPs1Pem35C78qHB2TJGAmaT7QdTSzk5xw0fIrfFk+N4ybl3uR3RuOSQVo+Pcrl
-OWFigAAAABJRU5ErkJggg==&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Current Value&lt;/span&gt;. This button will read the current value for this setting from the VESC.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/31745.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAAA7DAAAOwwHHb6hkAAACCElEQVQ4j
-a2US0uVURSGn3U0yy6W3a+DEqNJCU4iMioEIZo0iKioHEiTJo2aNG7UH8hBRdQsgm5YFAgFEREhRAQ1q
-bygBTXITE3Jp8HZR0/H76gDX/jY7L32ete71rfWhnlGZB2qK4GtwHpgATAMdAPdETE6J2a1Qj2mdqq/1
-Qn/x4T6Tb2uNsyoUM0BN4BTSU0n8BroA8aApUA9cABoBMaB1oi4XU7d3qTgrrpmlkx2qz1qX5Y9l9YNl
-KnnDJltyjJUluyPAC3qM+Al0Av8AWqA7UAzsAuoKBeplPAqsA3YDxwqUT0BfAduAjuAPXMh/BQRZ9UVQ
-B2wEagChoAvwGfyP6Q9BciGejS1xl/1kXparVer1Zy6Sm1UK4t8lqg1sxG+VUecjmG1qcSnJdkG1Sup9
-aalfBl4ChwEGoDNwCKgA+hX2yLiWro7kNZlwIuImCpBkcIetVWtzcjiTlJfl/ar1VfqgNqrLs4iHEvrk
-NqlPlQvpbEcUTuKfEJdrl5IQ9EEU41dwDmgDXhMftya01cFLAS+Fi5GhBHxM51FSn0y2r4U5V650VPfq
-/3q2qKznPpEHVW3UGK4lUh/qffVi+oZ8y/QTvVEaqt36kn1sPog+bRnKahQj6vPnf58fUj1Op/apIBx8
-89Z9WQpyqRXS34EC5MyCHRFxA91HdBEvp3eRMTHLI55wz/tOPCh0cJ7OwAAAABJRU5ErkJggg==&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Default Value&lt;/span&gt;. This button will read the default value for this setting from the VESC.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/29590.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABsUlEQVQ4j
-a2Uu25TURBF10RIETVKAo1BRMJIQco34IrOHcqroEbwDbTg9PxBREEVBC30KYOJYiqIgo2QoEt4CLwoP
-E6uTm6s8Jjqas+efebM3WfgP0dMSqrTQBNoJLQH9CLi+x+dos6p62pfHXocw8TW1bkzdajeBJ4As0AX2
-ATeZvoa0AZuAJ+A5Yh4NamzlnqoflaX1KkazpS6nJxDtXWa2Iw6UL+oC4XAVbVR8BeSO1Bn6gQ7OaOlC
-nZB3VJ/qT/V5+r5Sn45azql2HQOe7t6TfVe/oy76v38vlN0v61+SEcwLr4OXAQ2I2JYOeslcBvYALYSm
-x0nk/sMuJQaR4KXGf3xXrXziNiJiKfAN+AB8BV4UUyrl7UNgHMnhlkfD4FbwFpEvJlEHHf4HpDRq6iLH
-8BjRv4so5m1e1XBXWAAtOu8lwfuRIRVMLntrN2lSI5ts1KqqV21W4OvZs2jEy2ksftp1sUiN6/OF9hic
-vu1xk5SSz1I4sqEp7eWnIN8+0dx2nLYYOTL14x8NrZTk+Pl8BFYnbgciut31P2a9bWfudprnnXBXknoH
-X+zYP8lfgOHlZEKN7DBYwAAAABJRU5ErkJggg==&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Show Help&lt;/span&gt;. This button will show a help dialog describing what this setting does. If you are not sure about a setting the help dialog can be very useful.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The full app configuration can also be written to and read from XML files using the &lt;span style=&quot; font-weight:600;&quot;&gt;File&lt;/span&gt; menu. This is a good way to keep your settings when going between different VESC Tool versions, to share your settings and to store your configuration in general.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Notice that uploading new firmware to the VESC will reset all its settings to their default values for that firmware. This means that after uploading firmware to the VESC you have to perform the app configuration again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <description>&lt;p class=&quot;lead&quot;&gt;Which app controls the VESC, and the settings of each input: remote, throttle or pedal sensor.&lt;/p&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/warning.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;warn&quot;&gt;A firmware upload resets all settings. Use &lt;b&gt;Backup Configs&lt;/b&gt; first and &lt;b&gt;Restore Configs&lt;/b&gt; after (Welcome page).&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;The &lt;b&gt;Input Setup Wizard&lt;/b&gt; below (also &lt;b&gt;Wizards &amp;gt; Setup Input&lt;/b&gt;) sets up a remote or throttle step by step.&lt;/p&gt;
+
+&lt;h3&gt;Choose the app&lt;/h3&gt;
+&lt;p&gt;&lt;b&gt;APP to Use&lt;/b&gt; on the &lt;b&gt;General&lt;/b&gt; page selects the app. The page list then shows that app's pages, plus &lt;b&gt;Nrf&lt;/b&gt; and &lt;b&gt;IMU&lt;/b&gt;. With several VESCs on CAN, only the one the input is wired to needs an app.&lt;/p&gt;
+
+&lt;h3&gt;Read and write&lt;/h3&gt;
+&lt;p&gt;Column &lt;b&gt;A&lt;/b&gt; under CONFIG in the toolbar works like column &lt;b&gt;M&lt;/b&gt; on Motor Settings.&lt;/p&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/app_up.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Read&lt;/td&gt;&lt;td&gt;Reads the app configuration from the VESC.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/app_default.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Read default&lt;/td&gt;&lt;td&gt;Reads the firmware defaults.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/app_down.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Write&lt;/td&gt;&lt;td&gt;Writes it to the VESC, kept after power off.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/warning.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;warn&quot; colspan=&quot;2&quot;&gt;Read and Read default replace changes you have not written.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;h3&gt;Test the input&lt;/h3&gt;
+&lt;p&gt;Turn on &lt;b&gt;APP&lt;/b&gt; under LIVE in the toolbar to see the input on the &lt;b&gt;Mapping&lt;/b&gt; tabs of PPM and ADC and on VESC Remote.&lt;/p&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/Restart-96.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Reset&lt;/td&gt;&lt;td&gt;Clears the measured min and max. Then move the throttle end to end, and let a PPM stick return to centre.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/Ok-96.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Apply&lt;/td&gt;&lt;td&gt;Puts the measured range into the configuration. Then write it.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p class=&quot;muted&quot;&gt;A backup holds the motor and app configuration and stays in VESC Tool on this computer. To move a configuration, save it as an XML file in the File menu.&lt;/p&gt;</description>
             <cDefine></cDefine>
         </app_setting_description>
         <dev_tools_description>
             <longName> Development Tool Description</longName>
             <type>0</type>
             <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; ; font-weight:600;&quot;&gt;VESC Development Tools&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; ; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Terminal&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is a text command interface to some advanced and debug-functions of the hardware. &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Qml Scripting&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Qml is an extension of javascript that is used to make mobile applications in Qt. The mobile version of VESC Tool as well as the wizards in the desktop version are written in Qml. The Qml-editor in VESC Tool can be used to write custom user interface pages that are loaded and run in VESC Tool. There are many examples available that can be used as a starting point.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;LispBM Scripting&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The VESC motor control firmware as well as the VESC Express firmware have a built-in version of LispBM, which is a modern embedded scripting language based on lisp. Code written in LispBM runs directly on the hardware and can be used for custom functionality not covered by the basic applications. &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;CAN Tools&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Simple CAN-bus tool that can read and send messages on the CAN-bus. &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Display Tool&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Graphic and font generation tool for displays supported by the VESC display driver, which is part of the Express firmware. &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Debug Console&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Debug messages from VESC Tool are printed here. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <description>&lt;p class=&quot;lead&quot;&gt;Tools for developers: commands, scripts, CAN traffic and display graphics.&lt;/p&gt;
+
+&lt;h3&gt;Scripting&lt;/h3&gt;
+&lt;p&gt;Both editors have &lt;b&gt;Examples&lt;/b&gt; and &lt;b&gt;Recent&lt;/b&gt; tabs to start from.&lt;/p&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;QML Scripting&lt;/td&gt;&lt;td&gt;User interface pages in QML. &lt;b&gt;Run&lt;/b&gt; shows the page in the panel, &lt;b&gt;Window&lt;/b&gt; in its own window. The &lt;b&gt;Tools&lt;/b&gt; tab uploads it to the VESC.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;LispBM Scripting&lt;/td&gt;&lt;td&gt;Code that runs on the VESC or VESC Express itself. &lt;b&gt;Upload&lt;/b&gt; stores it in flash and runs it on every boot. &lt;b&gt;Stream&lt;/b&gt; is faster but is not kept.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;h3&gt;More tools&lt;/h3&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Terminal&lt;/td&gt;&lt;td&gt;Sends text commands to the VESC. Type &lt;b&gt;help&lt;/b&gt; to list them.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;CAN Tools&lt;/td&gt;&lt;td&gt;Shows received CAN frames and sends your own. &lt;b&gt;Update CAN Baudrate&lt;/b&gt; changes all connected devices at once.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Display Tool&lt;/td&gt;&lt;td&gt;Makes fonts and overlay images for the display driver of the VESC Express firmware.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Debug Console&lt;/td&gt;&lt;td&gt;Messages from VESC Tool itself.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</description>
             <cDefine></cDefine>
         </dev_tools_description>
         <data_analysis_description>
             <longName>Data Analysis Description</longName>
             <type>0</type>
             <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Data Analysis&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Here you can stream and plot data from the VESC to analyze what is going on. Next to all plots the following buttons are available:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/14240.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAACKZAAAimQETZNpHAAAA6UlEQVRIi
-e2TPUoEQRCFv1o8wAZ7BBMz9QzKgoGBibF6CFNjD7DpZv6cwU30AJ7AQ8hgsozOZ1JgC73LKIog86CgK
-arfq3rVDQMG/B+oW7XzTwrM1FHGrO+9jTWEm8Ax0EbE5Yqa8+S4jYinPl1O1FP1Xl2qrbq9agJ1J2uW6
-oN6pk5qxFP1Sm3Uzg806pF6qN4UAtfqQeabor5TX7J2CjBKjRYQ6CqDvWZY5CKtqVn8ljxtbZKxeqLeF
-Rbt9rRokfaOS85PHUTEMzAH5sWS94DHSqcA+8AFfZe8Dt99pl8R+N2PNmDA3+EdH2UCNWAhxgQAAAAAS
-UVORK5CYII=&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt; &lt;img src=&quot;data:image/25743.PNG;base64,i
-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&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If this button is toggled active (blue), scolling with the mouse on the graph will zoom the graph horizontally.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/31963.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAACKZAAAimQETZNpHAAABJUlEQVRIi
-c2VMUoDURCGv6exEAQTD2AVGxtB8ARpJEVAGz2AtXZi6xG0t/IKtoYcwNrSKxhjobHws8gTF4vsvLCIP
-zyYnd3v/cvsvFn4T1J7aq+EaRV6nAAC94VcvdSOOsmrE+WWCjwOgbW8DkpfsFbqyB+Nmt58S51WDKbqV
-oSNlug4P/sKTHJ8FAGjXfQB7AGbwDLwBOwH2bjUvjooYVLNhtvAWSW1nplxJXeVUnpcyCCbzP1OKaXPe
-fdLzsFCipTotJLaYDYqniu563klKpI6UPslTKhE6rm6w6ytW+quehFho+dgBXgA3vL1KnAZZOuldtX3X
-6Oi25hBNhlWDIZRrqRNb5l1kDluVmpbfcmrHeXCv8yU0li9+44bN8i6ITBe/lRfq0es4mlJfQ0AAAAAS
-UVORK5CYII=&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt; &lt;img src=&quot;data:image/17175.PNG;base64,i
-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
-fo/DPf/89vyFbLgXpdE9QetAAAAAElFTkSuQmCC&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If this button is toggled active (blue), scolling with the mouse on the graph will zoom the graph vertically. Often it is useful to deactivate this button and only zoom in the horizontal direction because the sampled data can be squeezed together horizontally for long sampling sequences.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;img src=&quot;data:image/839.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAACdiAAAnYgHPiuanAAABbklEQVRIi
-bXVPWsUURSH8f8NMUTBLqTSRMUXbEMEC0FQsLMVwc4PFhAUxMJGhAiiAQubaCd+B9lGiLhgsj+L3IVxd
-hd39uU0d+49l+c558zAFMgSY7WukvTruogoSdaTlKGgn2Q3SW9Bgo0kh0nONjvolVJ+zEPFzSQnOS1Uk
-qzMA2yA7+B1ks9JBu0k/MJmR+gKHuITTirnRc1tVqbOAqzjKb75N/5gZxGC5/htNPYbd2YXVMBVfGzAB
-7g/TjDrSx4kOUpyUPdfknyYVE3XEV3CW2zjOvp41Loz24iwhX1sNc72cKazAGvYa+wvV/iFKQqZSvC4t
-n8DV+pYLv4PPpUABYc1d4A32J4G3hZM+oruJdmpz3eTnE9yblpB2zaug3dGo49nXTsYEWAXxy34VzzB2
-iIEL+vZMd7jAUrHqYwX4Bp+4hVudYFOEqy2ciXJ7VLK91nh7RgKSk5/c71hBXNyNyozBbLEn/5QsLT4C
-1/GbmAhMxLfAAAAAElFTkSuQmCC&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt; &lt;img src=&quot;data:image/13894.PNG;base64,i
-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&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is the auto fit button. If the toggle verion of the button is active (blue), new realtime data that drops in will cause a rezoom in the graph to fit all data. Deactivating this button can be useful of you want to zoom in on the realtime data manually while samples are dropping in.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/23239.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAACdiAAAnYgHPiuanAAABbklEQVRIi
-bXVPWsUURSH8f8NMUTBLqTSRMUXbEMEC0FQsLMVwc4PFhAUxMJGhAiiAQubaCd+B9lGiLhgsj+L3IVxd
-hd39uU0d+49l+c558zAFMgSY7WukvTruogoSdaTlKGgn2Q3SW9Bgo0kh0nONjvolVJ+zEPFzSQnOS1Uk
-qzMA2yA7+B1ks9JBu0k/MJmR+gKHuITTirnRc1tVqbOAqzjKb75N/5gZxGC5/htNPYbd2YXVMBVfGzAB
-7g/TjDrSx4kOUpyUPdfknyYVE3XEV3CW2zjOvp41Loz24iwhX1sNc72cKazAGvYa+wvV/iFKQqZSvC4t
-n8DV+pYLv4PPpUABYc1d4A32J4G3hZM+oruJdmpz3eTnE9yblpB2zaug3dGo49nXTsYEWAXxy34VzzB2
-iIEL+vZMd7jAUrHqYwX4Bp+4hVudYFOEqy2ciXJ7VLK91nh7RgKSk5/c71hBXNyNyozBbLEn/5QsLT4C
-1/GbmAhMxLfAAAAAElFTkSuQmCC&quot; width=&quot;24&quot; height=&quot;24&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is the non-toggle version of the auto fit button. Pressing it will zoom the plots so that all data fits in them.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Realtime Data&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The realtime data page can be used to stream and plot filtered data continuously, which can be useful for visualizing things in real time while they are happening. For example, if you run a motor and put some load on it, you can see that reflected right away in the current and RPM graphs. Tuning the position and speed PID control parameters is also a lot easier when looking at the step response in a graph.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In ordet to stream realtime data, the &lt;span style=&quot; font-style:italic;&quot;&gt;Stream realtime data&lt;/span&gt; button in the main toolbar to the right has to be activated:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/9960.PNG;base64,i
-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
-II=&quot; width=&quot;32&quot; height=&quot;32&quot; /&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Sampled Data&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The sampled data page can be used to sample data at high rate internally on the VESC and send it back for plotting after that. This page can be used to visualize all samples taken by the ADCs to analyze the current and voltage waveforms in detail. Since this data is sampled at such a high rate it cannot be streamed in real time, which is why sampling and plotting has to be toggled manually. There are two buttons for starting the sampling in the lower toolbar in this page:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/3365.PNG;base64,i
-VBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA4WlDQ1BzUkdCAAAYlWNgYDzNAARMDgwMu
-XklRUHuTgoRkVEKDEggMbm4gAE3YGRg+HYNRDIwXNYNLGHlx6MWG+AsAloIpD8AsUg6mM3IAmInQdgSI
-HZ5SUEJkK0DYicXFIHYQBcz8BSFBDkD2T5AtkI6EjsJiZ2SWpwMZOcA2fEIv+XPZ2Cw+MLAwDwRIZY0j
-YFhezsDg8QdhJjKQgYG/lYGhm2XEWKf/cH+ZRQ7VJJaUQIS8dN3ZChILEoESzODAjQtjYHh03IGBt5IB
-gbhCwwMXNEQd4ABazEwoEkMJ0IAAHLYNoSjH0ezAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAy0lEQVRYh
-e2VsRGCQBRE9xwjarACKtA+1JQarMQSiLURLIASzEwxfiYy6sEhyHEE3otufvB3b3ZnvhQZAZAAyZwGc
-iCfSzzjRRZaPAWqNwMVkIYST4CSJmWQPjxzdzFtH6zcXUzTh5bcXfjvQ0fuLvz2ge7cXfjpA/1yd/G1D
-8seHm6S9tbsIGljzQpJR2t277F/OMCp5bfnX3YtfJuLBqKBaCAaiAzF1A9gJWkdSPdijLl+TIDtiLM7l
-F2tO3sJ7QjsGz8VRSOCv+UBobYCfWgtZnEAAAAASUVORK5CYII=&quot; width=&quot;32&quot; height=&quot;32&quot; /&gt;  &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sample data now and send it when this is done.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;data:image/22333.PNG;base64,i
-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
-Z6fygf3f6rVX1TOmrF1AAAAAElFTkSuQmCC&quot; width=&quot;32&quot; height=&quot;32&quot; /&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sample data the next time the motor starts moving. This can be useful to analyze the startup behaviour in real time.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;There are also options to apply filters to the sampled data and/or to plot a FFT of all samples if desired.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <description>&lt;p class=&quot;lead&quot;&gt;Plots and logs of what the VESC measures: live, sampled at full rate, or recorded.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;Realtime Data&lt;/b&gt;, &lt;b&gt;IMU Data&lt;/b&gt; and &lt;b&gt;BMS Data&lt;/b&gt; show data only while it streams: turn on &lt;b&gt;RT&lt;/b&gt;, &lt;b&gt;IMU&lt;/b&gt; or &lt;b&gt;BMS&lt;/b&gt; under LIVE in the toolbar. Set the rates in &lt;b&gt;Preferences &amp;gt; Data Polling&lt;/b&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Pages&lt;/h3&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Realtime Data&lt;/td&gt;&lt;td&gt;Current, temperature, RPM, FOC and rotor position over time. &lt;b&gt;Log&lt;/b&gt; saves them as CSV in the folder set in &lt;b&gt;Preferences &amp;gt; Paths&lt;/b&gt;.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Sampled Data&lt;/td&gt;&lt;td&gt;Currents and voltages at full rate. Start with &lt;b&gt;Now&lt;/b&gt; or &lt;b&gt;At motor start&lt;/b&gt;.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Experiment Plot&lt;/td&gt;&lt;td&gt;Plots that the firmware and LispBM scripts send.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;IMU Data&lt;/td&gt;&lt;td&gt;Roll, pitch and yaw, the raw sensors and a 3D view.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;BMS Data&lt;/td&gt;&lt;td&gt;Cell voltages, balancing, temperatures and pack totals.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Log Analysis&lt;/td&gt;&lt;td&gt;Logs from the VESC, from files or from Realtime Data, with a map, plots and statistics.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;Motor Analysis&lt;/td&gt;&lt;td&gt;Compares two motor configurations in torque, RPM and power sweeps.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;h3&gt;Plot controls&lt;/h3&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Auto&lt;/td&gt;&lt;td&gt;Keeps rescaling to fit as samples arrive.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/expand_off.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Horizontal zoom&lt;/td&gt;&lt;td&gt;Mouse wheel zooms the time axis.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/expand_v_off.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Vertical zoom&lt;/td&gt;&lt;td&gt;Mouse wheel zooms the value axis.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src=&quot;theme:icons/size_off.png&quot; width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;/td&gt;&lt;td class=&quot;name&quot;&gt;Rescale&lt;/td&gt;&lt;td&gt;Fits the plot to the data now.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</description>
             <cDefine></cDefine>
         </data_analysis_description>
         <app_adc.info>

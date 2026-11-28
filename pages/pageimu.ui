@@ -16,9 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
-     <property name="tabShape">
-      <enum>QTabWidget::Triangular</enum>
-     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -28,7 +25,28 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QCustomPlot" name="rpyPlot" native="true"/>
+        <widget class="QFrame" name="rpyWell">
+         <property name="well" stdset="0">
+          <bool>true</bool>
+         </property>
+         <layout class="QVBoxLayout" name="rpyWellLayout">
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QCustomPlot" name="rpyPlot" native="true" />
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -42,9 +60,72 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QCustomPlot" name="accelPlot" native="true"/>
-         <widget class="QCustomPlot" name="gyroPlot" native="true"/>
-         <widget class="QCustomPlot" name="magPlot" native="true"/>
+         <widget class="QFrame" name="accelWell">
+          <property name="well" stdset="0">
+           <bool>true</bool>
+          </property>
+          <layout class="QVBoxLayout" name="accelWellLayout">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QCustomPlot" name="accelPlot" native="true" />
+           </item>
+          </layout>
+         </widget>
+         <widget class="QFrame" name="gyroWell">
+          <property name="well" stdset="0">
+           <bool>true</bool>
+          </property>
+          <layout class="QVBoxLayout" name="gyroWellLayout">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QCustomPlot" name="gyroPlot" native="true" />
+           </item>
+          </layout>
+         </widget>
+         <widget class="QFrame" name="magWell">
+          <property name="well" stdset="0">
+           <bool>true</bool>
+          </property>
+          <layout class="QVBoxLayout" name="magWellLayout">
+           <property name="leftMargin">
+            <number>4</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>4</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QCustomPlot" name="magPlot" native="true" />
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -55,10 +136,67 @@
       </attribute>
       <layout class="QVBoxLayout" name="layout3d">
        <item>
-        <widget class="QCheckBox" name="useYawBox">
-         <property name="text">
-          <string>Use Yaw (will drift)</string>
+        <widget class="QFrame" name="viewWell">
+         <property name="well" stdset="0">
+          <bool>true</bool>
          </property>
+         <layout class="QVBoxLayout" name="viewLayout">
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="yawLayout">
+            <property name="leftMargin">
+             <number>8</number>
+            </property>
+            <property name="topMargin">
+             <number>4</number>
+            </property>
+            <property name="rightMargin">
+             <number>8</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="anglesLabel">
+              <property name="muted" stdset="0">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="yawSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="useYawBox">
+              <property name="text">
+               <string>Use Yaw (will drift)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

@@ -24,6 +24,9 @@
 #include <QFileDialog>
 #include "utility.h"
 
+// Default poll rates in Hz of realtime data, app data, IMU data and BMS data
+static const double pollDefaults[] = {50.0, 20.0, 50.0, 10.0};
+
 Preferences::Preferences(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Preferences)
@@ -37,6 +40,11 @@ Preferences::Preferences(QWidget *parent) :
     ui->pathRtLogChooseButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->pathScriptOutputChooseButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->pathLocalLogChooseButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
+    ui->estopNoteIcon->setPixmap(Utility::getIcon("icons/About-96.png"));
+    ui->pollNoteIcon->setPixmap(Utility::getIcon("icons/About-96.png"));
+    ui->pollNoteLabel->setText(tr("Each rate can be set from %1 to %2 Hz. Defaults: RT %3, App %4, IMU %5, BMS %6 Hz.").
+                               arg(ui->pollRtDataBox->minimum()).arg(ui->pollRtDataBox->maximum()).
+                               arg(pollDefaults[0]).arg(pollDefaults[1]).arg(pollDefaults[2]).arg(pollDefaults[3]));
 
     ui->uiScaleBox->setValue(mSettings.value("app_scale_factor", 1.0).toDouble());
     ui->uiPlotWidthBox->setValue(mSettings.value("plot_line_width",4.0).toDouble());
@@ -44,10 +52,10 @@ Preferences::Preferences(QWidget *parent) :
     ui->pathScriptInputEdit->setText(mSettings.value("path_script_input", "./log").toString());
     ui->pathScriptOutputEdit->setText(mSettings.value("path_script_output", "./log").toString());
     ui->pathLocalLogEdit->setText(mSettings.value("path_local_log", "./log_local").toString());
-    ui->pollRtDataBox->setValue(mSettings.value("poll_rate_rt_data", 50.0).toDouble());
-    ui->pollAppDataBox->setValue(mSettings.value("poll_rate_app_data", 20.0).toDouble());
-    ui->pollImuDataBox->setValue(mSettings.value("poll_rate_imu_data", 50.0).toDouble());
-    ui->pollBmsDataBox->setValue(mSettings.value("poll_rate_bms_data", 10.0).toDouble());
+    ui->pollRtDataBox->setValue(mSettings.value("poll_rate_rt_data", pollDefaults[0]).toDouble());
+    ui->pollAppDataBox->setValue(mSettings.value("poll_rate_app_data", pollDefaults[1]).toDouble());
+    ui->pollImuDataBox->setValue(mSettings.value("poll_rate_imu_data", pollDefaults[2]).toDouble());
+    ui->pollBmsDataBox->setValue(mSettings.value("poll_rate_bms_data", pollDefaults[3]).toDouble());
     ui->darkModeBox->setChecked(Utility::isDarkMode());
     ui->estopTimeBox->setValue(mSettings.value("estop_ms", 5000).toInt());
 
@@ -56,6 +64,10 @@ Preferences::Preferences(QWidget *parent) :
     ui->reconnectCanBox->setChecked(mSettings.value("reconnectLastCan", true).toBool());
     ui->reduceLispBox->setChecked(mSettings.value("reduceLisp", false).toBool());
     ui->replMaxLineBox->setValue(mSettings.value("scripting/replMaxLines", 5000).toInt());
+
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this] {
+        QTimer::singleShot(0, this, &Preferences::fitToTab);
+    });
 
     saveSettingsChanged();
 }
@@ -111,7 +123,26 @@ void Preferences::showEvent(QShowEvent *event)
         ui->qmlUiAskBox->setChecked(mVesc->askQmlLoad());
         ui->showFwUpdateBox->setChecked(mVesc->showFwUpdateAvailable());
     }
+
+    QTimer::singleShot(0, this, &Preferences::fitToTab);
     event->accept();
+}
+
+void Preferences::fitToTab()
+{
+    // The dialog takes the height of the open tab, so that a short tab does not leave an empty window
+    QWidget *page = ui->tabWidget->currentWidget();
+    for (int i = 0;i < ui->tabWidget->count();i++) {
+        ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Preferred,
+                                                ui->tabWidget->widget(i) == page ?
+                                                    QSizePolicy::Preferred : QSizePolicy::Ignored);
+    }
+    ui->tabWidget->updateGeometry();
+    layout()->activate();
+
+    int pageHeight = page->hasHeightForWidth() ?
+                page->heightForWidth(page->width()) : page->minimumSizeHint().height();
+    resize(width(), height() - page->height() + pageHeight);
 }
 
 void Preferences::on_uiScaleBox_valueChanged(double arg1)
@@ -200,10 +231,10 @@ void Preferences::on_pollBmsDataBox_valueChanged(double arg1)
 
 void Preferences::on_pollRestoreButton_clicked()
 {
-    ui->pollRtDataBox->setValue(50.0);
-    ui->pollAppDataBox->setValue(20.0);
-    ui->pollImuDataBox->setValue(50.0);
-    ui->pollBmsDataBox->setValue(10.0);
+    ui->pollRtDataBox->setValue(pollDefaults[0]);
+    ui->pollAppDataBox->setValue(pollDefaults[1]);
+    ui->pollImuDataBox->setValue(pollDefaults[2]);
+    ui->pollBmsDataBox->setValue(pollDefaults[3]);
 }
 
 void Preferences::on_darkModeBox_toggled(bool checked)

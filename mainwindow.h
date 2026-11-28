@@ -242,6 +242,7 @@ private:
     PageDisplayTool *mPageDisplayTool;
     Preferences *mPreferences;
 
+    void setRunning(QWidget *cell);
     void addPageItem(QString name,
                      QString icon = "",
                      QString groupIcon = "",
@@ -251,6 +252,7 @@ private:
     void showPage(const QString &name);
     void reloadPages();
     void updateConfigChanges();
+    void setStatusState(const QString &state);
     void checkUdev();
 #ifdef Q_OS_LINUX
     bool waitProcess(QProcess &process, bool block = true, int timeoutMs = 300000);

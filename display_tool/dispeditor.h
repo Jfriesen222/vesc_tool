@@ -39,6 +39,8 @@ public:
     DisplayEdit *getEdit();
     QColor paletteColor(int ind);
     void setColors(int colors);
+    void addSideWidget(QWidget *widget);
+    void addEditorHeader(QWidget *widget);
 
 private slots:
     void on_saveCButton_clicked();

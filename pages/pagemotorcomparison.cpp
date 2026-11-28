@@ -37,7 +37,7 @@ PageMotorComparison::PageMotorComparison(QWidget *parent) :
     ui->qmlWidget->setClearColor(Utility::getAppQColor("normalBackground"));
 
     ui->testRunButton->setIcon(Utility::getIcon("icons/Process-96.png"));
-    ui->rescaleButton->setIcon(Utility::getIcon("icons/expand_off.png"));
+    ui->rescaleButton->setIcon(Utility::getIcon("icons/size_off.png"));
     ui->qmlChooseButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
     ui->qmlRunButton->setIcon(Utility::getIcon("icons/Circled Play-96.png"));
     ui->savePlotPdfButton->setIcon(Utility::getIcon("icons/Line Chart-96.png"));
@@ -51,20 +51,9 @@ PageMotorComparison::PageMotorComparison(QWidget *parent) :
     ui->m2LoadConfButton->setIcon(Utility::getIcon("icons/motor_up.png"));
     ui->m2ConfChooseButton->setIcon(Utility::getIcon("icons/Open Folder-96.png"));
 
-    QIcon mycon = QIcon(Utility::getIcon("icons/expand_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_off.png"), QIcon::Normal, QIcon::Off);
-    ui->zoomHButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/expand_v_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/expand_v_off.png"), QIcon::Normal, QIcon::Off);
-    ui->zoomVButton->setIcon(mycon);
-
-    mycon = QIcon(Utility::getIcon("icons/size_off.png"));
-    mycon.addPixmap(Utility::getIcon("icons/size_on.png"), QIcon::Normal, QIcon::On);
-    mycon.addPixmap(Utility::getIcon("icons/size_off.png"), QIcon::Normal, QIcon::Off);
-    ui->autoscaleButton->setIcon(mycon);
+    // The checked state shows as a raised button, so the icons stay the same
+    ui->zoomHButton->setIcon(Utility::getIcon("icons/expand_off.png"));
+    ui->zoomVButton->setIcon(Utility::getIcon("icons/expand_v_off.png"));
 
 
     mVesc = nullptr;
@@ -80,18 +69,16 @@ PageMotorComparison::PageMotorComparison(QWidget *parent) :
     mVerticalLine->setPen(QPen(Utility::getAppQColor("normalText")));
     mVerticalLinePosLast = -1.0;
 
-    ui->m1PlotTable->setColumnWidth(0, 140);
-    ui->m1PlotTable->setColumnWidth(1, 120);
-    ui->m2PlotTable->setColumnWidth(0, 140);
-    ui->m2PlotTable->setColumnWidth(1, 120);
+    // The name takes the room the value and plot scale columns leave
+    for (QTableWidget *table: {ui->m1PlotTable, ui->m2PlotTable}) {
+        table->verticalHeader()->hide();
+        table->horizontalHeader()->setStretchLastSection(false);
+        table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    }
 
-    QFont legendFont = font();
-    legendFont.setPointSize(9);
-
-    Utility::setPlotColors(ui->plot);
+    Utility::setPlotLegendRow(ui->plot);
     ui->plot->legend->setVisible(true);
-    ui->plot->legend->setFont(legendFont);
-    ui->plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom | Qt::AlignRight);
     ui->plot->xAxis->setLabel("Torque (Nm)");
 
     auto updateZoom = [&]() {
