@@ -969,18 +969,30 @@ QLabel[chip] {
     font-weight: 500;
 }
 
+/* As high as the tabs it stands beside */
 QLabel[chip="live"] {
     background: @positiveDim;
     color: @positiveText;
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 0px 12px 0px 7px;
-    min-height: 24px;
-    max-height: 24px;
+    min-height: 26px;
+    max-height: 26px;
+}
+
+MainWindow[compact="true"] QLabel[chip="live"] {
+    border-radius: 11px;
+    padding: 0px 9px 0px 5px;
+    min-height: 22px;
+    max-height: 22px;
 }
 
 /* In the corner of a tab bar it keeps clear of the edge of the page panel */
 QTabWidget > QLabel[chip="live"] {
-    margin: 0px 14px 8px 0px;
+    margin: 6px 14px 6px 0px;
+}
+
+MainWindow[compact="true"] QTabWidget > QLabel[chip="live"] {
+    margin: 4px 9px 4px 0px;
 }
 
 /* Buttons that belong together sit in a frame with the seg property; the checked ones are raised */

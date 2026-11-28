@@ -294,15 +294,16 @@ void PageRtData::timerSlot()
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     if (now - mRateStart >= 1000) {
         if (mRateCount > 0) {
-            // In a table the lamp and the text are centered on each other
+            // In a table the lamp and the text are centered on each other. A compact window has the rate only, so
+            // that the tabs beside it still fit.
             mLiveChip->setText(QString("<table cellspacing=\"0\" cellpadding=\"0\"><tr><td valign=\"middle\"><img src=\"%1desktop/icons/led_ok.png\" "
                                        "width=\"16\" height=\"16\"></td><td valign=\"middle\">&nbsp;%2</td></tr></table>").
-                               arg(Utility::getThemePath(), tr("Streaming · %1 Hz").arg(qRound(mRateCount * 1000.0 / (now - mRateStart)))));
+                               arg(Utility::getThemePath(), (mCompact ? tr("%1 Hz") : tr("Streaming · %1 Hz")).arg(qRound(mRateCount * 1000.0 / (now - mRateStart)))));
         }
         mRateCount = 0;
         mRateStart = now;
     }
-    mLiveChip->setVisible(now - mLastUpdateTime < 2000 && !mLiveChip->text().isEmpty() && !mCompact);
+    mLiveChip->setVisible(now - mLastUpdateTime < 2000 && !mLiveChip->text().isEmpty());
 
     if (mUpdateValPlot) {
         int dataSize = mTempMosVec.size();
